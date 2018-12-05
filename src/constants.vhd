@@ -39,6 +39,44 @@ package constants is
 	constant OPCODE_CUSTOM_3   : std_logic_vector(6 downto 0) := "1111011"; -- TODO: Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "1111111";
 
+	-- IMMEDIATE FUNCT3 ALU FUNCTIONS
+	constant FUNCT3_ADDI  : std_logic_vector(2 downto 0) := "000";
+	constant FUNCT3_SLTI  : std_logic_vector(2 downto 0) := "010";
+	constant FUNCT3_SLTIU : std_logic_vector(2 downto 0) := "011";
+	constant FUNCT3_XORI  : std_logic_vector(2 downto 0) := "100";
+	constant FUNCT3_ORI   : std_logic_vector(2 downto 0) := "110";
+	constant FUNCT3_ANDI  : std_logic_vector(2 downto 0) := "111";
+	constant FUNCT3_SLLI  : std_logic_vector(2 downto 0) := "001";
+	constant FUNCT3_SRLI  : std_logic_vector(2 downto 0) := "101";
+	constant FUNCT3_SRAI  : std_logic_vector(2 downto 0) := "101";
+	-- NORMAL FUNCT3 ALU FUNCTIONS
+	constant FUNCT3_ADD  : std_logic_vector(2 downto 0) := "000";
+	constant FUNCT3_SUB  : std_logic_vector(2 downto 0) := "000";
+	constant FUNCT3_SLL  : std_logic_vector(2 downto 0) := "001";
+	constant FUNCT3_SLT  : std_logic_vector(2 downto 0) := "010";
+	constant FUNCT3_SLTU : std_logic_vector(2 downto 0) := "011";
+	constant FUNCT3_XOR  : std_logic_vector(2 downto 0) := "100";
+	constant FUNCT3_SRL  : std_logic_vector(2 downto 0) := "101";
+	constant FUNCT3_SRA  : std_logic_vector(2 downto 0) := "101";
+	constant FUNCT3_OR   : std_logic_vector(2 downto 0) := "110";
+	constant FUNCT3_AND  : std_logic_vector(2 downto 0) := "111";
+	
+	-- IMMEDIATE FUNCT7 ALU FUNCTIONS
+	constant FUNCT7_SLLI  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SRLI  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SRAI  : std_logic_vector(6 downto 0) := "0100000";
+	-- NORMAL FUNCT7 ALU FUNCTIONS
+	constant FUNCT7_ADD  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SUB  : std_logic_vector(6 downto 0) := "0100000";
+	constant FUNCT7_SLL  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SLT  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SLTU : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_XOR  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SRL  : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_SRA  : std_logic_vector(6 downto 0) := "0100000";
+	constant FUNCT7_OR   : std_logic_vector(6 downto 0) := "0000000";
+	constant FUNCT7_AND  : std_logic_vector(6 downto 0) := "0000000";
+
 end package constants;
 
 package body constants is
