@@ -34,6 +34,7 @@ begin
 			r1 <= registers(to_integer(unsigned(rs1)));
 			r2 <= registers(to_integer(unsigned(rs2)));
 		end if;
+
 	end process;
 
 end architecture register_file_arch;

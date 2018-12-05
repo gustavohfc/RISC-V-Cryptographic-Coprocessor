@@ -29,8 +29,11 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk         => clk,
-			instruction => instruction
+			write_enable_in => '0', --TODO
+			write_data      => (others => '0'), --TODO
+			clk             => clk,
+			instruction_in  => instruction,
+			instruction_out => instruction
 		);
 
 end RISCV_arch;
