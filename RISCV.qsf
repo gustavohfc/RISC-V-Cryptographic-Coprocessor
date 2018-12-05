@@ -57,17 +57,19 @@ set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 
 set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
 set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
 set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH RISCV_tb -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME RISCV_tb -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id RISCV_tb
+set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 ns" -section_id RISCV_tb
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME RISCV_tb -section_id RISCV_tb
+set_global_assignment -name EDA_TEST_BENCH_FILE testbench/RISCV_tb.vhd -section_id RISCV_tb
+set_global_assignment -name VHDL_FILE src/ALU.vhd
+set_global_assignment -name VHDL_FILE src/ALU_control.vhd
 set_global_assignment -name QIP_FILE src/instruction_memory.qip
 set_global_assignment -name VHDL_FILE src/mux4.vhd
 set_global_assignment -name VHDL_FILE src/RISCV.vhd
 set_global_assignment -name VHDL_FILE src/stage_IF.vhd
 set_global_assignment -name VHDL_FILE src/PC.vhd
 set_global_assignment -name VHDL_FILE src/adder.vhd
-set_global_assignment -name EDA_TEST_BENCH_NAME RISCV_tb -section_id eda_simulation
-set_global_assignment -name EDA_DESIGN_INSTANCE_NAME NA -section_id RISCV_tb
-set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 ns" -section_id RISCV_tb
-set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME RISCV_tb -section_id RISCV_tb
-set_global_assignment -name EDA_TEST_BENCH_FILE testbench/RISCV_tb.vhd -section_id RISCV_tb
 set_global_assignment -name VHDL_FILE src/constants.vhd
 set_global_assignment -name VHDL_FILE src/stage_ID.vhd
 set_global_assignment -name VHDL_FILE src/register_file.vhd
