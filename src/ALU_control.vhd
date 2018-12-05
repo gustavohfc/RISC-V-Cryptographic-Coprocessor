@@ -38,6 +38,7 @@ begin
 						case funct7 is
 							when FUNCT7_SRLI => ALU_function <= ALU_SRL;
 							when FUNCT7_SRAI => ALU_function <= ALU_SRA;
+							when others => ALU_function <= ALU_ADD;
 						end case;
 					when others => ALU_function <= ALU_ADD;
 				end case;
@@ -48,6 +49,7 @@ begin
 						case funct7 is
 							when FUNCT7_ADD => ALU_function <= ALU_ADD;
 							when FUNCT7_SUB => ALU_function <= ALU_SUB;
+							when others => ALU_function <= ALU_ADD;
 						end case;
 					when FUNCT3_SLL  => ALU_function <= ALU_SLL;
 					when FUNCT3_SLT  => ALU_function <= ALU_SLT;
@@ -57,12 +59,14 @@ begin
 						case funct7 is
 							when FUNCT7_SRL => ALU_function <= ALU_SRL;
 							when FUNCT7_SRA => ALU_function <= ALU_SRA;
+							when others => ALU_function <= ALU_ADD;
 						end case;
 					when FUNCT3_OR   => ALU_function <= ALU_OR;
 					when FUNCT3_AND  => ALU_function <= ALU_AND;
 
 					when others => ALU_function <= ALU_ADD;
 				end case;
+				when others => ALU_function <= ALU_ADD;
 		end case;
 
 	end process control;

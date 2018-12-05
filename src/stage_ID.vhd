@@ -19,7 +19,7 @@ entity stage_ID is
 end entity stage_ID;
 
 architecture stage_ID_arch of stage_ID is
-	signal rs1, rs2, rd     : std_logic_vector(4 downto 0);
+	signal rs1, rs2, rd     : std_logic_vector(4 downto 0) := (others => '0');
 	signal r2, immediate    : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_select       : std_logic;
 	signal instruction_type : instruction_type;

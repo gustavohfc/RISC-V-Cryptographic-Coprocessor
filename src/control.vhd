@@ -53,6 +53,10 @@ begin
 			when OPCODE_JAL =>
 				instruction_type <= J_type;
 				ALU_select <= ULA_SELECT_IMM;
+				
+			when others =>
+				instruction_type <= J_type;
+				ALU_select <= ULA_SELECT_IMM;
 		end case;
 	end process;
 
