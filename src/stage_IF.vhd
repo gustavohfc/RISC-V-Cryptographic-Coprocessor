@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 entity stage_IF is
-	generic(WSIZE : natural := 32);
+	generic(WSIZE : natural);
 
 	port(
 		clk         : in  std_logic;

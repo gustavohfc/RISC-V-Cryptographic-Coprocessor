@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 
 entity mux4 is
-	generic(WSIZE : natural := 32);
+	generic(WSIZE : natural);
 	
 	port(
 		S              : in  std_logic_vector(1 downto 0);
