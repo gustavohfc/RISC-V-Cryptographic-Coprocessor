@@ -76,6 +76,23 @@ package constants is
 	constant FUNCT7_SRA  : std_logic_vector(6 downto 0) := "0100000";
 	constant FUNCT7_OR   : std_logic_vector(6 downto 0) := "0000000";
 	constant FUNCT7_AND  : std_logic_vector(6 downto 0) := "0000000";
+	
+	type FUNCTION_TYPE is (
+			ALU_ADD  ,
+			ALU_SUB  ,
+			ALU_SLL  ,
+			ALU_SLT  ,
+			ALU_SLTU ,
+			ALU_XOR  ,
+			ALU_SRL  ,
+			ALU_SRA  ,
+			ALU_OR   ,
+			ALU_AND  ,
+			
+			ALU_SLLI  ,
+			ALU_SRLI  ,
+			ALU_SRAI  
+			);
 
 end package constants;
 
