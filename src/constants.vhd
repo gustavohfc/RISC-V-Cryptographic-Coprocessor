@@ -5,6 +5,9 @@ package constants is
 	-- Configuration
 	constant WORD_SIZE : integer := 32;
 
+	constant TRUE  : std_logic := '1';
+	constant FALSE : std_logic := '0';
+
 	-- Opcodes
 	constant OPCODE_LOAD       : std_logic_vector(6 downto 0) := "0000011"; -- TODO: Not implemented
 	constant OPCODE_LOAD_FP    : std_logic_vector(6 downto 0) := "0000111"; -- TODO: Not implemented
@@ -76,23 +79,22 @@ package constants is
 	constant FUNCT7_SRA  : std_logic_vector(6 downto 0) := "0100000";
 	constant FUNCT7_OR   : std_logic_vector(6 downto 0) := "0000000";
 	constant FUNCT7_AND  : std_logic_vector(6 downto 0) := "0000000";
-	
+
 	type FUNCTION_TYPE is (
-			ALU_ADD  ,
-			ALU_SUB  ,
-			ALU_SLL  ,
-			ALU_SLT  ,
-			ALU_SLTU ,
-			ALU_XOR  ,
-			ALU_SRL  ,
-			ALU_SRA  ,
-			ALU_OR   ,
-			ALU_AND  ,
-			
-			ALU_SLLI  ,
-			ALU_SRLI  ,
-			ALU_SRAI  
-			);
+		ALU_ADD,
+		ALU_SUB,
+		ALU_SLL,
+		ALU_SLT,
+		ALU_SLTU,
+		ALU_XOR,
+		ALU_SRL,
+		ALU_SRA,
+		ALU_OR,
+		ALU_AND,
+		ALU_SLLI,
+		ALU_SRLI,
+		ALU_SRAI
+	);
 
 	-- Instructions type
 	type instruction_type is (

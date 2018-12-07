@@ -8,9 +8,15 @@ entity stage_EX is
 	generic(WSIZE : natural);
 
 	port(
-		clk            : in std_logic;
-		ALU_A, ALU_B   : in std_logic_vector((WSIZE - 1) downto 0);
-		instruction_in : in std_logic_vector((WSIZE - 1) downto 0)
+		clk                                : in  std_logic;
+		instruction_in                     : in  std_logic_vector((WSIZE - 1) downto 0);
+		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
+		wdata_in                           : in  std_logic_vector((WSIZE - 1) downto 0);
+		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
+		ALU_A, ALU_B                       : in  std_logic_vector((WSIZE - 1) downto 0);
+		ALU_Z                              : out std_logic_vector((WSIZE - 1) downto 0);
+		wren_memory_in, wren_register_in   : in  std_logic;
+		wren_memory_out, wren_register_out : out std_logic
 	);
 end entity stage_EX;
 
@@ -42,5 +48,16 @@ begin
 			Z            => Z,
 			zero         => zero
 		);
+
+	process(clk) is
+	begin
+		if rising_edge(clk) then
+			instruction_out   <= instruction_in;
+			wdata_out         <= wdata_in;
+			wren_memory_out   <= wren_memory_in;
+			wren_register_out <= wren_register_in;
+			ALU_Z             <= Z;
+		end if;
+	end process;
 
 end architecture stage_EX_arch;
