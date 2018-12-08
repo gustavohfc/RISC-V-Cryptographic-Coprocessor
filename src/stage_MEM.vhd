@@ -23,7 +23,8 @@ end entity stage_MEM;
 architecture stage_MEM_arch of stage_MEM is
 
 	signal data, rdata        : std_logic_vector((WSIZE - 1) downto 0);
-	signal mux4_out, mux8_out : std_logic_vector((WSIZE - 1) downto 0);
+	signal mux8_out : std_logic_vector((WSIZE - 1) downto 0);
+	signal mux4_out : std_logic_vector(((WSIZE/8)-1) downto 0);
 
 	alias funct3 : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
 begin
@@ -40,7 +41,7 @@ begin
 
 	mux4_inst : entity work.mux4
 		generic map(
-			WSIZE => 4
+			WSIZE => (WSIZE/8)
 		)
 		port map(
 			S  => funct3(1 downto 0),

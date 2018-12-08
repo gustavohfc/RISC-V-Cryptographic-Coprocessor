@@ -6,8 +6,8 @@ entity mux4 is
 	
 	port(
 		S              : in  std_logic_vector(1 downto 0);
-		I0, I1, I2, I3 : in  std_logic_vector(WSIZE - 1 downto 0);
-		O              : out std_logic_vector(WSIZE - 1 downto 0)
+		I0, I1, I2, I3 : in  std_logic_vector((WSIZE - 1) downto 0);
+		O              : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end mux4;
 

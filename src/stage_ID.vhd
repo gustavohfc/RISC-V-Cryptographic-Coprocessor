@@ -22,11 +22,13 @@ entity stage_ID is
 end entity stage_ID;
 
 architecture stage_ID_arch of stage_ID is
-	signal rs1, rs2                                          : std_logic_vector(4 downto 0) := (others => '0');
 	signal r2, immediate                                     : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_select, wren_memory, wren_register, WB_select : std_logic;
 	signal instruction_type                                  : instruction_type;
 	signal ALU_A, ALU_B                                      : std_logic_vector((WSIZE - 1) downto 0);
+	
+	alias rs1  : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
+	alias rs2  : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
 
 begin
 
