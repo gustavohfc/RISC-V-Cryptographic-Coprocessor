@@ -11,20 +11,22 @@ entity stage_ID is
 		clk                                : in  std_logic;
 		instruction_in                     : in  std_logic_vector((WSIZE - 1) downto 0);
 		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
-		write_back_data                    : in  std_logic_vector((WSIZE - 1) downto 0);
-		wren_register_in   : in  std_logic;
+		WB_data                            : in  std_logic_vector((WSIZE - 1) downto 0);
+		WB_address                         : in  std_logic_vector(4 downto 0);
+		wren_register_in                   : in  std_logic;
 		wren_memory_out, wren_register_out : out std_logic;
+		WB_select_out                      : out std_logic;
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end entity stage_ID;
 
 architecture stage_ID_arch of stage_ID is
-	signal rs1, rs2, rd                           : std_logic_vector(4 downto 0) := (others => '0');
-	signal r2, immediate                          : std_logic_vector((WSIZE - 1) downto 0);
-	signal ALU_select, wren_memory, wren_register : std_logic;
-	signal instruction_type                       : instruction_type;
-	signal ALU_A, ALU_B                           : std_logic_vector((WSIZE - 1) downto 0);
+	signal rs1, rs2                                          : std_logic_vector(4 downto 0) := (others => '0');
+	signal r2, immediate                                     : std_logic_vector((WSIZE - 1) downto 0);
+	signal ALU_select, wren_memory, wren_register, WB_select : std_logic;
+	signal instruction_type                                  : instruction_type;
+	signal ALU_A, ALU_B                                      : std_logic_vector((WSIZE - 1) downto 0);
 
 begin
 
@@ -37,7 +39,8 @@ begin
 			instruction_type => instruction_type,
 			ALU_select       => ALU_select,
 			wren_memory      => wren_memory,
-			wren_register    => wren_register
+			wren_register    => wren_register,
+			WB_select        => WB_select
 		);
 
 	registers : entity work.register_file
@@ -49,8 +52,8 @@ begin
 			write_enable => wren_register_in,
 			rs1          => rs1,
 			rs2          => rs2,
-			rd           => rd,
-			write_data   => write_back_data,
+			rd           => WB_address,
+			write_data   => WB_data,
 			r1           => ALU_A,
 			r2           => r2
 		);
@@ -85,6 +88,7 @@ begin
 			wdata_out         <= r2;
 			wren_memory_out   <= wren_memory;
 			wren_register_out <= wren_register;
+			WB_select_out     <= WB_select;
 		end if;
 	end process;
 

@@ -8,15 +8,15 @@ entity stage_EX is
 	generic(WSIZE : natural);
 
 	port(
-		clk                                : in  std_logic;
-		instruction_in                     : in  std_logic_vector((WSIZE - 1) downto 0);
-		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
-		wdata_in                           : in  std_logic_vector((WSIZE - 1) downto 0);
-		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
-		ALU_A, ALU_B                       : in  std_logic_vector((WSIZE - 1) downto 0);
-		ALU_Z                              : out std_logic_vector((WSIZE - 1) downto 0);
-		wren_memory_in, wren_register_in   : in  std_logic;
-		wren_memory_out, wren_register_out : out std_logic
+		clk                                               : in  std_logic;
+		instruction_in                                    : in  std_logic_vector((WSIZE - 1) downto 0);
+		instruction_out                                   : out std_logic_vector((WSIZE - 1) downto 0);
+		wdata_in                                          : in  std_logic_vector((WSIZE - 1) downto 0);
+		wdata_out                                         : out std_logic_vector((WSIZE - 1) downto 0);
+		ALU_A, ALU_B                                      : in  std_logic_vector((WSIZE - 1) downto 0);
+		ALU_Z                                             : out std_logic_vector((WSIZE - 1) downto 0);
+		wren_memory_in, wren_register_in, WB_select_in    : in  std_logic;
+		wren_memory_out, wren_register_out, WB_select_out : out std_logic
 	);
 end entity stage_EX;
 
@@ -56,6 +56,7 @@ begin
 			wdata_out         <= wdata_in;
 			wren_memory_out   <= wren_memory_in;
 			wren_register_out <= wren_register_in;
+			WB_select_out     <= WB_select_in;
 			ALU_Z             <= Z;
 		end if;
 	end process;

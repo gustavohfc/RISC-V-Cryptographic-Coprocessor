@@ -5,9 +5,6 @@ package constants is
 	-- Configuration
 	constant WORD_SIZE : integer := 32;
 
-	constant TRUE  : std_logic := '1';
-	constant FALSE : std_logic := '0';
-
 	-- Opcodes
 	constant OPCODE_LOAD       : std_logic_vector(6 downto 0) := "0000011"; -- TODO: Not implemented
 	constant OPCODE_LOAD_FP    : std_logic_vector(6 downto 0) := "0000111"; -- TODO: Not implemented
@@ -107,8 +104,12 @@ package constants is
 	);
 
 	-- ULA selector
-	constant ULA_SELECT_IMM : std_logic := '0';
-	constant ULA_SELECT_RS2 : std_logic := '1';
+	constant ALU_SELECT_IMM : std_logic := '0';
+	constant ALU_SELECT_RS2 : std_logic := '1';
+	
+	-- WriteBack selector
+	constant WB_SELECT_ALU : std_logic := '0';
+	constant WB_SELECT_MEM : std_logic := '1';
 
 end package constants;
 

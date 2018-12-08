@@ -15,8 +15,6 @@ entity ALU_control is
 end entity ALU_control;
 
 architecture ALU_control_arch of ALU_control is
-	constant FSIZE : natural := 4;
-
 	alias opcode : std_logic_vector(6 downto 0) is instruction(6 downto 0);
 	alias funct3 : std_logic_vector(2 downto 0) is instruction(14 downto 12);
 	alias funct7 : std_logic_vector(6 downto 0) is instruction(31 downto 25);
