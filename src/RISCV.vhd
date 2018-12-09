@@ -57,7 +57,7 @@ begin
 
 	mux4_FPGA : entity work.mux4
 		generic map(WSIZE => WSIZE)
-		port map(MUX_FPGA_select, PC4, instruction_IF_ID, BUBBLE, reg_display, MUX_FPGA_out);
+		port map(MUX_FPGA_select, PC_IF_ID, instruction_IF_ID, BUBBLE, reg_display, MUX_FPGA_out);
 	-- cada portmap ira gerar os sinais que serao enviados para o FPGA
 	HEX_0 : entity work.display7seg_decoder
 		port map(MUX_FPGA_out(31 downto 28), hex7aux);

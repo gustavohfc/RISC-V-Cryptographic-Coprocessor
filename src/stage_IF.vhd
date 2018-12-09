@@ -83,7 +83,7 @@ begin
 	begin
 		if rising_edge(clk) then
 			PC_IF_ID <= current_pc;
-		else
+		elsif falling_edge(clk) then
 			if next_pc_select = PC_SELECT_PLUS4 then
 				instruction_out <= current_instruction;
 			else
