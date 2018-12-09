@@ -4,6 +4,9 @@ use ieee.std_logic_1164.all;
 package constants is
 	-- Configuration
 	constant WORD_SIZE : natural := 32;
+	
+	-- Breg typedef
+	TYPE ARRAY_32X32 is array (0 to WORD_SIZE - 1) of std_logic_vector(WORD_SIZE - 1 downto 0);
 
 	-- Opcodes
 	constant OPCODE_LOAD       : std_logic_vector(6 downto 0) := "0000011"; -- TODO: Not implemented

@@ -1,24 +1,26 @@
 LIBRARY ieee;
 USE ieee.std_logic_1164.all;
 
+use work.constants.all;
+
 ENTITY RISCV_tb IS
 END RISCV_tb;
 
 ARCHITECTURE RISCV_tb_arch OF RISCV_tb IS
-	constant clk_period : time      := 20 ps;
-	signal clk          : std_logic := '1';
-	signal clk_unset    : std_logic := '0';
-
-	COMPONENT RISCV
-		PORT(
-			clk         : IN  STD_LOGIC
-		);
-	END COMPONENT;
+	constant clk_period    : time                                     := 20 ps;
+	signal clk             : std_logic                                := '1';
+	signal clk_unset       : std_logic                                := '0';
+	signal instruction     : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
+	signal registers_array : ARRAY_32X32;
 
 BEGIN
-	i1 : RISCV
-		PORT MAP(
-			clk         => clk
+	riscv : entity work.RISCV
+		generic map(WSIZE => WORD_SIZE)
+
+		port map(
+			clk             => clk,
+			instruction     => instruction,
+			registers_array => registers_array
 		);
 
 	clk <= not clk after clk_period / 2 when clk_unset = '0' else '0';

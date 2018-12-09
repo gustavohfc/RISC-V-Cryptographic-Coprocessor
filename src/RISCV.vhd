@@ -8,8 +8,9 @@ entity RISCV is
 	generic(WSIZE : natural := WORD_SIZE);
 
 	port(
-		clk : in std_logic;
-		clk2 : out std_logic
+		clk             : in    std_logic;
+		instruction     : out   std_logic_vector(WSIZE - 1 downto 0);
+		registers_array : out   ARRAY_32X32
 	);
 end RISCV;
 
@@ -59,7 +60,8 @@ begin
 			immediate_out     => immediate,
 			rs1_out           => rs1,
 			PC4               => PC4,
-			next_pc_select    => next_pc_select
+			next_pc_select    => next_pc_select,
+			registers_array   => registers_array
 		);
 
 	stage_EX_inst : entity work.stage_EX
@@ -114,7 +116,6 @@ begin
 			WB_data_out       => WB_data
 		);
 		
-	clk2 <= clk;
-		
+	instruction <= instruction_IF_ID;
 
 end RISCV_arch;

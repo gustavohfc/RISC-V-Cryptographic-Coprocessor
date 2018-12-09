@@ -20,7 +20,8 @@ entity stage_ID is
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
 		PC4                                : in  std_logic_vector((WSIZE - 1) downto 0);
-		next_pc_select                     : out std_logic_vector(1 downto 0)
+		next_pc_select                     : out std_logic_vector(1 downto 0);
+		registers_array                    : out ARRAY_32X32
 	);
 end entity stage_ID;
 
@@ -58,14 +59,15 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk          => clk,
-			write_enable => wren_register_in,
-			rs1          => rs1,
-			rs2          => rs2,
-			rd           => WB_address,
-			write_data   => WB_data,
-			r1           => r1,
-			r2           => r2
+			clk             => clk,
+			write_enable    => wren_register_in,
+			rs1             => rs1,
+			rs2             => rs2,
+			rd              => WB_address,
+			write_data      => WB_data,
+			r1              => r1,
+			r2              => r2,
+			registers_array => registers_array
 		);
 
 	imm_decoder : entity work.immediate_decoder
