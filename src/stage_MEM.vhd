@@ -35,6 +35,8 @@ architecture stage_MEM_arch of stage_MEM is
 	alias address : std_logic_vector(7 downto 0) is ALU_Z_in(7 downto 0);
 	alias address_div4 : std_logic_vector(7 downto 0) is ALU_Z_in(9 downto 2);
 
+	signal not_clk : std_logic;
+
 begin
 
 	rdata_byte_signed   <= ((WSIZE - 1) downto (WSIZE / 4) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 4) - 1) downto 0);
@@ -42,12 +44,13 @@ begin
 	rdata_byte_unsigned <= ((WSIZE - 1) downto (WSIZE / 4) => '0') & rdata(((WSIZE / 4) - 1) downto 0);
 	rdata_half_unsigend <= ((WSIZE - 1) downto (WSIZE / 2) => '0') & rdata(((WSIZE / 2) - 1) downto 0);
 
+	not_clk <= not clk;
 
 	data_memory_inst : entity work.data_memory
 		port map(
 			address => address_div4,
 			byteena => byteena,
-			clock   => clk,
+			clock   => not_clk, -- Update the memory input on the falling edge
 			data    => wdata_in,
 			wren    => wren_memory_in,
 			q       => rdata
