@@ -20,13 +20,8 @@ architecture RTL of stage_WB is
 
 begin
 
-	process(clk) is
-	begin
-		if rising_edge(clk) then
-			WB_address        <= instruction_in(11 downto 7);
-			WB_data_out       <= data_in;
-			wren_register_out <= wren_register_in;
-		end if;
-	end process;
+	WB_address        <= instruction_in(11 downto 7);
+	WB_data_out       <= data_in;
+	wren_register_out <= wren_register_in;
 
 end architecture RTL;

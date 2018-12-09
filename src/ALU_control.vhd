@@ -31,11 +31,11 @@ begin
 					when FUNCT3_XORI  => ALU_function <= ALU_XOR;
 					when FUNCT3_ORI   => ALU_function <= ALU_OR;
 					when FUNCT3_ANDI  => ALU_function <= ALU_AND;
-					when FUNCT3_SLLI  => ALU_function <= ALU_SLL;
+					when FUNCT3_SLLI  => ALU_function <= ALU_SLLI;
 					when FUNCT3_SRLI =>
 						case funct7 is
-							when FUNCT7_SRLI => ALU_function <= ALU_SRL;
-							when FUNCT7_SRAI => ALU_function <= ALU_SRA;
+							when FUNCT7_SRLI => ALU_function <= ALU_SRLI;
+							when FUNCT7_SRAI => ALU_function <= ALU_SRAI;
 							when others => ALU_function <= ALU_ADD;
 						end case;
 					when others => ALU_function <= ALU_ADD;

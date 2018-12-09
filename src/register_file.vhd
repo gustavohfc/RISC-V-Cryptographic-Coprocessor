@@ -19,20 +19,20 @@ architecture register_file_arch of register_file is
 	signal registers : ARRAY_32X32 := ((others => (others => '0')));
 
 begin
+	r1 <= registers(to_integer(unsigned(rs1)));
+	r2 <= registers(to_integer(unsigned(rs2)));
 
-	process(clk) is
+	     process(clk) is
 		variable i : natural;
 
 	begin
-		if (rising_edge(clk)) then
+		if (falling_edge(clk)) then
 			if (write_enable = '1') then
 				i := to_integer(unsigned(rd));
 				if (i /= 0) then
 					registers(i) <= write_data;
 				end if;
 			end if;
-			r1 <= registers(to_integer(unsigned(rs1)));
-			r2 <= registers(to_integer(unsigned(rs2)));
 		end if;
 
 	end process;
