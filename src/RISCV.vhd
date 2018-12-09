@@ -17,7 +17,8 @@ end RISCV;
 architecture RISCV_arch of RISCV is
 	signal instruction_IF_ID, instruction_ID_EX, instruction_EX_MEM, instruction_MEM_WB : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_A, ALU_B, ALU_Z, wdata_ID_EX, wdata_EX_MEM                               : std_logic_vector((WSIZE - 1) downto 0);
-	signal WB_data, data_MEM_WB, immediate, PC4, rs1                                    : std_logic_vector((WSIZE - 1) downto 0);
+	signal WB_data, data_MEM_WB, immediate, rs1                                         : std_logic_vector((WSIZE - 1) downto 0);
+	signal PC_IF_ID                                                                     : std_logic_vector((WSIZE - 1) downto 0);
 
 	signal WB_address     : std_logic_vector(4 downto 0);
 	signal next_pc_select : std_logic_vector(1 downto 0);
@@ -36,8 +37,8 @@ begin
 			immediate      => immediate,
 			rs1            => rs1,
 			next_pc_select => next_pc_select,
-			instruction    => instruction_IF_ID,
-			PC4            => PC4
+			instruction_out => instruction_IF_ID,
+			PC_IF_ID_out   => PC_IF_ID
 		);
 
 	stage_ID_inst : entity work.stage_ID
@@ -59,7 +60,7 @@ begin
 			ALU_B_out         => ALU_B,
 			immediate_out     => immediate,
 			rs1_out           => rs1,
-			PC4               => PC4,
+			PC_IF_ID          => PC_IF_ID,
 			next_pc_select    => next_pc_select,
 			registers_array   => registers_array
 		);

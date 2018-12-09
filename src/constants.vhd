@@ -113,11 +113,12 @@ package constants is
 
 	-- ULA selector
 	constant ALUA_SELECT_RS1    : std_logic_vector(1 downto 0) := "00";
-	constant ALUA_SELECT_PC4    : std_logic_vector(1 downto 0) := "01";
+	constant ALUA_SELECT_PC     : std_logic_vector(1 downto 0) := "01";
 	constant ALUA_SELECT_BUBBLE : std_logic_vector(1 downto 0) := "11";
 
 	constant ALUB_SELECT_RS2    : std_logic_vector(1 downto 0) := "00";
 	constant ALUB_SELECT_IMM    : std_logic_vector(1 downto 0) := "01";
+	constant ALUB_SELECT_4      : std_logic_vector(1 downto 0) := "10";
 	constant ALUB_SELECT_BUBBLE : std_logic_vector(1 downto 0) := "11";
 
 	-- WriteBack selector

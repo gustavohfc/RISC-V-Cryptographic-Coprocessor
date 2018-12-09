@@ -19,8 +19,9 @@ entity stage_ID is
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
-		PC4                                : in  std_logic_vector((WSIZE - 1) downto 0);
+		PC_IF_ID                           : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                     : out std_logic_vector(1 downto 0);
+		next_pc_base                       : out std_logic_vector((WSIZE - 1) downto 0);
 		registers_array                    : out ARRAY_32X32
 	);
 end entity stage_ID;
@@ -87,7 +88,7 @@ begin
 		port map(
 			S  => ALUA_select,
 			I0 => r1,
-			I1 => PC4,
+			I1 => PC_IF_ID,
 			I2 => BUBBLE,
 			I3 => BUBBLE,
 			O  => mux_ALUA_out
@@ -101,7 +102,7 @@ begin
 			S  => ALUB_select,
 			I0 => r2,
 			I1 => immediate,
-			I2 => BUBBLE,
+			I2 => std_logic_vector(to_unsigned(4, WSIZE)),
 			I3 => BUBBLE,
 			O  => mux_ALUB_out
 		);

@@ -81,8 +81,8 @@ begin
 
 			when OPCODE_JALR =>
 				instruction_type <= I_type;
-				ALUA_select      <= ALUA_SELECT_PC4;
-				ALUB_select      <= ALUB_SELECT_BUBBLE;
+				ALUA_select      <= ALUA_SELECT_PC;
+				ALUB_select      <= ALUB_SELECT_4;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
@@ -90,8 +90,8 @@ begin
 
 			when OPCODE_JAL =>
 				instruction_type <= J_type;
-				ALUA_select      <= ALUA_SELECT_PC4;
-				ALUB_select      <= ALUB_SELECT_BUBBLE;
+				ALUA_select      <= ALUA_SELECT_PC;
+				ALUB_select      <= ALUB_SELECT_4;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;

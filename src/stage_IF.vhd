@@ -2,23 +2,27 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.constants.all;
+
 entity stage_IF is
 	generic(WSIZE : natural);
 
 	port(
-		clk              : in  std_logic;
-		immediate, rs1   : in  std_logic_vector((WSIZE - 1) downto 0);
-		next_pc_select   : in  std_logic_vector(1 downto 0);
-		instruction, PC4 : out std_logic_vector((WSIZE - 1) downto 0)
+		clk                           : in  std_logic;
+		immediate, rs1                : in  std_logic_vector((WSIZE - 1) downto 0);
+		next_pc_select                : in  std_logic_vector(1 downto 0);
+		instruction_out, PC_IF_ID_out : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end stage_IF;
 
 architecture stage_IF_arch of stage_IF is
-	signal current_pc, next_pc, pc_plus_4, pc_plus_immediate, jalr_result : std_logic_vector((WSIZE - 1) downto 0);
-	signal jalr_result0                                                   : std_logic_vector((WSIZE - 1) downto 0);
+	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
+	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
+	signal current_instruction                      : std_logic_vector((WSIZE - 1) downto 0);
 
 begin
-	PC4          <= pc_plus_4;
+	PC_IF_ID_out <= PC_IF_ID;
+
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
 	PC : entity work.PC
@@ -42,9 +46,9 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			a      => current_pc,
+			a      => PC_IF_ID,
 			b      => immediate,
-			result => pc_plus_immediate
+			result => jal_result
 		);
 
 	adder_jalr : entity work.adder
@@ -62,7 +66,7 @@ begin
 		port map(
 			S  => next_pc_select,
 			I0 => pc_plus_4,
-			I1 => pc_plus_immediate,
+			I1 => jal_result,
 			I2 => jalr_result0,
 			I3 => (others => '0'),      --TODO
 			O  => next_pc
@@ -72,7 +76,20 @@ begin
 		port map(
 			address => current_pc(9 downto 2),
 			clock   => clk,
-			q       => instruction
+			q       => current_instruction
 		);
+
+	process(clk) is
+	begin
+		if rising_edge(clk) then
+			PC_IF_ID <= current_pc;
+		else
+			if next_pc_select = PC_SELECT_PLUS4 then
+				instruction_out <= current_instruction;
+			else
+				instruction_out <= BUBBLE;
+			end if;
+		end if;
+	end process;
 
 end stage_IF_arch;
