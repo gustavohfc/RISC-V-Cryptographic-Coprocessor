@@ -33,6 +33,7 @@ architecture stage_MEM_arch of stage_MEM is
 
 	alias funct3  : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
 	alias address : std_logic_vector(7 downto 0) is ALU_Z_in(7 downto 0);
+	alias address_div4 : std_logic_vector(7 downto 0) is ALU_Z_in(9 downto 2);
 
 begin
 
@@ -44,14 +45,14 @@ begin
 
 	data_memory_inst : entity work.data_memory
 		port map(
-			address => address,
+			address => address_div4,
 			byteena => byteena,
 			clock   => clk,
 			data    => wdata_in,
 			wren    => wren_memory_in,
 			q       => rdata
 		);
-		
+
 	byteena_decoder_inst : entity work.byteena_decoder
 		generic map(
 			WSIZE => WSIZE
@@ -61,7 +62,6 @@ begin
 			address => address,
 			byteena => byteena
 		);
-	
 
 	mux8_inst : entity work.mux8
 		generic map(
