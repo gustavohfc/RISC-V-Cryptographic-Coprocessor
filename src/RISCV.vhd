@@ -22,7 +22,7 @@ end RISCV;
 
 architecture RISCV_arch of RISCV is
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
-	signal clk                                                                    : std_logic;
+	signal clk, clk_out                                                           : std_logic;
 	signal registers_array                                                        : ARRAY_32X32;
 	signal MUX_FPGA_out, reg_display                                              : std_logic_vector(31 downto 0);
 	signal hex0aux, hex1aux, hex2aux, hex3aux, hex4aux, hex5aux, hex6aux, hex7aux : std_logic_vector(7 downto 0);
@@ -83,8 +83,9 @@ begin
 		port map(
 			clk    => clk50,
 			button => clk_key,
-			result => clk
+			result => clk_out
 		);
+	clk <= not clk_out;
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
 	stage_IF_inst : entity work.stage_IF
@@ -92,12 +93,12 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk            => clk,
-			immediate      => immediate,
-			rs1            => rs1,
-			next_pc_select => next_pc_select,
+			clk             => clk,
+			immediate       => immediate,
+			rs1             => rs1,
+			next_pc_select  => next_pc_select,
 			instruction_out => instruction_IF_ID,
-			PC_IF_ID_out   => PC_IF_ID
+			PC_IF_ID_out    => PC_IF_ID
 		);
 
 	stage_ID_inst : entity work.stage_ID
