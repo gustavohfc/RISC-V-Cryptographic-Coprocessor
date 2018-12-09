@@ -15,9 +15,11 @@ end stage_IF;
 
 architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, pc_plus_immediate, jalr_result : std_logic_vector((WSIZE - 1) downto 0);
+	signal jalr_result0                                                   : std_logic_vector((WSIZE - 1) downto 0);
 
 begin
-	PC4 <= pc_plus_4;
+	PC4          <= pc_plus_4;
+	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
 	PC : entity work.PC
 		generic map(WSIZE => WSIZE)
@@ -61,7 +63,7 @@ begin
 			S  => next_pc_select,
 			I0 => pc_plus_4,
 			I1 => pc_plus_immediate,
-			I2 => jalr_result,
+			I2 => jalr_result0,
 			I3 => (others => '0'),      --TODO
 			O  => next_pc
 		);
