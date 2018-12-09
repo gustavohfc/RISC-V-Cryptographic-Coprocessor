@@ -8,13 +8,26 @@ entity RISCV is
 	generic(WSIZE : natural := WORD_SIZE);
 
 	port(
-		clk             : in    std_logic;
-		instruction     : out   std_logic_vector(WSIZE - 1 downto 0);
-		registers_array : out   ARRAY_32X32
+		--		clk                                            : in  std_logic;
+		--		instruction                                    : out std_logic_vector(WSIZE - 1 downto 0);
+		--		registers_array                                : out ARRAY_32X32;
+		--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim and uncomment above --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
+		clk50, clk_key                                 : in  std_logic;
+		MUX_FPGA_select                                : in  std_logic_vector(1 downto 0);
+		reg_number                                     : in  std_logic_vector(4 downto 0);
+		hex7, hex6, hex5, hex4, hex3, hex2, hex1, hex0 : out std_logic_vector(7 downto 0)
+		--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 	);
 end RISCV;
 
 architecture RISCV_arch of RISCV is
+	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
+	signal clk                                                                    : std_logic;
+	signal registers_array                                                        : ARRAY_32X32;
+	signal MUX_FPGA_out, reg_display                                              : std_logic_vector(31 downto 0);
+	signal hex0aux, hex1aux, hex2aux, hex3aux, hex4aux, hex5aux, hex6aux, hex7aux : std_logic_vector(7 downto 0);
+	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
+
 	signal instruction_IF_ID, instruction_ID_EX, instruction_EX_MEM, instruction_MEM_WB : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_A, ALU_B, ALU_Z, wdata_ID_EX, wdata_EX_MEM                               : std_logic_vector((WSIZE - 1) downto 0);
 	signal WB_data, data_MEM_WB, immediate, rs1                                         : std_logic_vector((WSIZE - 1) downto 0);
@@ -26,7 +39,53 @@ architecture RISCV_arch of RISCV is
 	signal wren_register_ID_EX, wren_register_EX_MEM, wren_register_MEM_WB, wren_register_WB : std_logic;
 	signal wren_memory_ID_EX, wren_memory_EX_MEM                                             : std_logic;
 	signal WB_select_ID_EX, WB_select_EX_MEM                                                 : std_logic;
+
 begin
+
+	--	instruction <= instruction_IF_ID;
+	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim and uncomment above --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
+	reg_display <= registers_array(to_integer(unsigned(reg_number)));
+
+	hex7 <= hex7aux;
+	hex6 <= hex6aux;
+	hex5 <= hex5aux;
+	hex4 <= hex4aux;
+	hex3 <= hex3aux;
+	hex2 <= hex2aux;
+	hex1 <= hex1aux;
+	hex0 <= hex0aux;
+
+	mux4_FPGA : entity work.mux4
+		generic map(WSIZE => WSIZE)
+		port map(MUX_FPGA_select, PC4, instruction_IF_ID, BUBBLE, reg_display, MUX_FPGA_out);
+	-- cada portmap ira gerar os sinais que serao enviados para o FPGA
+	HEX_0 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(31 downto 28), hex7aux);
+	HEX_1 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(27 downto 24), hex6aux);
+	HEX_2 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(23 downto 20), hex5aux);
+	HEX_3 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(19 downto 16), hex4aux);
+	HEX_4 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(15 downto 12), hex3aux);
+	HEX_5 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(11 downto 8), hex2aux);
+	HEX_6 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(7 downto 4), hex1aux);
+	HEX_7 : entity work.display7seg_decoder
+		port map(MUX_FPGA_out(3 downto 0), hex0aux);
+
+	debounce_inst : entity work.debounce
+		generic map(
+			counter_size => 19
+		)
+		port map(
+			clk    => clk50,
+			button => clk_key,
+			result => clk
+		);
+	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
 	stage_IF_inst : entity work.stage_IF
 		generic map(
@@ -116,7 +175,5 @@ begin
 			WB_address        => WB_address,
 			WB_data_out       => WB_data
 		);
-		
-	instruction <= instruction_IF_ID;
 
 end RISCV_arch;
