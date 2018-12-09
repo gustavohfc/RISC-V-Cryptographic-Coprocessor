@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 
 package constants is
 	-- Configuration
-	constant WORD_SIZE : integer := 32;
+	constant WORD_SIZE : natural := 32;
 
 	-- Opcodes
 	constant OPCODE_LOAD       : std_logic_vector(6 downto 0) := "0000011"; -- TODO: Not implemented
@@ -76,11 +76,11 @@ package constants is
 	constant FUNCT7_SRA  : std_logic_vector(6 downto 0) := "0100000";
 	constant FUNCT7_OR   : std_logic_vector(6 downto 0) := "0000000";
 	constant FUNCT7_AND  : std_logic_vector(6 downto 0) := "0000000";
-	
+
 	-- STORE INSTRUCTION FUNCT3
-	constant FUNCT3_SB  : std_logic_vector(2 downto 0) := "000";
-	constant FUNCT3_SH  : std_logic_vector(2 downto 0) := "001";
-	constant FUNCT3_SW  : std_logic_vector(2 downto 0) := "010";
+	constant FUNCT3_SB : std_logic_vector(2 downto 0) := "000";
+	constant FUNCT3_SH : std_logic_vector(2 downto 0) := "001";
+	constant FUNCT3_SW : std_logic_vector(2 downto 0) := "010";
 
 	type FUNCTION_TYPE is (
 		ALU_ADD,
@@ -109,12 +109,25 @@ package constants is
 	);
 
 	-- ULA selector
-	constant ALU_SELECT_IMM : std_logic := '0';
-	constant ALU_SELECT_RS2 : std_logic := '1';
-	
+	constant ALUA_SELECT_RS1    : std_logic_vector(1 downto 0) := "00";
+	constant ALUA_SELECT_PC4    : std_logic_vector(1 downto 0) := "01";
+	constant ALUA_SELECT_BUBBLE : std_logic_vector(1 downto 0) := "11";
+
+	constant ALUB_SELECT_RS2    : std_logic_vector(1 downto 0) := "00";
+	constant ALUB_SELECT_IMM    : std_logic_vector(1 downto 0) := "01";
+	constant ALUB_SELECT_BUBBLE : std_logic_vector(1 downto 0) := "11";
+
 	-- WriteBack selector
 	constant WB_SELECT_ALU : std_logic := '0';
 	constant WB_SELECT_MEM : std_logic := '1';
+
+	-- Next PC selector
+	constant PC_SELECT_PLUS4 : std_logic_vector(1 downto 0) := "00";
+	constant PC_SELECT_JAL   : std_logic_vector(1 downto 0) := "01";
+	constant PC_SELECT_JALR  : std_logic_vector(1 downto 0) := "10";
+	constant PC_SELECT_BR    : std_logic_vector(1 downto 0) := "11";
+
+	constant BUBBLE : std_logic_vector((WORD_SIZE - 1) downto 0) := (others => '0');
 
 end package constants;
 

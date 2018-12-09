@@ -10,8 +10,10 @@ entity control is
 	port(
 		instruction                : in  std_logic_vector(WSIZE - 1 downto 0);
 		instruction_type           : out instruction_type;
-		ALU_select, WB_select      : out std_logic; -- TODO
-		wren_memory, wren_register : out std_logic
+		ALUA_select, ALUB_select   : out std_logic_vector(1 downto 0);
+		WB_select                  : out std_logic;
+		wren_memory, wren_register : out std_logic;
+		next_pc_select             : out std_logic_vector(1 downto 0)
 	);
 end entity control;
 
@@ -25,66 +27,84 @@ begin
 		case opcode is
 			when OPCODE_LOAD =>
 				instruction_type <= I_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_MEM;
+				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_OP_IMM =>
 				instruction_type <= I_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_STORE =>
 				instruction_type <= S_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '1';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_OP =>
 				instruction_type <= R_type;
-				ALU_select       <= ALU_SELECT_RS2;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_RS2;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_LUI =>
 				instruction_type <= U_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_BRANCH =>
 				instruction_type <= B_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '0';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_BR;
 
 			when OPCODE_JALR =>
 				instruction_type <= I_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_PC4;
+				ALUB_select      <= ALUB_SELECT_BUBBLE;
 				wren_memory      <= '0';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_JALR;
 
 			when OPCODE_JAL =>
 				instruction_type <= J_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_PC4;
+				ALUB_select      <= ALUB_SELECT_BUBBLE;
 				wren_memory      <= '0';
-				wren_register    <= '0';
+				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_JAL;
 
 			when others =>
 				instruction_type <= J_type;
-				ALU_select       <= ALU_SELECT_IMM;
+				ALUA_select      <= ALUA_SELECT_RS1;
+				ALUB_select      <= ALUB_SELECT_IMM;
 				wren_memory      <= '0';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
+				next_pc_select   <= PC_SELECT_PLUS4;
 		end case;
 	end process;
 

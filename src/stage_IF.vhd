@@ -6,15 +6,19 @@ entity stage_IF is
 	generic(WSIZE : natural);
 
 	port(
-		clk         : in  std_logic;
-		instruction : out std_logic_vector((WSIZE - 1) downto 0)
+		clk              : in  std_logic;
+		immediate        : in  std_logic_vector((WSIZE - 1) downto 0);
+		next_pc_select   : in  std_logic_vector(1 downto 0);
+		instruction, PC4 : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end stage_IF;
 
 architecture stage_IF_arch of stage_IF is
-	signal current_pc, next_pc, pc_plus_4 : std_logic_vector((WSIZE - 1) downto 0);
+	signal current_pc, next_pc, pc_plus_4, pc_plus_immediate : std_logic_vector((WSIZE - 1) downto 0);
 
 begin
+	PC4 <= pc_plus_4;
+
 	PC : entity work.PC
 		generic map(WSIZE => WSIZE)
 		port map(
@@ -31,12 +35,22 @@ begin
 			result => pc_plus_4
 		);
 
+	adder_imm : entity work.adder
+		generic map(
+			WSIZE => WSIZE
+		)
+		port map(
+			a      => current_pc,
+			b      => immediate,
+			result => pc_plus_immediate
+		);
+
 	mux4 : entity work.mux4
 		generic map(WSIZE => WSIZE)
 		port map(
-			S  => "00",
+			S  => next_pc_select,
 			I0 => pc_plus_4,
-			I1 => (others => '0'),      --TODO
+			I1 => pc_plus_immediate,
 			I2 => (others => '0'),      --TODO
 			I3 => (others => '0'),      --TODO
 			O  => next_pc

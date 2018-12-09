@@ -17,20 +17,25 @@ entity stage_ID is
 		wren_memory_out, wren_register_out : out std_logic;
 		WB_select_out                      : out std_logic;
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
-		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0)
+		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
+		immediate_out                      : out std_logic_vector((WSIZE - 1) downto 0);
+		PC4                                : in  std_logic_vector((WSIZE - 1) downto 0);
+		next_pc_select                     : out std_logic_vector(1 downto 0)
 	);
 end entity stage_ID;
 
 architecture stage_ID_arch of stage_ID is
-	signal r2, immediate                                     : std_logic_vector((WSIZE - 1) downto 0);
-	signal ALU_select, wren_memory, wren_register, WB_select : std_logic;
-	signal instruction_type                                  : instruction_type;
-	signal ALU_A, ALU_B                                      : std_logic_vector((WSIZE - 1) downto 0);
-	
-	alias rs1  : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
-	alias rs2  : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
+	signal r2, r1, immediate                     : std_logic_vector((WSIZE - 1) downto 0);
+	signal wren_memory, wren_register, WB_select : std_logic;
+	signal ALUA_select, ALUB_select              : std_logic_vector(1 downto 0);
+	signal instruction_type                      : instruction_type;
+	signal mux_ALUB_out, mux_ALUA_out            : std_logic_vector((WSIZE - 1) downto 0);
+
+	alias rs1 : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
+	alias rs2 : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
 
 begin
+	immediate_out <= immediate;
 
 	control : entity work.control
 		generic map(
@@ -39,10 +44,12 @@ begin
 		port map(
 			instruction      => instruction_in,
 			instruction_type => instruction_type,
-			ALU_select       => ALU_select,
+			ALUA_select      => ALUA_select,
+			ALUB_select      => ALUB_select,
 			wren_memory      => wren_memory,
 			wren_register    => wren_register,
-			WB_select        => WB_select
+			WB_select        => WB_select,
+			next_pc_select   => next_pc_select
 		);
 
 	registers : entity work.register_file
@@ -56,7 +63,7 @@ begin
 			rs2          => rs2,
 			rd           => WB_address,
 			write_data   => WB_data,
-			r1           => ALU_A,
+			r1           => r1,
 			r2           => r2
 		);
 
@@ -70,23 +77,38 @@ begin
 			immediate        => immediate
 		);
 
-	mux_ALU : entity work.mux2
+	mux4_ALUA : entity work.mux4
 		generic map(
 			WSIZE => WSIZE
 		)
 		port map(
-			S  => ALU_select,
-			I0 => immediate,
-			I1 => r2,
-			O  => ALU_B
+			S  => ALUA_select,
+			I0 => r1,
+			I1 => PC4,
+			I2 => BUBBLE,
+			I3 => BUBBLE,
+			O  => mux_ALUA_out
+		);
+
+	mux4_ALUB : entity work.mux4
+		generic map(
+			WSIZE => WSIZE
+		)
+		port map(
+			S  => ALUB_select,
+			I0 => r2,
+			I1 => immediate,
+			I2 => BUBBLE,
+			I3 => BUBBLE,
+			O  => mux_ALUB_out
 		);
 
 	process(clk) is
 	begin
 		if rising_edge(clk) then
 			instruction_out   <= instruction_in;
-			ALU_A_out         <= ALU_A;
-			ALU_B_out         <= ALU_B;
+			ALU_A_out         <= mux_ALUA_out;
+			ALU_B_out         <= mux_ALUB_out;
 			wdata_out         <= r2;
 			wren_memory_out   <= wren_memory;
 			wren_register_out <= wren_register;

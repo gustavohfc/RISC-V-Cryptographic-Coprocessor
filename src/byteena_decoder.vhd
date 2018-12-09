@@ -22,13 +22,24 @@ begin
 		case funct3 is
 			when FUNCT3_SW =>
 				byteena <= (others => '1');
-			when FUNCT3_SH =>           -- TODO
-				byteena <= "0011";
-			--			with address select byteena <=
-			--				"1100" when (unsigned(address) mod 2) >= 1,
-			--				"0011" when others;
+			when FUNCT3_SH => 
+--				byteena <= "0011";
+				if (unsigned(address) mod 2) /= 0 then
+					byteena <= "1100";
+				else
+					byteena <= "0011";
+				end if;
 			when FUNCT3_SB =>
-				byteena <= "0001";
+--				byteena <= "0001";
+				if (unsigned(address) mod 4) = 3 then
+					byteena <= "1000";
+				elsif (unsigned(address) mod 4) = 2 then
+					byteena <= "0100";
+				elsif (unsigned(address) mod 4) = 1 then
+					byteena <= "0010";
+				else
+					byteena <= "0001";
+				end if;
 			when others =>
 				byteena <= (others => '1');
 		end case;
