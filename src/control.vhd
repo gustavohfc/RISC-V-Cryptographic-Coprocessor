@@ -84,7 +84,7 @@ begin
 				ALUA_select      <= ALUA_SELECT_PC4;
 				ALUB_select      <= ALUB_SELECT_BUBBLE;
 				wren_memory      <= '0';
-				wren_register    <= '0';
+				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
 				next_pc_select   <= PC_SELECT_JALR;
 

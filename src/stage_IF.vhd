@@ -7,14 +7,14 @@ entity stage_IF is
 
 	port(
 		clk              : in  std_logic;
-		immediate        : in  std_logic_vector((WSIZE - 1) downto 0);
+		immediate, rs1   : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select   : in  std_logic_vector(1 downto 0);
 		instruction, PC4 : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end stage_IF;
 
 architecture stage_IF_arch of stage_IF is
-	signal current_pc, next_pc, pc_plus_4, pc_plus_immediate : std_logic_vector((WSIZE - 1) downto 0);
+	signal current_pc, next_pc, pc_plus_4, pc_plus_immediate, jalr_result : std_logic_vector((WSIZE - 1) downto 0);
 
 begin
 	PC4 <= pc_plus_4;
@@ -45,13 +45,23 @@ begin
 			result => pc_plus_immediate
 		);
 
+	adder_jalr : entity work.adder
+		generic map(
+			WSIZE => WSIZE
+		)
+		port map(
+			a      => rs1,
+			b      => immediate,
+			result => jalr_result
+		);
+
 	mux4 : entity work.mux4
 		generic map(WSIZE => WSIZE)
 		port map(
 			S  => next_pc_select,
 			I0 => pc_plus_4,
 			I1 => pc_plus_immediate,
-			I2 => (others => '0'),      --TODO
+			I2 => jalr_result,
 			I3 => (others => '0'),      --TODO
 			O  => next_pc
 		);

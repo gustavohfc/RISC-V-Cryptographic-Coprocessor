@@ -21,7 +21,7 @@ entity stage_EX is
 end entity stage_EX;
 
 architecture stage_EX_arch of stage_EX is
-	signal zero         : std_logic;
+--	signal zero         : std_logic;
 	signal Z            : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_function : FUNCTION_TYPE;
 
@@ -46,7 +46,7 @@ begin
 			A            => ALU_A,
 			B            => ALU_B,
 			Z            => Z,
-			zero         => zero
+			zero         => open
 		);
 
 	process(clk) is

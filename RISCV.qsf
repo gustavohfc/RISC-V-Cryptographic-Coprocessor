@@ -35,6 +35,8 @@
 #
 # -------------------------------------------------------------------------- #
 
+#Warning (18236): Number of processors has not been specified which may cause overloading on shared machines.  Set the global assignment NUM_PARALLEL_PROCESSORS in your QSF to an appropriate value for best performance.
+set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 
 set_global_assignment -name FAMILY "Cyclone IV E"
 set_global_assignment -name DEVICE EP4CE115F23C7

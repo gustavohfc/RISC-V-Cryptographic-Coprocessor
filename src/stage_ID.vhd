@@ -18,7 +18,7 @@ entity stage_ID is
 		WB_select_out                      : out std_logic;
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
-		immediate_out                      : out std_logic_vector((WSIZE - 1) downto 0);
+		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
 		PC4                                : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                     : out std_logic_vector(1 downto 0)
 	);
@@ -36,6 +36,7 @@ architecture stage_ID_arch of stage_ID is
 
 begin
 	immediate_out <= immediate;
+	rs1_out       <= r1;
 
 	control : entity work.control
 		generic map(
