@@ -1,0 +1,63 @@
+-- Copyright (C) 1991-2013 Altera Corporation
+-- Your use of Altera Corporation's design tools, logic functions 
+-- and other software and tools, and its AMPP partner logic 
+-- functions, and any output files from any of the foregoing 
+-- (including device programming or simulation files), and any 
+-- associated documentation or information are expressly subject 
+-- to the terms and conditions of the Altera Program License 
+-- Subscription Agreement, Altera MegaCore Function License 
+-- Agreement, or other applicable license agreement, including, 
+-- without limitation, that your use is for the sole purpose of 
+-- programming logic devices manufactured by Altera and sold by 
+-- Altera or its authorized distributors.  Please refer to the 
+-- applicable agreement for further details.
+
+-- Quartus II generated Memory Initialization File (.mif)
+
+WIDTH=32;
+DEPTH=256;
+
+ADDRESS_RADIX=UNS;
+DATA_RADIX=HEX;
+
+CONTENT BEGIN
+	0    :   00402083; -- lw x1, 4(zero)	x1 = 1
+	1    :   00802103; -- lw x2, 8(zero)	x2 = 2
+	2    :   00C02183; -- lw x3, 12(zero)	x3 = 3
+	3    :   01002203; -- lw x4, 16(zero)	x4 = -1
+	4    :   01E08293; -- addi x5, x1, 30	x5 = 31
+	5    :   02102023; -- sw x1, 32(zero)
+	6    :   02002083; -- lw x1, 32(zero)
+	7    :   00122313; -- slti x6, x4, 1	x6 = 1
+	8    :   00123313; -- sltiu x6, x4, 1	x6 = 0
+	9    :   03F2C313; -- xori x6, x5, 63	x6 = 32
+	10   :   03C2E313; -- ori x6, x5, 60	x6 = 63
+	11   :   03C2F313; -- andi x6, x5, 60	x6 = 28
+	12   :   00509313; -- slli x6, x1, 5	x6 = 32
+	13   :   01025313; -- srli x6, x4, 16	x6 = 65535 (FFFF)
+	14   :   41025313; -- srai x6, x4, 16	x6 = -1
+	15   :   00408333; -- add x6, x1, x4	x6 = 0
+	16   :   00218333; -- add x6, x2, x3	x6 = 5
+	17   :   40128333; -- sub x6, x5, x1	x6 = 32
+	18   :   00311333; -- sll x6, x2, x3	x6 = 16
+	19   :   0040A333; -- slt x6, x1, x4	x6 = 0
+	20   :   0040B333; -- sltu x6, x1, x4	x6 = 1
+	21   :   00324333; -- xor x6, x4, x3	x6 = -4 (FFFFFFFC)
+	22   :   00325333; -- srl x6, x4, x3	x6 = 536870911 (1FFFFFFF)
+	23   :   40325333; -- sra x6, x4, x3	x6 = -1
+	24   :   0020E333; -- or x6, x1, x2		x6 = 3
+	25   :   0020F333; -- and x6, x1, x2	x6 = 0
+	26   :   00000000;
+	27   :   00000000;
+	28   :   00000000;
+	29   :   00000000;
+	30   :   00000000;
+	31   :   00000000;
+	32   :   00000000;
+	33   :   00000000;
+	34   :   00000000;
+	35   :   00000000;
+	36   :   00000000;
+	37   :   00000000;
+	[38..255]  :   00000000;
+END;
