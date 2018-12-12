@@ -89,7 +89,7 @@ begin
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			if next_pc_select = PC_SELECT_PLUS4 then
+			if next_pc_select = PC_SELECT_PLUS4 or stall = '1' then
 				instruction_out <= current_instruction;
 			else
 				instruction_out <= BUBBLE;
