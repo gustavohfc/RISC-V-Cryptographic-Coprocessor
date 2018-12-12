@@ -20,11 +20,11 @@ architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
 	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
 	signal current_instruction                      : std_logic_vector((WSIZE - 1) downto 0);
-	signal clk_stall                                : std_logic;
+	signal clk_memory                                : std_logic;
 
 begin
 	PC_IF_ID_out <= PC_IF_ID;
-	clk_stall    <= clk and (not stall);
+	clk_memory   <= (not clk) and (not stall);
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
 	PC : entity work.PC
@@ -78,20 +78,20 @@ begin
 	instruction_memory : entity work.instruction_memory
 		port map(
 			address => current_pc(9 downto 2),
-			clock   => clk_stall,
+			clock   => clk_memory,
 			q       => current_instruction
 		);
 
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			PC_IF_ID <= current_pc;
-		elsif falling_edge(clk) then
 			if next_pc_select = PC_SELECT_PLUS4 then
 				instruction_out <= current_instruction;
 			else
 				instruction_out <= BUBBLE;
 			end if;
+
+			PC_IF_ID <= current_pc;
 		end if;
 	end process;
 
