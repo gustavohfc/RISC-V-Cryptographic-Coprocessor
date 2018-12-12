@@ -34,9 +34,11 @@ architecture stage_ID_arch of stage_ID is
 	signal mux_ALUB_out, mux_ALUA_out            : std_logic_vector((WSIZE - 1) downto 0);
 	signal stall_aux                             : std_logic;
 
-	alias rs1 : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
-	alias rs2 : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
-	alias rd  : std_logic_vector(4 downto 0) is instruction_in(11 downto 7);
+	alias rs1    : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
+	alias rs2    : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
+	alias rd     : std_logic_vector(4 downto 0) is instruction_in(11 downto 7);
+	alias funct3 : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
+	alias opcode : std_logic_vector(6 downto 0) is instruction_in(6 downto 0);
 
 begin
 	immediate_out <= immediate;
@@ -54,8 +56,7 @@ begin
 			ALUB_select      => ALUB_select,
 			wren_memory      => wren_memory,
 			wren_register    => wren_register,
-			WB_select        => WB_select,
-			next_pc_select   => next_pc_select
+			WB_select        => WB_select
 		);
 
 	registers : entity work.register_file
@@ -108,6 +109,18 @@ begin
 			I2 => std_logic_vector(to_unsigned(4, WSIZE)),
 			I3 => BUBBLE,
 			O  => mux_ALUB_out
+		);
+
+	jump_control_inst : entity work.jump_control
+		generic map(
+			WSIZE => WSIZE
+		)
+		port map(
+			r1             => r1,
+			r2             => r2,
+			funct3         => funct3,
+			opcode         => opcode,
+			next_pc_select => next_pc_select
 		);
 
 	register_queue_inst : entity work.register_queue

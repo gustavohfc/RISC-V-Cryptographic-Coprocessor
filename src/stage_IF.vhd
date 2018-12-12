@@ -19,7 +19,7 @@ end stage_IF;
 architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
 	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
-	signal current_instruction                      : std_logic_vector((WSIZE - 1) downto 0);
+	signal current_instruction, branch_result                      : std_logic_vector((WSIZE - 1) downto 0);
 	signal clk_memory                                : std_logic;
 
 begin
@@ -63,6 +63,7 @@ begin
 			b      => immediate,
 			result => jalr_result
 		);
+	
 
 	mux4 : entity work.mux4
 		generic map(WSIZE => WSIZE)
@@ -71,7 +72,7 @@ begin
 			I0 => pc_plus_4,
 			I1 => jal_result,
 			I2 => jalr_result0,
-			I3 => (others => '0'),      --TODO
+			I3 => jal_result,	-- Branch PC is same from jal with proper immediate decoding
 			O  => next_pc
 		);
 
