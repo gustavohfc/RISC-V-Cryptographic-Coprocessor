@@ -20,18 +20,21 @@ architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
 	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
 	signal current_instruction, branch_result                      : std_logic_vector((WSIZE - 1) downto 0);
-	signal clk_memory                                : std_logic;
+	signal clk_memory, pc_stall                                : std_logic;
 
 begin
 	PC_IF_ID_out <= PC_IF_ID;
 	clk_memory   <= (not clk) and (not stall);
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
+	-- Stall the PC only when the next PC isn't a jump.
+	pc_stall <= stall when next_pc_select = PC_SELECT_PLUS4 else '0';
+
 	PC : entity work.PC
 		generic map(WSIZE => WSIZE)
 		port map(
 			clk        => clk,
-			stall      => stall,
+			stall      => pc_stall,
 			next_pc    => next_pc,
 			current_pc => current_pc
 		);

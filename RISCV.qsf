@@ -149,6 +149,7 @@ set_global_assignment -name EDA_TEST_BENCH_RUN_SIM_FOR "1 ns" -section_id RISCV_
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME RISCV_tb -section_id RISCV_tb
 set_global_assignment -name EDA_TEST_BENCH_FILE testbench/RISCV_tb.vhd -section_id RISCV_tb
 set_global_assignment -name PROJECT_IP_REGENERATION_POLICY ALWAYS_REGENERATE_IP
+set_global_assignment -name VHDL_FILE src/jump_control.vhd
 set_global_assignment -name VHDL_FILE testbench/RISCV_tb.vhd
 set_global_assignment -name VHDL_FILE src/display7seg_decoder.vhd
 set_global_assignment -name VHDL_FILE src/debounce.vhd

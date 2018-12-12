@@ -12,8 +12,7 @@ entity control is
 		instruction_type           : out instruction_type;
 		ALUA_select, ALUB_select   : out std_logic_vector(1 downto 0);
 		WB_select                  : out std_logic;
-		wren_memory, wren_register : out std_logic;
-		next_pc_select             : out std_logic_vector(1 downto 0)
+		wren_memory, wren_register : out std_logic
 	);
 end entity control;
 
@@ -32,7 +31,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_MEM;
-				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_OP_IMM =>
 				instruction_type <= I_type;
@@ -41,7 +39,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_STORE =>
 				instruction_type <= S_type;
@@ -50,7 +47,6 @@ begin
 				wren_memory      <= '1';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_OP =>
 				instruction_type <= R_type;
@@ -59,7 +55,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_LUI =>
 				instruction_type <= U_type;
@@ -68,7 +63,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_PLUS4;
 
 			when OPCODE_BRANCH =>
 				instruction_type <= B_type;
@@ -77,7 +71,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_BR;
 
 			when OPCODE_JALR =>
 				instruction_type <= I_type;
@@ -86,7 +79,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_JALR;
 
 			when OPCODE_JAL =>
 				instruction_type <= J_type;
@@ -95,7 +87,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '1';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_JAL;
 
 			when others =>
 				instruction_type <= J_type;
@@ -104,7 +95,6 @@ begin
 				wren_memory      <= '0';
 				wren_register    <= '0';
 				WB_select        <= WB_SELECT_ALU;
-				next_pc_select   <= PC_SELECT_PLUS4;
 		end case;
 	end process;
 
