@@ -16,12 +16,12 @@ entity stage_ID is
 		wren_register_in                   : in  std_logic;
 		wren_memory_out, wren_register_out : out std_logic;
 		WB_select_out                      : out std_logic;
+		stall                              : out std_logic;
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
 		PC_IF_ID                           : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                     : out std_logic_vector(1 downto 0);
-		next_pc_base                       : out std_logic_vector((WSIZE - 1) downto 0);
 		registers_array                    : out ARRAY_32X32
 	);
 end entity stage_ID;
@@ -32,13 +32,16 @@ architecture stage_ID_arch of stage_ID is
 	signal ALUA_select, ALUB_select              : std_logic_vector(1 downto 0);
 	signal instruction_type                      : instruction_type;
 	signal mux_ALUB_out, mux_ALUA_out            : std_logic_vector((WSIZE - 1) downto 0);
+	signal stall_aux                             : std_logic;
 
 	alias rs1 : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
 	alias rs2 : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
+	alias rd  : std_logic_vector(4 downto 0) is instruction_in(11 downto 7);
 
 begin
 	immediate_out <= immediate;
 	rs1_out       <= r1;
+	stall         <= stall_aux;
 
 	control : entity work.control
 		generic map(
@@ -107,10 +110,25 @@ begin
 			O  => mux_ALUB_out
 		);
 
+	register_queue_inst : entity work.register_queue
+		port map(
+			clk              => clk,
+			rs1              => rs1,
+			rs2              => rs2,
+			rd               => rd,
+			instruction_type => instruction_type,
+			stall            => stall_aux
+		);
+
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			instruction_out   <= instruction_in;
+			if stall_aux = '1' then
+				instruction_out <= BUBBLE;
+			else
+				instruction_out <= instruction_in;
+			end if;
+
 			ALU_A_out         <= mux_ALUA_out;
 			ALU_B_out         <= mux_ALUB_out;
 			wdata_out         <= r2;

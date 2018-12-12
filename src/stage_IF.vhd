@@ -11,6 +11,7 @@ entity stage_IF is
 		clk                           : in  std_logic;
 		immediate, rs1                : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                : in  std_logic_vector(1 downto 0);
+		stall                         : in  std_logic;
 		instruction_out, PC_IF_ID_out : out std_logic_vector((WSIZE - 1) downto 0)
 	);
 end stage_IF;
@@ -19,16 +20,18 @@ architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
 	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
 	signal current_instruction                      : std_logic_vector((WSIZE - 1) downto 0);
+	signal clk_stall                                : std_logic;
 
 begin
 	PC_IF_ID_out <= PC_IF_ID;
-
+	clk_stall    <= clk and (not stall);
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
 	PC : entity work.PC
 		generic map(WSIZE => WSIZE)
 		port map(
 			clk        => clk,
+			stall      => stall,
 			next_pc    => next_pc,
 			current_pc => current_pc
 		);
@@ -75,7 +78,7 @@ begin
 	instruction_memory : entity work.instruction_memory
 		port map(
 			address => current_pc(9 downto 2),
-			clock   => clk,
+			clock   => clk_stall,
 			q       => current_instruction
 		);
 

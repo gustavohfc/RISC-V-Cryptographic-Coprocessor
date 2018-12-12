@@ -6,7 +6,7 @@ entity PC is
 	generic(WSIZE : natural);
 
 	port(
-		clk        : in  std_logic;
+		clk, stall : in  std_logic;
 		next_pc    : in  std_logic_vector(WSIZE - 1 downto 0);
 		current_pc : out std_logic_vector(WSIZE - 1 downto 0)
 	);
@@ -20,7 +20,9 @@ begin
 	process(clk)
 	begin
 		if (rising_edge(clk)) then
-			aux <= next_pc;
+			if stall /= '1' then
+				aux <= next_pc;
+			end if;
 		end if;
 	end process;
 end PC_arch;
