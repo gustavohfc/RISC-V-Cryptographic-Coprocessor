@@ -5,7 +5,10 @@ use ieee.numeric_std.all;
 use work.constants.all;
 
 entity RISCV is
-	generic(WSIZE : natural := WORD_SIZE);
+	generic(
+		WSIZE : natural := WORD_SIZE;
+		memory_init_file : string := DEFAULT_INIT_FILE
+	);
 
 	port(
 				clk                                            : in  std_logic;
@@ -90,7 +93,8 @@ begin
 
 	stage_IF_inst : entity work.stage_IF
 		generic map(
-			WSIZE => WSIZE
+			WSIZE => WSIZE,
+			memory_init_file => memory_init_file
 		)
 		port map(
 			clk             => clk,

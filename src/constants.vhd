@@ -4,6 +4,7 @@ use ieee.std_logic_1164.all;
 package constants is
 	-- Configuration
 	constant WORD_SIZE : natural := 32;
+	constant DEFAULT_INIT_FILE : string := "MEM_INSTR.mif";
 
 	-- Breg typedef
 	TYPE ARRAY_32X32 is array (0 to WORD_SIZE - 1) of std_logic_vector(WORD_SIZE - 1 downto 0);

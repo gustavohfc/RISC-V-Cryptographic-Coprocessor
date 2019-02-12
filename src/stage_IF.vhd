@@ -5,7 +5,10 @@ use ieee.numeric_std.all;
 use work.constants.all;
 
 entity stage_IF is
-	generic(WSIZE : natural);
+	generic(
+		WSIZE : natural;
+		memory_init_file : string
+	);
 
 	port(
 		clk                           : in  std_logic;
@@ -80,6 +83,9 @@ begin
 		);
 
 	instruction_memory : entity work.instruction_memory
+		generic map(
+			init_file => memory_init_file
+		)
 		port map(
 			address => current_pc(9 downto 2),
 			clock   => clk_memory,
