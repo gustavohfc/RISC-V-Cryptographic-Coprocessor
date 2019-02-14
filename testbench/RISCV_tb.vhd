@@ -4,6 +4,11 @@ USE ieee.std_logic_1164.all;
 use work.constants.all;
 
 ENTITY RISCV_tb IS
+	generic (
+		runner_cfg : string;
+		WSIZE : natural;
+		memory_init_file : string
+	);
 END RISCV_tb;
 
 ARCHITECTURE RISCV_tb_arch OF RISCV_tb IS
@@ -15,7 +20,10 @@ ARCHITECTURE RISCV_tb_arch OF RISCV_tb IS
 
 BEGIN
 	riscv : entity work.RISCV
-		generic map(WSIZE => WORD_SIZE)
+		generic map(
+			WSIZE => WSIZE,
+			memory_init_file => memory_init_file
+		)
 
 		port map(
 			clk             => clk,

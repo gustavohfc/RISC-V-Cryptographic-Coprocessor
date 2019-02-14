@@ -18,6 +18,7 @@ timing
 *.jdi
 *.jpg
 *.mif
+!test/integration/*.mif
 *.pin
 *.pof
 *.ptf.*
@@ -40,4 +41,4 @@ PLLJ_PLLSPE_INFO.txt # The generated PLL specification file
 .*
 !/.gitignore
 
-test/vunit_out
+vunit_out
