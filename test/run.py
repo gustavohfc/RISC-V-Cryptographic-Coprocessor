@@ -11,7 +11,10 @@ def copy_mif_files(vu):
         TODO: Find a better way to copy this files without accessing private properties.
         More info about this workaround at https://github.com/VUnit/vunit/issues/236
     """
-    copy2(join(root, "..", "MEM_DADOS.mif"), vu._simulator_output_path) # TODO: Use a specific data memory initialization file for each test
+    if not os.path.exists(vu._simulator_output_path):
+        os.mkdir(vu._simulator_output_path)
+
+    copy2(join(root, "..", "MEM_DADOS.mif"), join(vu._simulator_output_path, "MEM_DADOS.mif")) # TODO: Use a specific data memory initialization file for each test
 
     # Copy all mif files from integration tests folder to the simulation path
     for file in os.listdir(join(root, "integration")):
