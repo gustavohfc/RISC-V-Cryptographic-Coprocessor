@@ -60,8 +60,8 @@ BEGIN
 	BEGIN
 		-- Watch changes to the registers
 		if falling_edge(clk) and register_write_enable = '1' then
-			write(row, to_string(unsigned(register_rd)), right, 2);
-			write(row, " " & to_string(signed(register_write_data)));
+			write(row, to_string(register_rd), right);
+			write(row, " " & to_string(register_write_data));
 			writeline(register_changes, row);
 		end if;
 	END PROCESS;

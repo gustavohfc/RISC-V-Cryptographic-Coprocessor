@@ -1,6 +1,7 @@
 from vunit import VUnit
 from os.path import join, dirname
 from shutil import copy2
+from itertools import zip_longest
 import re
 import os
 
@@ -14,20 +15,40 @@ def copy_mif_files(vu):
     if not os.path.exists(vu._simulator_output_path):
         os.mkdir(vu._simulator_output_path)
 
-    copy2(join(root, "..", "MEM_DADOS.mif"), join(vu._simulator_output_path, "MEM_DADOS.mif")) # TODO: Use a specific data memory initialization file for each test
+    copy2(join(root, "..", "MEM_DADOS.mif"), vu._simulator_output_path) # TODO: Use a specific data memory initialization file for each test
 
     # Copy all mif files from integration tests folder to the simulation path
     for file in os.listdir(join(root, "integration")):
         if file.endswith(".mif"):
             copy2(join(root, "integration", file), vu._simulator_output_path)
 
-def extract_test_name(output_path):
-    return re.search(".*lib\.integration_tb\.(.*)_.*", output_path).group(1)
+def make_integration_post_check(vu, test_name):
+    """
+    Return a check function to verify the output files
+    """
 
-# def pre_config(output_path):
-#     print(extract_test_name(output_path))
-#     copy2(join(root, "..", "MEM_DADOS.mif"), join(output_path))
-#     return True
+    simulator_output_path = vu._simulator_output_path
+
+    def post_check(output_path):
+        expected_register_changes_path = join(root, "integration", test_name + "_register_changes.txt")
+        simulated_register_changes_path = join(simulator_output_path, test_name + "_register_changes.txt")
+
+        if not compare_files(expected_register_changes_path, simulated_register_changes_path):
+            return False
+
+        # TODO: Check memory files
+
+        return True
+
+    return post_check
+
+def compare_files(file_path_1, file_path_2):
+    with open(file_path_1, 'r') as file_1, open(file_path_2, 'r') as file_2:
+        for line_file_1, line_file_2 in zip_longest(file_1, file_2, fillvalue=""):
+            if line_file_1 != line_file_2:
+                print("ERROR: The files " + file_path_1 + " and " + file_path_2 + " aren't equal.")
+                return False
+    return True
 
 if __name__ == "__main__":
     # Create VUnit instance by parsing command line arguments
@@ -43,7 +64,7 @@ if __name__ == "__main__":
     lib.add_source_files(join(root, "integration/integration_tb.vhd"))
     #tbs = lib.get_test_benches()
     tb = lib.get_test_benches("*integration_tb*")[0]
-    tb.add_config("test_1", generics=dict(WSIZE=32, test_name="test_1"))
+    tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add"), post_check=make_integration_post_check(vu, "simple_add"))
     #tb.add_config("test_2", generics=dict(WSIZE=32, test_name="test_2"))
 
     copy_mif_files(vu)
