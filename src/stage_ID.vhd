@@ -138,15 +138,17 @@ begin
 		if rising_edge(clk) then
 			if stall_aux = '1' then
 				instruction_out <= BUBBLE;
+				wren_memory_out   <= '0';
+				wren_register_out <= '0';
 			else
 				instruction_out <= instruction_in;
+				wren_memory_out   <= wren_memory;
+				wren_register_out <= wren_register;
 			end if;
 
 			ALU_A_out         <= mux_ALUA_out;
 			ALU_B_out         <= mux_ALUB_out;
 			wdata_out         <= r2;
-			wren_memory_out   <= wren_memory;
-			wren_register_out <= wren_register;
 			WB_select_out     <= WB_select;
 		end if;
 	end process;
