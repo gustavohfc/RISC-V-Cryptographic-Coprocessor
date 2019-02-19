@@ -61,7 +61,7 @@ if __name__ == "__main__":
     lib.add_source_files(join(root, "..", "src" , "*.vhd"))
 
     # Unit tests
-    #lib.add_source_files(join(root, "unit", "*_tb.vhd"))
+    lib.add_source_files(join(root, "unit", "*_tb.vhd"))
 
     # Integration tests
     lib.add_source_files(join(root, "integration/integration_tb.vhd"))
