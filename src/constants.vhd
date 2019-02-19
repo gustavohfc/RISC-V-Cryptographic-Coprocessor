@@ -5,7 +5,7 @@ package constants is
 	-- Configuration
 	constant WORD_SIZE : natural := 32;
 	constant DEFAULT_INIT_FILE : string := "test_1.hex";
-	constant DATA_MEMORY_ADDRESS_OFFSET : natural := 16#00003000#; -- This value will be added to all addresses of the data memory
+	constant DATA_MEMORY_ADDRESS_OFFSET : natural := 16#00002000#; -- This value will be added to all addresses of the data memory
 
 	-- Breg typedef
 	TYPE ARRAY_32X32 is array (0 to WORD_SIZE - 1) of std_logic_vector(WORD_SIZE - 1 downto 0);
