@@ -6,7 +6,7 @@ use work.constants.all;
 
 entity stage_IF is
 	generic(
-		WSIZE : natural;
+		WSIZE            : natural;
 		memory_init_file : string
 	);
 
@@ -22,15 +22,15 @@ end stage_IF;
 architecture stage_IF_arch of stage_IF is
 	signal current_pc, next_pc, pc_plus_4, PC_IF_ID : std_logic_vector((WSIZE - 1) downto 0);
 	signal jalr_result0, jal_result, jalr_result    : std_logic_vector((WSIZE - 1) downto 0);
-	signal current_instruction, branch_result                      : std_logic_vector((WSIZE - 1) downto 0);
-	signal clk_memory, pc_stall                                : std_logic;
+	signal current_instruction, branch_result       : std_logic_vector((WSIZE - 1) downto 0);
+	signal clk_memory, pc_stall                     : std_logic;
 
 begin
 	PC_IF_ID_out <= PC_IF_ID;
 	clk_memory   <= (not clk) and (not stall);
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
-	-- Stall the PC only when the next PC isn't a jump.
+	-- Stall the PC only when the next PC isn't from a jump.
 	pc_stall <= stall when next_pc_select = PC_SELECT_PLUS4 else '0';
 
 	PC : entity work.PC
@@ -69,7 +69,6 @@ begin
 			b      => immediate,
 			result => jalr_result
 		);
-	
 
 	mux4 : entity work.mux4
 		generic map(WSIZE => WSIZE)
@@ -78,7 +77,7 @@ begin
 			I0 => pc_plus_4,
 			I1 => jal_result,
 			I2 => jalr_result0,
-			I3 => jal_result,	-- Branch PC is same from jal with proper immediate decoding
+			I3 => jal_result,           -- Branch PC is same from jal with proper immediate decoding
 			O  => next_pc
 		);
 

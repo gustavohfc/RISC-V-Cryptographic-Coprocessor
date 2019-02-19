@@ -9,7 +9,7 @@ entity byteena_decoder is
 
 	port(
 		funct3  : in  std_logic_vector(2 downto 0);
-		address : in  std_logic_vector(7 downto 0);
+		address : in  std_logic_vector((WSIZE - 1) downto 0);
 		byteena : out std_logic_vector(((WSIZE / 8) - 1) downto 0)
 	);
 end entity byteena_decoder;
