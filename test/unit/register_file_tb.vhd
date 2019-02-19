@@ -14,14 +14,14 @@ ENTITY unit_register_file_tb IS
 END unit_register_file_tb;
 
 ARCHITECTURE unit_register_file_tb_arch OF unit_register_file_tb IS
-	signal clk             : std_logic := '0';
-	signal write_enable    : std_logic := '0';
-	signal rs1             : std_logic_vector(4 downto 0);
-	signal rs2             : std_logic_vector(4 downto 0);
-	signal rd              : std_logic_vector(4 downto 0);
-	signal write_data      : std_logic_vector(WORD_SIZE - 1 downto 0);
-	signal r1              : std_logic_vector(WORD_SIZE - 1 downto 0);
-	signal r2              : std_logic_vector(WORD_SIZE - 1 downto 0);
+	signal clk             : std_logic                                := '0';
+	signal write_enable    : std_logic                                := '0';
+	signal rs1             : std_logic_vector(4 downto 0)             := (others => '0');
+	signal rs2             : std_logic_vector(4 downto 0)             := (others => '0');
+	signal rd              : std_logic_vector(4 downto 0)             := (others => '0');
+	signal write_data      : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
+	signal r1              : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
+	signal r2              : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
 	signal registers_array : ARRAY_32X32;
 
 BEGIN
@@ -59,25 +59,24 @@ BEGIN
 		rs1 <= "00000";
 		wait until rising_edge(clk);
 		check(r1 = std_logic_vector(to_signed(0, WORD_SIZE)), "The value of the register 0 was changed");
-		
+
 		-- Write on the registers 1 and 2
 		write_enable <= '1';
 		write_data   <= std_logic_vector(to_signed(-1, WORD_SIZE));
 		rd           <= "00001";
 		wait until falling_edge(clk);
-		
+
 		write_enable <= '1';
 		write_data   <= std_logic_vector(to_signed(255, WORD_SIZE));
 		rd           <= "00010";
 		wait until falling_edge(clk);
-		
+
 		-- Check the values on the registers 1 and 2
 		rs1 <= "00001";
 		rs2 <= "00010";
 		wait until rising_edge(clk);
 		check(r1 = std_logic_vector(to_signed(-1, WORD_SIZE)), "Fail to write on register 1");
 		check(r2 = std_logic_vector(to_signed(255, WORD_SIZE)), "Fail to write on register 2");
-
 
 		test_runner_cleanup(runner);
 		wait;
