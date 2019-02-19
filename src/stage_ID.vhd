@@ -9,18 +9,18 @@ entity stage_ID is
 
 	port(
 		clk                                : in  std_logic;
+		PC_IF_ID                           : in  std_logic_vector((WSIZE - 1) downto 0);
 		instruction_in                     : in  std_logic_vector((WSIZE - 1) downto 0);
-		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
 		WB_data                            : in  std_logic_vector((WSIZE - 1) downto 0);
 		WB_address                         : in  std_logic_vector(4 downto 0);
 		wren_register_in                   : in  std_logic;
 		wren_memory_out, wren_register_out : out std_logic;
 		WB_select_out                      : out std_logic;
 		stall                              : out std_logic;
+		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
-		PC_IF_ID                           : in  std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                     : out std_logic_vector(1 downto 0);
 		registers_array                    : out ARRAY_32X32
 	);

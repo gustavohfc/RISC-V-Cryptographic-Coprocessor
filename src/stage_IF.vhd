@@ -31,7 +31,8 @@ begin
 	jalr_result0 <= jalr_result((WSIZE - 1) downto 1) & '0';
 
 	-- Stall the PC only when the next PC isn't from a jump.
-	pc_stall <= stall when next_pc_select = PC_SELECT_PLUS4 else '0';
+	-- pc_stall <= stall when next_pc_select = PC_SELECT_PLUS4 else '0';
+	pc_stall <= stall;
 
 	PC : entity work.PC
 		generic map(WSIZE => WSIZE)
