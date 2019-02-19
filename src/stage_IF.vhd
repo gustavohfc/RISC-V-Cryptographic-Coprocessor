@@ -6,8 +6,8 @@ use work.constants.all;
 
 entity stage_IF is
 	generic(
-		WSIZE            : natural;
-		memory_init_file : string
+		WSIZE                  : natural;
+		instructions_init_file : string
 	);
 
 	port(
@@ -83,7 +83,7 @@ begin
 
 	instruction_memory : entity work.instruction_memory
 		generic map(
-			init_file => memory_init_file
+			init_file => instructions_init_file
 		)
 		port map(
 			address => current_pc(9 downto 2),

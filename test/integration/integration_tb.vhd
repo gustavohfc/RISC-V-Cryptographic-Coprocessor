@@ -28,8 +28,9 @@ ARCHITECTURE integration_tb_arch OF integration_tb IS
 BEGIN
 	riscv : entity work.RISCV
 		generic map(
-			WSIZE            => WSIZE,
-			memory_init_file => test_name & ".hex"
+			WSIZE                  => WSIZE,
+			instructions_init_file => test_name & "_instructions.hex",
+			data_init_file         => test_name & "_data.hex"
 		)
 
 		port map(

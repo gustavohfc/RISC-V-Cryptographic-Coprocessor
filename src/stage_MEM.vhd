@@ -5,7 +5,10 @@ use ieee.numeric_std.all;
 use work.constants.all;
 
 entity stage_MEM is
-	generic(WSIZE : natural);
+	generic(
+		WSIZE          : natural;
+		data_init_file : string
+	);
 
 	port(
 		clk                              : in  std_logic;
@@ -30,17 +33,17 @@ architecture stage_MEM_arch of stage_MEM is
 	signal rdata_half_signed   : std_logic_vector((WSIZE - 1) downto 0);
 	signal rdata_byte_unsigned : std_logic_vector((WSIZE - 1) downto 0);
 	signal rdata_half_unsigend : std_logic_vector((WSIZE - 1) downto 0);
-	
+
 	signal write_address : std_logic_vector((WSIZE - 1) downto 0);
 
-	alias funct3  : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
+	alias funct3             : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
 	alias write_address_div4 : std_logic_vector(7 downto 0) is write_address(9 downto 2);
 
 	signal not_clk : std_logic;
 
 begin
 
-	write_address <= std_logic_vector(unsigned(ALU_Z_in) + DATA_MEMORY_ADDRESS_OFFSET);
+	write_address       <= std_logic_vector(unsigned(ALU_Z_in) + DATA_MEMORY_ADDRESS_OFFSET);
 	rdata_byte_signed   <= ((WSIZE - 1) downto (WSIZE / 4) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 4) - 1) downto 0);
 	rdata_half_signed   <= ((WSIZE - 1) downto (WSIZE / 2) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 2) - 1) downto 0);
 	rdata_byte_unsigned <= ((WSIZE - 1) downto (WSIZE / 4) => '0') & rdata(((WSIZE / 4) - 1) downto 0);
@@ -49,10 +52,13 @@ begin
 	not_clk <= not clk;
 
 	data_memory_inst : entity work.data_memory
+		generic map(
+			init_file => data_init_file
+		)
 		port map(
 			address => write_address_div4,
 			byteena => byteena,
-			clock   => not_clk, -- Update the memory input on the falling edge
+			clock   => not_clk,         -- Update the memory input on the falling edge
 			data    => wdata_in,
 			wren    => wren_memory_in,
 			q       => rdata
