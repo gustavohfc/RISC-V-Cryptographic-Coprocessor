@@ -13,7 +13,8 @@ ENTITY integration_tb IS
 	generic(
 		runner_cfg : string;
 		WSIZE      : natural;
-		test_name  : string
+		test_name  : string;
+		PC_max     : natural
 	);
 END integration_tb;
 
@@ -28,7 +29,7 @@ BEGIN
 	riscv : entity work.RISCV
 		generic map(
 			WSIZE            => WSIZE,
-			memory_init_file => test_name & ".mif"
+			memory_init_file => test_name & ".hex"
 		)
 
 		port map(
@@ -44,7 +45,7 @@ BEGIN
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 
-		wait until PC >= std_logic_vector(to_unsigned(24, WORD_SIZE));
+		wait until PC >= std_logic_vector(to_unsigned(PC_max, WORD_SIZE));
 
 		test_runner_cleanup(runner);
 		wait;

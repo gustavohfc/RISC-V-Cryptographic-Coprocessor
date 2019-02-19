@@ -7,7 +7,7 @@ import os
 
 root = dirname(__file__)
 
-def copy_mif_files(vu):
+def copy_hex_files(vu):
     """ 
         TODO: Find a better way to copy this files without accessing private properties.
         More info about this workaround at https://github.com/VUnit/vunit/issues/236
@@ -19,7 +19,7 @@ def copy_mif_files(vu):
 
     # Copy all mif files from integration tests folder to the simulation path
     for file in os.listdir(join(root, "integration")):
-        if file.endswith(".mif"):
+        if file.endswith(".hex"):
             copy2(join(root, "integration", file), vu._simulator_output_path)
 
 def make_integration_post_check(vu, test_name):
@@ -60,14 +60,16 @@ if __name__ == "__main__":
     # Add all files ending in .vhd in current working directory to library
     lib.add_source_files(join(root, "..", "src" , "*.vhd"))
 
+    # Unit tests
+    #lib.add_source_files(join(root, "unit", "*_tb.vhd"))
+
     # Integration tests
     lib.add_source_files(join(root, "integration/integration_tb.vhd"))
-    #tbs = lib.get_test_benches()
     tb = lib.get_test_benches("*integration_tb*")[0]
-    tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add"), post_check=make_integration_post_check(vu, "simple_add"))
-    #tb.add_config("test_2", generics=dict(WSIZE=32, test_name="test_2"))
+    tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add", PC_max=24), post_check=make_integration_post_check(vu, "simple_add"))
+    tb.add_config("test_1", generics=dict(WSIZE=32, test_name="test_1", PC_max=208), post_check=make_integration_post_check(vu, "test_1"))
 
-    copy_mif_files(vu)
+    copy_hex_files(vu)
 
     # Run vunit function
     vu.main()
