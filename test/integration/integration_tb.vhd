@@ -54,17 +54,30 @@ BEGIN
 
 	watch_chnages : PROCESS(clk)
 		file register_changes : text open write_mode is test_name & "_register_changes.txt";
+		file memory_changes   : text open write_mode is test_name & "_memory_changes.txt";
 		variable row          : line;
 
 		alias register_write_enable is <<signal riscv.stage_ID_inst.registers.write_enable : std_logic>>;
 		alias register_rd is <<signal riscv.stage_ID_inst.registers.rd : std_logic_vector(4 downto 0)>>;
 		alias register_write_data is <<signal riscv.stage_ID_inst.registers.write_data : std_logic_vector(WSIZE - 1 downto 0)>>;
+
+		alias memory_write_enable is <<signal riscv.stage_MEM_inst.wren_memory_in : std_logic>>;
+		alias memory_write_address is <<signal riscv.stage_MEM_inst.write_address : std_logic_vector(WSIZE - 1 downto 0)>>;
+		alias memory_wdata is <<signal riscv.stage_MEM_inst.wdata_in : std_logic_vector(WSIZE - 1 downto 0)>>;
 	BEGIN
 		-- Watch changes to the registers
 		if falling_edge(clk) and register_write_enable = '1' then
 			write(row, to_string(register_rd), right);
 			write(row, " " & to_string(register_write_data));
 			writeline(register_changes, row);
+		end if;
+
+		-- Watch changes to the memory
+		if falling_edge(clk) and memory_write_enable = '1' then
+			report(to_string(memory_write_address));
+			write(row, to_string(memory_write_address), right);
+			write(row, " " & to_string(memory_wdata));
+			writeline(memory_changes, row);
 		end if;
 	END PROCESS;
 

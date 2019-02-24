@@ -32,11 +32,14 @@ def make_integration_post_check(vu, test_name):
     def post_check(output_path):
         expected_register_changes_path = join(root, "integration", test_name + "_register_changes.txt")
         simulated_register_changes_path = join(simulator_output_path, test_name + "_register_changes.txt")
+        expected_memory_changes_path = join(root, "integration", test_name + "_memory_changes.txt")
+        simulated_memory_changes_path = join(simulator_output_path, test_name + "_memory_changes.txt")
 
         if not compare_files(expected_register_changes_path, simulated_register_changes_path):
             return False
 
-        # TODO: Check memory files
+        if not compare_files(expected_memory_changes_path, simulated_memory_changes_path):
+            return False
 
         return True
 
