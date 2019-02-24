@@ -62,7 +62,7 @@ BEGIN
 		alias register_write_data is <<signal riscv.stage_ID_inst.registers.write_data : std_logic_vector(WSIZE - 1 downto 0)>>;
 
 		alias memory_write_enable is <<signal riscv.stage_MEM_inst.wren_memory_in : std_logic>>;
-		alias memory_write_address is <<signal riscv.stage_MEM_inst.write_address : std_logic_vector(WSIZE - 1 downto 0)>>;
+		alias memory_address is <<signal riscv.stage_MEM_inst.address : std_logic_vector(WSIZE - 1 downto 0)>>;
 		alias memory_wdata is <<signal riscv.stage_MEM_inst.wdata_in : std_logic_vector(WSIZE - 1 downto 0)>>;
 	BEGIN
 		-- Watch changes to the registers
@@ -74,8 +74,8 @@ BEGIN
 
 		-- Watch changes to the memory
 		if falling_edge(clk) and memory_write_enable = '1' then
-			report(to_string(memory_write_address));
-			write(row, to_string(memory_write_address), right);
+			report(to_string(memory_address));
+			write(row, to_string(memory_address), right);
 			write(row, " " & to_string(memory_wdata));
 			writeline(memory_changes, row);
 		end if;

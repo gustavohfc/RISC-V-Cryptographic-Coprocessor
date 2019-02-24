@@ -163,7 +163,7 @@ begin
 			instruction_in    => instruction_EX_MEM,
 			instruction_out   => instruction_MEM_WB,
 			wdata_in          => wdata_EX_MEM,
-			ALU_Z_in          => ALU_Z,
+			address           => ALU_Z,
 			data_out          => data_MEM_WB,
 			wren_memory_in    => wren_memory_EX_MEM,
 			wren_register_in  => wren_register_EX_MEM,
