@@ -8,7 +8,7 @@ entity register_queue is
 	port(
 		clk              : in  std_logic;
 		rs1, rs2, rd     : in  std_logic_vector(4 downto 0);
-		instruction_type : in  instruction_type;
+		instruction_type : in  instruction_types;
 		stall            : out std_logic
 	);
 end entity register_queue;

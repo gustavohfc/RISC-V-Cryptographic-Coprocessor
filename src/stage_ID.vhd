@@ -30,7 +30,7 @@ architecture stage_ID_arch of stage_ID is
 	signal r2, r1, immediate                     : std_logic_vector((WSIZE - 1) downto 0);
 	signal wren_memory, wren_register, WB_select : std_logic;
 	signal ALUA_select, ALUB_select              : std_logic_vector(1 downto 0);
-	signal instruction_type                      : instruction_type;
+	signal instruction_type                      : instruction_types;
 	signal mux_ALUB_out, mux_ALUA_out            : std_logic_vector((WSIZE - 1) downto 0);
 	signal stall_aux                             : std_logic;
 

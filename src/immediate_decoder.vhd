@@ -9,7 +9,7 @@ entity immediate_decoder is
 
 	port(
 		instruction      : in  std_logic_vector(WSIZE - 1 downto 0);
-		instruction_type : in  instruction_type;
+		instruction_type : in  instruction_types;
 		immediate        : out std_logic_vector(WSIZE - 1 downto 0)
 	);
 end entity immediate_decoder;

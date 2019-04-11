@@ -9,7 +9,7 @@ entity control is
 
 	port(
 		instruction                : in  std_logic_vector(WSIZE - 1 downto 0);
-		instruction_type           : out instruction_type;
+		instruction_type           : out instruction_types;
 		ALUA_select, ALUB_select   : out std_logic_vector(1 downto 0);
 		WB_select                  : out std_logic;
 		wren_memory, wren_register : out std_logic

@@ -4,8 +4,8 @@ use ieee.std_logic_1164.all;
 package constants is
 	-- Configuration
 	constant WORD_SIZE                      : natural := 32;
-	constant DEFAULT_INSTRUCTIONS_INIT_FILE : string  := "test_1_instructions.hex";
-	constant DEFAULT_DATA_INIT_FILE         : string  := "test_1_data.hex";
+	constant DEFAULT_INSTRUCTIONS_INIT_FILE : string  := "MEM_INSTR.mif";
+	constant DEFAULT_DATA_INIT_FILE         : string  := "MEM_DADOS.mif";
 	constant DATA_MEMORY_ADDRESS_OFFSET     : integer := - 16#00002000#; -- This value will be subtract from all memory addresses
 
 	-- Breg typedef
@@ -114,7 +114,7 @@ package constants is
 	);
 
 	-- Instructions type
-	type instruction_type is (
+	type instruction_types is (
 		R_type,
 		I_type,
 		S_type,
