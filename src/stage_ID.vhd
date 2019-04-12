@@ -80,7 +80,7 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			instruction      => instruction_in,
+			instruction      => instruction_in(31 downto 7),
 			instruction_type => instruction_type,
 			immediate        => immediate
 		);
