@@ -66,7 +66,7 @@ BEGIN
 		alias memory_wdata is <<signal riscv.stage_MEM_inst.wdata_in : std_logic_vector(WSIZE - 1 downto 0)>>;
 	BEGIN
 		-- Watch changes to the registers
-		if falling_edge(clk) and register_write_enable = '1' then
+		if falling_edge(clk) and register_write_enable = '1' and unsigned(register_rd) /= 0 then
 			write(row, to_string(register_rd), right);
 			write(row, " " & to_string(register_write_data));
 			writeline(register_changes, row);
