@@ -2,7 +2,7 @@
 	# Memoria
 	mem: .word 0, 1, 2, 3, -1
 .text	
-	li s0, 0x2000 # TODO: It can be replaced with 'la s0, mem' when the instruction auipc is implemented
+	la s0, mem
 	lw s1, 4(s0)	# s1 = 1
 	lw s2, 8(s0)	# s2 = 2
 	lw s3, 12(s0)	# s3 = 3

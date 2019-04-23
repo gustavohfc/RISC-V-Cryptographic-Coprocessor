@@ -17,7 +17,7 @@ package constants is
 	constant OPCODE_CUSTOM_0   : std_logic_vector(6 downto 0) := "0001011"; -- TODO: Not implemented
 	constant OPCODE_MISC_MEM   : std_logic_vector(6 downto 0) := "0001111"; -- TODO: Not implemented
 	constant OPCODE_OP_IMM     : std_logic_vector(6 downto 0) := "0010011";
-	constant OPCODE_AUIPC      : std_logic_vector(6 downto 0) := "0010111"; -- TODO: Not implemented
+	constant OPCODE_AUIPC      : std_logic_vector(6 downto 0) := "0010111";
 	constant OPCODE_OP_IMM_32  : std_logic_vector(6 downto 0) := "0011011"; -- TODO: Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "0011111";
 	constant OPCODE_STORE      : std_logic_vector(6 downto 0) := "0100011";
@@ -25,7 +25,7 @@ package constants is
 	constant OPCODE_CUSTOM_1   : std_logic_vector(6 downto 0) := "0101011"; -- TODO: Not implemented
 	constant OPCODE_AMO        : std_logic_vector(6 downto 0) := "0101111"; -- TODO: Not implemented
 	constant OPCODE_OP         : std_logic_vector(6 downto 0) := "0110011";
-	constant OPCODE_LUI        : std_logic_vector(6 downto 0) := "0110111"; -- TODO: Not implemented
+	constant OPCODE_LUI        : std_logic_vector(6 downto 0) := "0110111";
 	constant OPCODE_OP_32      : std_logic_vector(6 downto 0) := "0111011"; -- TODO: Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "0111111";
 	constant OPCODE_MADD       : std_logic_vector(6 downto 0) := "1000011"; -- TODO: Not implemented
