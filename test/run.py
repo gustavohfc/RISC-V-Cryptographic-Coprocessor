@@ -72,8 +72,8 @@ if __name__ == "__main__":
     tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add", PC_max=24), post_check=make_integration_post_check(vu, "simple_add"))
     tb.add_config("test_1", generics=dict(WSIZE=32, test_name="test_1", PC_max=216), post_check=make_integration_post_check(vu, "test_1"))
     tb.add_config("fibonacci", generics=dict(WSIZE=32, test_name="fibonacci", PC_max=60), post_check=make_integration_post_check(vu, "fibonacci"))
-    tb.add_config("binary_search", generics=dict(WSIZE=32, test_name="binary_search", PC_max=176), post_check=make_integration_post_check(vu, "binary_search"))
-    tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=100), post_check=make_integration_post_check(vu, "branches"))
+    tb.add_config("binary_search", generics=dict(WSIZE=32, test_name="binary_search", PC_max=180), post_check=make_integration_post_check(vu, "binary_search"))
+    tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=108), post_check=make_integration_post_check(vu, "branches"))
 
     copy_hex_files(vu)
 

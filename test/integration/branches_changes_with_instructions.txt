@@ -2,80 +2,95 @@
 	add t1, zero, zero			add x6,x0,x0
 00110 00000000000000000000000000000000
 
-	addi t2, zero, 1			addi x7,x0,0x00000001
+	addi t2, zero, 1			addi x7,x0,1
 00111 00000000000000000000000000000001
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000001
 
-	beq t1, t2, beq_add			beq x6,x7,0xfffffffe
+	beq t1, t2, beq_add			beq x6,x7,-2
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000010
 
-	beq t1, t2, beq_add			beq x6,x7,0xfffffffe
+	beq t1, t2, beq_add			beq x6,x7,-2
 
 	add t1, zero, zero			add x6,x0,x0
 00110 00000000000000000000000000000000
 
-	addi t2, zero, 2			addi x7,x0,0x00000002
+	addi t2, zero, 2			addi x7,x0,2
 00111 00000000000000000000000000000010
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000001
 
-	bne t1, t2, bne_add			bne x6,x7,0xfffffffe
+	bne t1, t2, bne_add			bne x6,x7,-2
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000010
 
-	bne t1, t2, bne_add			bne x6,x7,0xfffffffe
+	bne t1, t2, bne_add			bne x6,x7,-2
 
 	add t1, zero, zero			add x6,x0,x0
 00110 00000000000000000000000000000000
 
-	addi t2, zero, 2			addi x7,x0,0x00000002
+	addi t2, zero, 2			addi x7,x0,2
 00111 00000000000000000000000000000010
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000001
 
-	blt t1, t2, blt_add			blt x6,x7,0xfffffffe
+	blt t1, t2, blt_add			blt x6,x7,-2
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000010
 
-	blt t1, t2, blt_add			blt x6,x7,0xfffffffe
+	blt t1, t2, blt_add			blt x6,x7,-2
 
 	add t1, zero, zero			add x6,x0,x0
 00110 00000000000000000000000000000000
 
-	addi t2, zero, 2			addi x7,x0,0x00000002
+	addi t2, zero, 2			addi x7,x0,2
 00111 00000000000000000000000000000010
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000001
 
-	bge t2, t1, bge_add			bge x7,x6,0xfffffffe
+	bge t2, t1, bge_add			bge x7,x6,-2
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000010
 
-	bge t2, t1, bge_add			bge x7,x6,0xfffffffe
+	bge t2, t1, bge_add			bge x7,x6,-2
 
-	addi t1, t1, 1			addi x6,x6,0x00000001
+	addi t1, t1, 1			addi x6,x6,1
 00110 00000000000000000000000000000011
 
-	bge t2, t1, bge_add			bge x7,x6,0xfffffffe
+	bge t2, t1, bge_add			bge x7,x6,-2
 
-	addi t0, zero, 2			addi x5,x0,0x00000002
+	addi t0, zero, 2			addi x5,x0,2
 00101 00000000000000000000000000000010
 
-	la t1, data			auipc x6,0x00000002
+	la t1, data			auipc x6,2
 00110 00000000000000000010000001000100
 
-			addi x6,x6,0xffffffbc
+			addi x6,x6,-68
 00110 00000000000000000010000000000000
 
-load:	lw t2, 0(t1)			lw x7,0x00000000(x6)
+load:	lw t2, 0(t1)			lw x7,0(x6)
 00111 00000000000000000000000000000001
+
+	blt t0, t2, end			blt x5,x7,6
+
+	addi t1, t1, 4			addi x6,x6,4
+00110 00000000000000000010000000000100
+
+	j load			jal x0,-6
+
+load:	lw t2, 0(t1)			lw x7,0(x6)
+00111 00000000000000000000000000000011
+
+	blt t0, t2, end			blt x5,x7,6
+
+	addi s0, zero, -1			addi x8,x0,-1
+01000 11111111111111111111111111111111

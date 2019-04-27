@@ -100,8 +100,10 @@ begin
 			else
 				instruction_out <= BUBBLE;
 			end if;
-
-			PC_IF_ID <= current_pc;
+			
+			if stall = '0' then
+				PC_IF_ID <= current_pc;
+			end if;
 		end if;
 	end process;
 

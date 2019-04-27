@@ -40,4 +40,4 @@ load:	lw t2, 0(t1)
 	j load
 	
 end:
-	addi t0, zero, -1
+	addi s0, zero, -1
