@@ -1,3 +1,6 @@
+.data
+data: .word 1 3
+
 .text
 
 # BEQ test
@@ -27,3 +30,14 @@ blt_add:
 bge_add:
 	addi t1, t1, 1
 	bge t2, t1, bge_add
+	
+# Branch afeter memory stall
+	addi t0, zero, 2
+	la t1, data
+load:	lw t2, 0(t1)
+	blt t0, t2, end
+	addi t1, t1, 4
+	j load
+	
+end:
+	addi t0, zero, -1
