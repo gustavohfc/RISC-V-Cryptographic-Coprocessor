@@ -24,9 +24,9 @@ begin
 				if 	(funct3 = FUNCT3_BEQ and signed(r1) = signed(r2)) or
 						(funct3 = FUNCT3_BNE and signed(r1) /= signed(r2)) or
 						(funct3 = FUNCT3_BLT and signed(r1) < signed(r2)) or
-						(funct3 = FUNCT3_BGE and signed(r1) > signed(r2)) or
+						(funct3 = FUNCT3_BGE and signed(r1) >= signed(r2)) or
 						(funct3 = FUNCT3_BLTU and unsigned(r1) < unsigned(r2)) or
-						(funct3 = FUNCT3_BGEU and unsigned(r1) > unsigned(r2)) then
+						(funct3 = FUNCT3_BGEU and unsigned(r1) >= unsigned(r2)) then
 					next_pc_select <= PC_SELECT_BR;
 				else
 					next_pc_select <= PC_SELECT_PLUS4;
