@@ -47,7 +47,7 @@ loop:
 	add t2, t1, s0
 	jal ra, align
 	lw t2, 0(t2)
-	
+
 	blt t2, s1, if_less
 	bgt t2, s1, if_greater
 	beq t2, s1, if_equal
