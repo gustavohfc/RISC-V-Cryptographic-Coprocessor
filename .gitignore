@@ -43,3 +43,5 @@ PLLJ_PLLSPE_INFO.txt # The generated PLL specification file
 !/.gitignore
 
 vunit_out
+
+Debug/
