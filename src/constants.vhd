@@ -6,7 +6,11 @@ package constants is
 	constant WORD_SIZE                      : natural := 32;
 	constant DEFAULT_INSTRUCTIONS_INIT_FILE : string  := "MEM_INSTR.mif";
 	constant DEFAULT_DATA_INIT_FILE         : string  := "MEM_DADOS.mif";
-	constant DATA_MEMORY_ADDRESS_OFFSET     : integer := - 16#00002000#; -- This value will be subtract from all memory addresses
+	constant DATA_MEMORY_ADDRESS_OFFSET     : integer := -16#00002000#; -- This value will be subtract from all memory addresses
+
+	-- General types
+	subtype word32 is std_logic_vector(31 downto 0);
+	subtype byte is std_logic_vector(7 downto 0);
 
 	-- Breg typedef
 	TYPE ARRAY_32X32 is array (0 to WORD_SIZE - 1) of std_logic_vector(WORD_SIZE - 1 downto 0);
