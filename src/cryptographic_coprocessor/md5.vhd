@@ -286,7 +286,7 @@ architecture md5_arch of md5 is
 	signal input_buffer : std_logic_vector(511 downto 0) := (others => '0');
 
 	signal error_next : md5_error_type;
-	
+
 begin
 
 	-- Outputs
@@ -301,13 +301,12 @@ begin
 	is_complete           <= '1' when state = hash_complete else '0';
 
 	-- Update state
-	process(clk, start_new_hash)
+	fsm : process(clk, start_new_hash)
 	begin
 		if start_new_hash = '1' then
 			state        <= idle;
 			current_step <= 0;
 			error        <= MD5_ERROR_NONE;
-			input_buffer <= (others => '0');
 
 			-- Set default messsage digest buffer
 			A <= A0;
@@ -331,6 +330,25 @@ begin
 			C <= C_next;
 			D <= D_next;
 
+		end if;
+	end process;
+
+	-- Input buffer control
+	process(clk, start_new_hash)
+		variable first_bit_position : natural; -- TODO: range 0 to 480
+	begin
+		if start_new_hash = '1' then
+			input_buffer <= (others => '0');
+		end if;
+		if rising_edge(clk) then
+			if write_data_in = '1' then
+				if state = waiting_next_chunk or state = idle then
+					first_bit_position                                              := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
+					input_buffer(first_bit_position + 31 downto first_bit_position) <= swap_byte_endianness(data_in);
+				else
+					error_next <= MD5_ERROR_UNEXPECTED_NEW_DATA;
+				end if;
+			end if;
 		end if;
 	end process;
 
@@ -392,24 +410,8 @@ begin
 		end case;
 	end process;
 
-	-- Save input data to buffer
-	process(clk)
-		variable first_bit_position : natural; -- TODO: range 0 to 480
-	begin
-		if rising_edge(clk) and write_data_in = '1' then
-			if state = waiting_next_chunk or state = idle then
-				first_bit_position                                              := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
-				rotate <= swap_byte_endianness(data_in);
-				--input_buffer(0) <= '1';
-				--input_buffer(first_bit_position + 31 downto first_bit_position) <= swap_byte_endianness(data_in);
-			else
-				error_next <= MD5_ERROR_UNEXPECTED_NEW_DATA;
-			end if;
-		end if;
-	end process;
-
 	-- Calculate
-	process(state)
+	process(state, A, B, C, D, current_step, input_buffer)
 		variable X_k           : unsigned(31 downto 0);
 		variable X_k_first_bit : natural; -- TODO: range 31 downto 0
 	begin
@@ -418,13 +420,13 @@ begin
 				null;
 
 			when calculating_round_1 =>
-				X_k_first_bit := K(current_step) * 32; -- TODO: change to shift
-				X_k := unsigned(input_buffer(X_k_first_bit+32 downto X_k_first_bit));
-				A_next    <= D;
-				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and C) or (not B and D)) + T(current_step)), s(current_step))));
-				C_next    <= B;
-				D_next    <= C;
-				next_step <= current_step + 1;
+				X_k_first_bit := (15 - K(current_step)) * 32; -- TODO: change to shift
+				X_k           := unsigned(input_buffer(X_k_first_bit + 31 downto X_k_first_bit));
+				A_next        <= D;
+				B_next        <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and C) or (not B and D)) + X_k + T(current_step)), s(current_step))));
+				C_next        <= B;
+				D_next        <= C;
+				next_step     <= current_step + 1;
 
 			when calculating_round_2 =>
 				null;
