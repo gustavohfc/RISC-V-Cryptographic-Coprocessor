@@ -61,10 +61,12 @@ if __name__ == "__main__":
     lib = vu.add_library("lib")
 
     # Add all files ending in .vhd in current working directory to library
-    lib.add_source_files(join(root, "..", "src" , "*.vhd"))
+    lib.add_source_files(join(root, "..", "src", "*.vhd"))
+    lib.add_source_files(join(root, "..", "src", "cryptographic_coprocessor", "*.vhd"))
 
     # Unit tests
     lib.add_source_files(join(root, "unit", "*_tb.vhd"))
+    lib.add_source_files(join(root, "unit", "cryptographic_coprocessor", "*_tb.vhd"))
 
     # Integration tests
     lib.add_source_files(join(root, "integration/integration_tb.vhd"))

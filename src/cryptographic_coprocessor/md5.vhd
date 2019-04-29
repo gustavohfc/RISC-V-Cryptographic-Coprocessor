@@ -10,10 +10,10 @@ entity md5 is
 		-- Inputs
 		clk                        : in  std_logic;
 		start_new_hash             : in  std_logic; -- Reset the state machine to calculate a new hash
-		calculate_next_chunk       : in  std_logic;
 		write_data_in              : in  std_logic;
-		data_in                    : in  std_logic_vector(32 downto 0);
-		data_in_word_position      : in  std_logic_vector(4 downto 0); -- A number between 0 and 15 that indicates in which word of the 512 bits input buffer the data_in should be written (most significant bit/byte/word first).
+		data_in                    : in  std_logic_vector(31 downto 0);
+		data_in_word_position      : in  unsigned(3 downto 0); -- A number between 0 and 15 that indicates in which word of the 512 bits input buffer the data_in should be written (most significant bit/byte/word first).
+		calculate_next_chunk       : in  std_logic;
 		is_last_chunk              : in  std_logic;
 		-- Outputs
 		is_idle                    : out std_logic; -- Waiting for a new message
@@ -21,7 +21,7 @@ entity md5 is
 		is_busy                    : out std_logic; -- Is busy calculating the padding os message digest of the last chunk
 		is_complete                : out std_logic; -- The message digest was calculated successfully
 		error                      : out md5_error_type;
-		A_out, B_out, C_out, D_out : out std_logic_vector(32 downto 0)
+		A_out, B_out, C_out, D_out : out std_logic_vector(31 downto 0)
 	);
 end entity md5;
 
@@ -285,6 +285,8 @@ architecture md5_arch of md5 is
 	-- Buffer for the 512 bit input
 	signal input_buffer : std_logic_vector(511 downto 0) := (others => '0');
 
+	signal error_next : md5_error_type;
+	
 begin
 
 	-- Outputs
@@ -314,7 +316,13 @@ begin
 			D <= D0;
 
 		elsif rising_edge(clk) then
-			state        <= next_state;
+			if error_next = MD5_ERROR_NONE then
+				state <= next_state;
+			else
+				state <= error_occurred;
+				error <= error_next;
+			end if;
+
 			current_step <= next_step;
 
 			-- Update messsage digest buffer
@@ -389,19 +397,21 @@ begin
 		variable first_bit_position : natural; -- TODO: range 0 to 480
 	begin
 		if rising_edge(clk) and write_data_in = '1' then
-			if state = idle or state = waiting_next_chunk then
-				first_bit_position                                              := to_integer(unsigned(data_in_word_position) * 32); -- TODO: this might be a shift
-				input_buffer(first_bit_position + 31 downto first_bit_position) <= swap_byte_endianness(data_in);
+			if state = waiting_next_chunk or state = idle then
+				first_bit_position                                              := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
+				rotate <= swap_byte_endianness(data_in);
+				--input_buffer(0) <= '1';
+				--input_buffer(first_bit_position + 31 downto first_bit_position) <= swap_byte_endianness(data_in);
 			else
-				error <= MD5_ERROR_UNEXPECTED_NEW_DATA;
+				error_next <= MD5_ERROR_UNEXPECTED_NEW_DATA;
 			end if;
 		end if;
 	end process;
 
 	-- Calculate
 	process(state)
-		variable X_k: unsigned; -- TODO: range 31 downto 0
-		variable X_k_first_bit: natural; -- TODO: range 31 downto 0
+		variable X_k           : unsigned(31 downto 0);
+		variable X_k_first_bit : natural; -- TODO: range 31 downto 0
 	begin
 		case state is
 			when padding_last_chunk =>
