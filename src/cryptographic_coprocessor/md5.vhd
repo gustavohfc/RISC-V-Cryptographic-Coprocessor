@@ -280,7 +280,7 @@ architecture md5_arch of md5 is
 	signal D, D_next : word32 := D0;
 
 	-- Buffer for the 512 bit input
-	signal input_buffer : std_logic_vector(511 downto 0) := (others => '0');
+	signal input_buffer : std_logic_vector(0 to 511) := (others => '0');
 
 	signal error_next : md5_error_type;
 
@@ -341,7 +341,7 @@ begin
 			if write_data_in = '1' then
 				if state = waiting_next_chunk or state = idle then
 					first_bit_position                                              := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
-					input_buffer(first_bit_position + 31 downto first_bit_position) <= swap_byte_endianness(data_in);
+					input_buffer(first_bit_position to first_bit_position + 31) <= swap_byte_endianness(data_in);
 				else
 					error_next <= MD5_ERROR_UNEXPECTED_NEW_DATA;
 				end if;
@@ -355,12 +355,16 @@ begin
 		case state is
 			when idle =>
 				if calculate_next_chunk = '1' then
-					next_state <= calculating;
+					if is_last_chunk = '0' then
+						next_state <= calculating;
+					else
+						next_state <= padding_last_chunk;
+					end if;
 				end if;
 
 			when waiting_next_chunk =>
 				if calculate_next_chunk = '1' then
-					if is_last_chunk = '1' then
+					if is_last_chunk = '0' then
 						next_state <= calculating;
 					else
 						next_state <= padding_last_chunk;
@@ -368,7 +372,7 @@ begin
 				end if;
 
 			when padding_last_chunk =>
-				null;
+				next_state <= calculating;
 
 			--			when calculating_round_1 =>
 			--				if current_step = 15 then
@@ -425,8 +429,8 @@ begin
 		if state = padding_last_chunk then
 			null;                       -- TODO
 		elsif state = calculating then
-			X_k_first_bit := (15 - K(current_step)) * 32; -- TODO: change to shift
-			X_k           := unsigned(input_buffer(X_k_first_bit + 31 downto X_k_first_bit));
+			X_k_first_bit := K(current_step) * 32; -- TODO: change to shift
+			X_k           := unsigned(input_buffer(X_k_first_bit to X_k_first_bit + 31));
 
 			if current_step < 16 then
 				f_result := unsigned((B and C) or (not B and D));

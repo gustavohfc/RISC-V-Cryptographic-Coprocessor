@@ -68,67 +68,67 @@ begin
 		write_data_in <= '1';
 
 		data_in               <= x"41424344";
-		data_in_word_position <= x"f";
+		data_in_word_position <= x"0";
 		wait until rising_edge(clk);
 
 		data_in               <= x"45464748";
-		data_in_word_position <= x"e";
-		wait until rising_edge(clk);
-
-		data_in               <= x"494a4b4c";
-		data_in_word_position <= x"d";
-		wait until rising_edge(clk);
-
-		data_in               <= x"4d4e4f50";
-		data_in_word_position <= x"c";
-		wait until rising_edge(clk);
-
-		data_in               <= x"51525354";
-		data_in_word_position <= x"b";
-		wait until rising_edge(clk);
-
-		data_in               <= x"55565758";
-		data_in_word_position <= x"a";
-		wait until rising_edge(clk);
-
-		data_in               <= x"595a6162";
-		data_in_word_position <= x"9";
-		wait until rising_edge(clk);
-
-		data_in               <= x"63646566";
-		data_in_word_position <= x"8";
-		wait until rising_edge(clk);
-
-		data_in               <= x"6768696a";
-		data_in_word_position <= x"7";
-		wait until rising_edge(clk);
-
-		data_in               <= x"6b6c6d6e";
-		data_in_word_position <= x"6";
-		wait until rising_edge(clk);
-
-		data_in               <= x"6f707172";
-		data_in_word_position <= x"5";
-		wait until rising_edge(clk);
-
-		data_in               <= x"73747576";
-		data_in_word_position <= x"4";
-		wait until rising_edge(clk);
-
-		data_in               <= x"7778797a";
-		data_in_word_position <= x"3";
-		wait until rising_edge(clk);
-
-		data_in               <= x"30313233";
-		data_in_word_position <= x"2";
-		wait until rising_edge(clk);
-
-		data_in               <= x"34353637";
 		data_in_word_position <= x"1";
 		wait until rising_edge(clk);
 
+		data_in               <= x"494a4b4c";
+		data_in_word_position <= x"2";
+		wait until rising_edge(clk);
+
+		data_in               <= x"4d4e4f50";
+		data_in_word_position <= x"3";
+		wait until rising_edge(clk);
+
+		data_in               <= x"51525354";
+		data_in_word_position <= x"4";
+		wait until rising_edge(clk);
+
+		data_in               <= x"55565758";
+		data_in_word_position <= x"5";
+		wait until rising_edge(clk);
+
+		data_in               <= x"595a6162";
+		data_in_word_position <= x"6";
+		wait until rising_edge(clk);
+
+		data_in               <= x"63646566";
+		data_in_word_position <= x"7";
+		wait until rising_edge(clk);
+
+		data_in               <= x"6768696a";
+		data_in_word_position <= x"8";
+		wait until rising_edge(clk);
+
+		data_in               <= x"6b6c6d6e";
+		data_in_word_position <= x"9";
+		wait until rising_edge(clk);
+
+		data_in               <= x"6f707172";
+		data_in_word_position <= x"a";
+		wait until rising_edge(clk);
+
+		data_in               <= x"73747576";
+		data_in_word_position <= x"b";
+		wait until rising_edge(clk);
+
+		data_in               <= x"7778797a";
+		data_in_word_position <= x"c";
+		wait until rising_edge(clk);
+
+		data_in               <= x"30313233";
+		data_in_word_position <= x"d";
+		wait until rising_edge(clk);
+
+		data_in               <= x"34353637";
+		data_in_word_position <= x"e";
+		wait until rising_edge(clk);
+
 		data_in               <= x"38390000";
-		data_in_word_position <= x"0";
+		data_in_word_position <= x"f";
 		wait until rising_edge(clk);
 
 		write_data_in <= '0';
@@ -138,6 +138,8 @@ begin
 		wait until rising_edge(clk);
 		calculate_next_chunk <= '0';
 
+		--wait until rising_edge(clk); -- Wait padding step
+		
 		wait until rising_edge(clk);
 
 		-------------------------------------------- Round 1 --------------------------------------------
