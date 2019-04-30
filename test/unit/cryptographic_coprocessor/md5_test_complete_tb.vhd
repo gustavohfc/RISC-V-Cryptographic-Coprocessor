@@ -139,9 +139,120 @@ begin
 		calculate_next_chunk <= '0';
 
 		wait until rising_edge(clk);
-		wait until rising_edge(clk);
 
+		-------------------------------------------- Round 1 --------------------------------------------
+		
+		-- Step 0
+		wait until rising_edge(clk);
 		check(A = x"10325476");
+		check(B = x"c6c10796");
+		check(C = x"efcdab89");
+		check(D = x"98badcfe");
+
+		-- Step 1
+		wait until rising_edge(clk);
+		check(A = x"98badcfe");
+		check(B = x"99a09999");
+		check(C = x"c6c10796");
+		check(D = x"efcdab89");
+
+		-- Step 2
+		wait until rising_edge(clk);
+		check(A = x"efcdab89");
+		check(B = x"11067980");
+		check(C = x"99a09999");
+		check(D = x"c6c10796");
+
+		-- Step 3
+		wait until rising_edge(clk);
+		check(A = x"c6c10796");
+		check(B = x"27bce07a");
+		check(C = x"11067980");
+		check(D = x"99a09999");
+
+		-- Step 4
+		wait until rising_edge(clk);
+		check(A = x"99a09999");
+		check(B = x"f22e6c4e");
+		check(C = x"27bce07a");
+		check(D = x"11067980");
+
+		-- Step 5
+		wait until rising_edge(clk);
+		check(A = x"11067980");
+		check(B = x"b4ac9218");
+		check(C = x"f22e6c4e");
+		check(D = x"27bce07a");
+
+		-- Step 6
+		wait until rising_edge(clk);
+		check(A = x"27bce07a");
+		check(B = x"a95a2fc0");
+		check(C = x"b4ac9218");
+		check(D = x"f22e6c4e");
+
+		-- Step 7
+		wait until rising_edge(clk);
+		check(A = x"f22e6c4e");
+		check(B = x"a4799506");
+		check(C = x"a95a2fc0");
+		check(D = x"b4ac9218");
+
+		-- Step 8
+		wait until rising_edge(clk);
+		check(A = x"b4ac9218");
+		check(B = x"1eb3e7c1");
+		check(C = x"a4799506");
+		check(D = x"a95a2fc0");
+
+		-- Step 9
+		wait until rising_edge(clk);
+		check(A = x"a95a2fc0");
+		check(B = x"a6e70cfe");
+		check(C = x"1eb3e7c1");
+		check(D = x"a4799506");
+
+		-- Step 10
+		wait until rising_edge(clk);
+		check(A = x"a4799506");
+		check(B = x"ca27520b");
+		check(C = x"a6e70cfe");
+		check(D = x"1eb3e7c1");
+
+		-- Step 11
+		wait until rising_edge(clk);
+		check(A = x"1eb3e7c1");
+		check(B = x"8a7612ec");
+		check(C = x"ca27520b");
+		check(D = x"a6e70cfe");
+
+		-- Step 12
+		wait until rising_edge(clk);
+		check(A = x"a6e70cfe");
+		check(B = x"3cbdcd45");
+		check(C = x"8a7612ec");
+		check(D = x"ca27520b");
+
+		-- Step 13
+		wait until rising_edge(clk);
+		check(A = x"ca27520b");
+		check(B = x"b8dec763");
+		check(C = x"3cbdcd45");
+		check(D = x"8a7612ec");
+
+		-- Step 14
+		wait until rising_edge(clk);
+		check(A = x"8a7612ec");
+		check(B = x"fa148c8a");
+		check(C = x"b8dec763");
+		check(D = x"3cbdcd45");
+
+		-- Step 15
+		wait until rising_edge(clk);
+		check(A = x"3cbdcd45");
+		check(B = x"5d38e690");
+		check(C = x"fa148c8a");
+		check(D = x"b8dec763");
 		
 		wait for 1000 ps;
 
