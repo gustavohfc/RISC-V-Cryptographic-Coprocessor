@@ -27,10 +27,10 @@ architecture md5_test_complete_tb_arch OF md5_test_complete_tb IS
 	signal is_busy               : std_logic                     := '0';
 	signal is_complete           : std_logic                     := '0';
 	signal error                 : md5_error_type;
-	signal A_out                 : std_logic_vector(31 downto 0) := (others => '0');
-	signal B_out                 : std_logic_vector(31 downto 0) := (others => '0');
-	signal C_out                 : std_logic_vector(31 downto 0) := (others => '0');
-	signal D_out                 : std_logic_vector(31 downto 0) := (others => '0');
+	signal A                     : std_logic_vector(31 downto 0) := (others => '0');
+	signal B                     : std_logic_vector(31 downto 0) := (others => '0');
+	signal C                     : std_logic_vector(31 downto 0) := (others => '0');
+	signal D                     : std_logic_vector(31 downto 0) := (others => '0');
 
 begin
 	md5 : entity work.md5
@@ -47,10 +47,10 @@ begin
 			is_busy               => is_busy,
 			is_complete           => is_complete,
 			error                 => error,
-			A_out                 => A_out,
-			B_out                 => B_out,
-			C_out                 => C_out,
-			D_out                 => D_out
+			A_out                 => A,
+			B_out                 => B,
+			C_out                 => C,
+			D_out                 => D
 		);
 
 	clk <= not clk after 10 ps;
@@ -137,6 +137,11 @@ begin
 		calculate_next_chunk <= '1';
 		wait until rising_edge(clk);
 		calculate_next_chunk <= '0';
+
+		wait until rising_edge(clk);
+		wait until rising_edge(clk);
+
+		check(A = x"10325476");
 		
 		wait for 1000 ps;
 

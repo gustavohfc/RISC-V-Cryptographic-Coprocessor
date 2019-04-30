@@ -31,10 +31,7 @@ architecture md5_arch of md5 is
 		idle,                           -- Waiting the first chunk of data
 		waiting_next_chunk,
 		padding_last_chunk,
-		calculating_round_1,
-		calculating_round_2,
-		calculating_round_3,
-		calculating_round_4,
+		calculating,
 		hash_complete,
 		error_occurred
 	);
@@ -297,7 +294,7 @@ begin
 
 	is_idle               <= '1' when state = idle else '0';
 	is_waiting_next_chunk <= '1' when state = waiting_next_chunk else '0';
-	is_busy               <= '1' when state = padding_last_chunk or state = calculating_round_1 or state = calculating_round_2 or state = calculating_round_3 or state = calculating_round_4 else '0';
+	is_busy               <= '1' when state = padding_last_chunk or state = calculating else '0';
 	is_complete           <= '1' when state = hash_complete else '0';
 
 	-- Update state
@@ -358,13 +355,13 @@ begin
 		case state is
 			when idle =>
 				if calculate_next_chunk = '1' then
-					next_state <= calculating_round_1;
+					next_state <= calculating;
 				end if;
 
 			when waiting_next_chunk =>
 				if calculate_next_chunk = '1' then
 					if is_last_chunk = '1' then
-						next_state <= calculating_round_1;
+						next_state <= calculating;
 					else
 						next_state <= padding_last_chunk;
 					end if;
@@ -373,32 +370,39 @@ begin
 			when padding_last_chunk =>
 				null;
 
-			when calculating_round_1 =>
-				if current_step = 15 then
-					next_state <= calculating_round_2;
-				else
-					next_state <= calculating_round_1;
-				end if;
+			--			when calculating_round_1 =>
+			--				if current_step = 15 then
+			--					next_state <= calculating_round_2;
+			--				else
+			--					next_state <= calculating_round_1;
+			--				end if;
+			--
+			--			when calculating_round_2 =>
+			--				if current_step = 31 then
+			--					next_state <= calculating_round_3;
+			--				else
+			--					next_state <= calculating_round_2;
+			--				end if;
+			--
+			--			when calculating_round_3 =>
+			--				if current_step = 47 then
+			--					next_state <= calculating_round_4;
+			--				else
+			--					next_state <= calculating_round_3;
+			--				end if;
+			--
+			--			when calculating_round_4 =>
+			--				if current_step = 63 then
+			--					next_state <= hash_complete;
+			--				else
+			--					next_state <= calculating_round_3;
+			--				end if;
 
-			when calculating_round_2 =>
-				if current_step = 31 then
-					next_state <= calculating_round_3;
-				else
-					next_state <= calculating_round_2;
-				end if;
-
-			when calculating_round_3 =>
-				if current_step = 47 then
-					next_state <= calculating_round_4;
-				else
-					next_state <= calculating_round_3;
-				end if;
-
-			when calculating_round_4 =>
+			when calculating =>
 				if current_step = 63 then
 					next_state <= hash_complete;
 				else
-					next_state <= calculating_round_3;
+					next_state <= calculating;
 				end if;
 
 			when hash_complete =>
@@ -407,40 +411,77 @@ begin
 			when error_occurred =>
 				next_state <= error_occurred;
 
+			when others =>
+				null;
+
 		end case;
 	end process;
 
 	-- Calculate
 	process(state, A, B, C, D, current_step, input_buffer)
-		variable X_k           : unsigned(31 downto 0);
+		variable X_k, f_result : unsigned(31 downto 0);
 		variable X_k_first_bit : natural; -- TODO: range 31 downto 0
 	begin
-		case state is
-			when padding_last_chunk =>
-				null;
+		if state = padding_last_chunk then
+			null;                       -- TODO
+		elsif state = calculating then
+			X_k_first_bit := (15 - K(current_step)) * 32; -- TODO: change to shift
+			X_k           := unsigned(input_buffer(X_k_first_bit + 31 downto X_k_first_bit));
 
-			when calculating_round_1 =>
-				X_k_first_bit := (15 - K(current_step)) * 32; -- TODO: change to shift
-				X_k           := unsigned(input_buffer(X_k_first_bit + 31 downto X_k_first_bit));
-				A_next        <= D;
-				B_next        <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and C) or (not B and D)) + X_k + T(current_step)), s(current_step))));
-				C_next        <= B;
-				D_next        <= C;
-				next_step     <= current_step + 1;
+			if current_step < 16 then
+				f_result := unsigned((B and C) or (not B and D));
+			elsif current_step < 32 then
+				f_result := unsigned((B and D) or (B and not D));
+			elsif current_step < 48 then
+				f_result := unsigned(B xor C xor D);
+			else
+				f_result := unsigned(C xor (B or not D));
+			end if;
 
-			when calculating_round_2 =>
-				null;
+			A_next    <= D;
+			B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + f_result + X_k + T(current_step)), s(current_step))));
+			C_next    <= B;
+			D_next    <= C;
+			next_step <= current_step + 1;
 
-			when calculating_round_3 =>
-				null;
+		end if;
 
-			when calculating_round_4 =>
-				null;
-
-			when others =>
-				null;
-
-		end case;
+		--		case state is
+		--			when padding_last_chunk =>
+		--				null;
+		--
+		--			when calculating_round_1 =>
+		--				A_next    <= D;
+		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and C) or (not B and D)) + X_k + T(current_step)), s(current_step))));
+		--				C_next    <= B;
+		--				D_next    <= C;
+		--				next_step <= current_step + 1;
+		--
+		--			when calculating_round_2 =>
+		--				A_next    <= D;
+		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and D) or (B and not D)) + X_k + T(current_step)), s(current_step))));
+		--				C_next    <= B;
+		--				D_next    <= C;
+		--				next_step <= current_step + 1;
+		--
+		--			when calculating_round_3 =>
+		--				A_next    <= D;
+		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned(B xor C xor D) + X_k + T(current_step)), s(current_step))));
+		--				C_next    <= B;
+		--				D_next    <= C;
+		--				next_step <= current_step + 1;
+		--
+		--			when calculating_round_4 =>
+		--				A_next    <= D;
+		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned(C xor (B or not D)) + X_k + T(current_step)), s(current_step))));
+		--				C_next    <= B;
+		--				D_next    <= C;
+		--				next_step <= current_step + 1;
+		--
+		--			when others =>
+		--				null;
+		--
+		--		end case;
 	end process;
 
 end architecture md5_arch;
