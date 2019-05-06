@@ -597,7 +597,17 @@ begin
 		check(C = x"10f68731");
 		check(D = x"ea3d3eb4");
 
+		-- Round result
+		wait until rising_edge(clk);
+		check(A = x"83fd320b");
+		check(B = x"defbe5cf");
+		check(C = x"a9b1642f");
+		check(D = x"fa6f932a");
+
 		-----------------------------------------------------------------------
+
+		wait until rising_edge(clk); -- Wait the padding
+
 		-- Step 0
 		wait until rising_edge(clk);
 		check(A = x"fa6f932a");

@@ -32,7 +32,9 @@ architecture md5_arch of md5 is
 		idle,                           -- Waiting the first chunk of data
 		waiting_next_chunk,
 		padding_last_chunk,
+		preparing_additional_chunk,
 		calculating,
+		complete_calculation,
 		hash_complete,
 		error_occurred
 	);
@@ -275,17 +277,24 @@ architecture md5_arch of md5 is
 	signal current_step : natural := 0;
 
 	-- Message digest buffer
-	signal A : word32 := A0;
-	signal B : word32 := B0;
-	signal C : word32 := C0;
-	signal D : word32 := D0;
+	signal A              : word32 := A0;
+	signal B              : word32 := B0;
+	signal C              : word32 := C0;
+	signal D              : word32 := D0;
+	signal AA, BB, CC, DD : word32 := (others => '0');
 
 	-- Buffer for the 512 bit input
 	signal input_buffer : std_logic_vector(0 to 511) := (others => '0');
 
-	signal message_size : unsigned(64 downto 0) := (others => '0');
-	
-	signal last_chunk_size_internal : unsigned(9 downto 0); -- A number between 1 and 512
+	signal message_size : unsigned(63 downto 0) := (others => '0');
+
+	signal last_chunk_size_internal : unsigned(9 downto 0) := (others => '0');
+
+	signal is_last_chunk_internal : std_logic := '0';
+
+	signal additional_chunk_needed : std_logic := '0';
+
+	signal padding_bit_1_on_additional_chunk : std_logic := '0';
 
 begin
 
@@ -319,6 +328,14 @@ begin
 			-- Reset the iput buffer
 			input_buffer <= (others => '0');
 
+			is_last_chunk_internal <= '0';
+
+			additional_chunk_needed <= '0';
+
+			padding_bit_1_on_additional_chunk <= '0';
+
+			message_size <= (others => '0');
+
 		elsif rising_edge(clk) then
 
 			-- Validate inputs
@@ -338,49 +355,107 @@ begin
 					-- Calculate next state
 					if calculate_next_chunk = '1' then
 						if is_last_chunk = '0' then
-							state <= calculating;
+							message_size <= message_size + 64;
+							state        <= calculating;
 						else
-							state <= padding_last_chunk;
+							message_size             <= message_size + last_chunk_size;
 							last_chunk_size_internal <= last_chunk_size;
+							is_last_chunk_internal   <= '1';
+							state                    <= padding_last_chunk;
 						end if;
 					end if;
 
 				when padding_last_chunk => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-					input_buffer(to_integer(last_chunk_size_internal)) <= '1';
-					input_buffer(to_integer(last_chunk_size_internal + 1) to 511) <= (others => '0');
-					
+					if last_chunk_size_internal < 447 then
+						input_buffer(to_integer(last_chunk_size_internal))            <= '1';
+						input_buffer(to_integer(last_chunk_size_internal + 1) to 447) <= (others => '0');
+						input_buffer(448 to 479)                                      <= std_logic_vector(message_size(7 downto 0)) & std_logic_vector(message_size(15 downto 8)) & std_logic_vector(message_size(23 downto 16)) & std_logic_vector(message_size(31 downto 24));
+						input_buffer(480 to 511)                                      <= std_logic_vector(message_size(39 downto 32)) & std_logic_vector(message_size(47 downto 40)) & std_logic_vector(message_size(55 downto 48)) & std_logic_vector(message_size(63 downto 56));
+						additional_chunk_needed                                       <= '0';
+						padding_bit_1_on_additional_chunk                             <= '0';
+						state                                                         <= calculating;
+					elsif last_chunk_size_internal < 511 then
+						input_buffer(to_integer(last_chunk_size_internal))            <= '1';
+						input_buffer(to_integer(last_chunk_size_internal + 1) to 511) <= (others => '0');
+						additional_chunk_needed                                       <= '1';
+						padding_bit_1_on_additional_chunk                             <= '0';
+						state                                                         <= calculating;
+					elsif last_chunk_size_internal = 511 then
+						input_buffer(511)                 <= '1';
+						additional_chunk_needed           <= '1';
+						padding_bit_1_on_additional_chunk <= '0';
+						state                             <= calculating;
+					elsif last_chunk_size_internal = 512 then
+						additional_chunk_needed           <= '1';
+						padding_bit_1_on_additional_chunk <= '1';
+						state                             <= calculating;
+					else
+						state <= error_occurred;
+						error <= MD5_ERROR_INVALID_LAST_CHUNK_SIZE;
+					end if;
+
+				when preparing_additional_chunk => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					input_buffer(0)          <= padding_bit_1_on_additional_chunk;
+					input_buffer(1 to 447)   <= (others => '0');
+					input_buffer(448 to 479) <= std_logic_vector(message_size(7 downto 0)) & std_logic_vector(message_size(15 downto 8)) & std_logic_vector(message_size(23 downto 16)) & std_logic_vector(message_size(31 downto 24));
+					input_buffer(480 to 511) <= std_logic_vector(message_size(39 downto 32)) & std_logic_vector(message_size(47 downto 40)) & std_logic_vector(message_size(55 downto 48)) & std_logic_vector(message_size(63 downto 56));
+
 					state <= calculating;
 
-				when calculating => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				when calculating =>     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					if current_step = 0 then
+						AA <= A;
+						BB <= B;
+						CC <= C;
+						DD <= D;
+					end if;
+
 					X_k_first_bit := K(current_step) * 32; -- TODO: change to shift
 					X_k           := unsigned(swap_byte_endianness(input_buffer(X_k_first_bit to X_k_first_bit + 31)));
 
 					if current_step < 16 then
 						f_result := unsigned((B and C) or (not B and D));
 					elsif current_step < 32 then
-						f_result := unsigned((B and D) or (B and not D));
+						f_result := unsigned((B and D) or (C and not D));
 					elsif current_step < 48 then
 						f_result := unsigned(B xor C xor D);
 					else
 						f_result := unsigned(C xor (B or not D));
 					end if;
 
-					A    <= D;
-					B    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + f_result + X_k + T(current_step)), s(current_step))));
-					C    <= B;
-					D    <= C;
-					current_step <= current_step + 1;
-					
+					A <= D;
+					B <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + f_result + X_k + T(current_step)), s(current_step))));
+					C <= B;
+					D <= C;
+
 					if current_step = 63 then
-						state <= hash_complete;
+						current_step <= 0;
+						state        <= complete_calculation;
 					else
-						state <= calculating;
+						current_step <= current_step + 1;
+						state        <= calculating;
 					end if;
 
-				when hash_complete => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				when complete_calculation => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					A <= std_logic_vector(unsigned(A) + unsigned(AA));
+					B <= std_logic_vector(unsigned(B) + unsigned(BB));
+					C <= std_logic_vector(unsigned(C) + unsigned(CC));
+					D <= std_logic_vector(unsigned(D) + unsigned(DD));
+
+					if is_last_chunk_internal = '1' then
+						if additional_chunk_needed = '1' then
+							state <= preparing_additional_chunk;
+						else
+							state <= hash_complete;
+						end if;
+					else
+						state <= hash_complete; -- TODO: waiting
+					end if;
+
+				when hash_complete =>   ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					state <= hash_complete;
 
-				when error_occurred => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				when error_occurred =>  ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					state <= error_occurred;
 
 				when others =>
