@@ -1056,8 +1056,13 @@ begin
 		check(C = x"826afd76");
 		check(D = x"a52dae75");
 		
-
-		wait for 1000 ps;
+		-- Check final result
+		wait until is_complete = '1';
+		report to_string(A);
+		check(A = x"d174ab98");
+		check(B = x"d277d9f5");
+		check(C = x"a5611c2c");
+		check(D = x"9f419d9f");
 
 		test_runner_cleanup(runner);
 	end process;
