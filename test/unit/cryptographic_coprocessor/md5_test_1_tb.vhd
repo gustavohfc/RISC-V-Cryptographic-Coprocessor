@@ -8,19 +8,21 @@ use ieee.numeric_std.all;
 use work.constants.all;
 use work.coprocessor_constants.all;
 
-entity md5_test_complete_tb IS
+-- 496 bits message ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+
+entity md5_test_1_tb IS
 	generic(
 		runner_cfg : string
 	);
-end md5_test_complete_tb;
+end md5_test_1_tb;
 
-architecture md5_test_complete_tb_arch OF md5_test_complete_tb IS
+architecture md5_test_1_tb_arch OF md5_test_1_tb IS
 	signal clk                   : std_logic             := '0';
 	signal start_new_hash        : std_logic             := '0';
 	signal calculate_next_block  : std_logic             := '0';
 	signal write_data_in         : std_logic             := '0';
 	signal data_in               : unsigned(31 downto 0) := (others => '0');
-	signal data_in_word_position : unsigned(3 downto 0);
+	signal data_in_word_position : unsigned(3 downto 0)  := (others => '0');
 	signal is_last_block         : std_logic             := '0';
 	signal last_block_size       : unsigned(9 downto 0)  := (others => '0');
 	signal is_idle               : std_logic             := '0';
@@ -604,7 +606,7 @@ begin
 		check(C = x"a9b1642f");
 		check(D = x"fa6f932a");
 
-		-----------------------------------------------------------------------
+		-------------------------------------------- Round 2 --------------------------------------------
 
 		wait until rising_edge(clk);    -- Wait the padding
 
@@ -1058,7 +1060,6 @@ begin
 
 		-- Check final result
 		wait until is_complete = '1';
-		report to_string(A);
 		check(A = x"d174ab98");
 		check(B = x"d277d9f5");
 		check(C = x"a5611c2c");
@@ -1067,4 +1068,4 @@ begin
 		test_runner_cleanup(runner);
 	end process;
 
-end md5_test_complete_tb_arch;
+end md5_test_1_tb_arch;

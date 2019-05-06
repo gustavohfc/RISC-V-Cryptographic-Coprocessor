@@ -350,7 +350,7 @@ begin
 					-- Calculate next state
 					if calculate_next_block = '1' then
 						if is_last_block = '0' then
-							message_size <= message_size + 64;
+							message_size <= message_size + 512;
 							state        <= calculating;
 						else
 							message_size             <= message_size + last_block_size;
