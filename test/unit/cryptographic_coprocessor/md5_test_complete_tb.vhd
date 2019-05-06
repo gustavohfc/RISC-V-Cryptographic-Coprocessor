@@ -15,23 +15,23 @@ entity md5_test_complete_tb IS
 end md5_test_complete_tb;
 
 architecture md5_test_complete_tb_arch OF md5_test_complete_tb IS
-	signal clk                   : std_logic                     := '0';
-	signal start_new_hash        : std_logic                     := '0';
-	signal calculate_next_chunk  : std_logic                     := '0';
-	signal write_data_in         : std_logic                     := '0';
-	signal data_in               : std_logic_vector(31 downto 0) := (others => '0');
+	signal clk                   : std_logic             := '0';
+	signal start_new_hash        : std_logic             := '0';
+	signal calculate_next_block  : std_logic             := '0';
+	signal write_data_in         : std_logic             := '0';
+	signal data_in               : unsigned(31 downto 0) := (others => '0');
 	signal data_in_word_position : unsigned(3 downto 0);
-	signal is_last_chunk         : std_logic                     := '0';
-	signal last_chunk_size       : unsigned(9 downto 0)          := (others => '0');
-	signal is_idle               : std_logic                     := '0';
-	signal is_waiting_next_chunk : std_logic                     := '0';
-	signal is_busy               : std_logic                     := '0';
-	signal is_complete           : std_logic                     := '0';
+	signal is_last_block         : std_logic             := '0';
+	signal last_block_size       : unsigned(9 downto 0)  := (others => '0');
+	signal is_idle               : std_logic             := '0';
+	signal is_waiting_next_block : std_logic             := '0';
+	signal is_busy               : std_logic             := '0';
+	signal is_complete           : std_logic             := '0';
 	signal error                 : md5_error_type;
-	signal A                     : std_logic_vector(31 downto 0) := (others => '0');
-	signal B                     : std_logic_vector(31 downto 0) := (others => '0');
-	signal C                     : std_logic_vector(31 downto 0) := (others => '0');
-	signal D                     : std_logic_vector(31 downto 0) := (others => '0');
+	signal A                     : unsigned(31 downto 0) := (others => '0');
+	signal B                     : unsigned(31 downto 0) := (others => '0');
+	signal C                     : unsigned(31 downto 0) := (others => '0');
+	signal D                     : unsigned(31 downto 0) := (others => '0');
 
 begin
 	md5 : entity work.md5
@@ -41,11 +41,11 @@ begin
 			write_data_in         => write_data_in,
 			data_in               => data_in,
 			data_in_word_position => data_in_word_position,
-			calculate_next_chunk  => calculate_next_chunk,
-			is_last_chunk         => is_last_chunk,
-			last_chunk_size       => last_chunk_size,
+			calculate_next_block  => calculate_next_block,
+			is_last_block         => is_last_block,
+			last_block_size       => last_block_size,
 			is_idle               => is_idle,
-			is_waiting_next_chunk => is_waiting_next_chunk,
+			is_waiting_next_block => is_waiting_next_block,
 			is_busy               => is_busy,
 			is_complete           => is_complete,
 			error                 => error,
@@ -136,12 +136,12 @@ begin
 		write_data_in <= '0';
 
 		-- Start calculation
-		calculate_next_chunk <= '1';
-		is_last_chunk        <= '1';
-		last_chunk_size      <= to_unsigned(496, 10);
+		calculate_next_block <= '1';
+		is_last_block        <= '1';
+		last_block_size      <= to_unsigned(496, 10);
 		wait until rising_edge(clk);
-		calculate_next_chunk <= '0';
-		is_last_chunk        <= '0';
+		calculate_next_block <= '0';
+		is_last_block        <= '0';
 
 		wait until rising_edge(clk);    -- Wait padding step
 
@@ -606,7 +606,7 @@ begin
 
 		-----------------------------------------------------------------------
 
-		wait until rising_edge(clk); -- Wait the padding
+		wait until rising_edge(clk);    -- Wait the padding
 
 		-- Step 0
 		wait until rising_edge(clk);
@@ -1055,7 +1055,7 @@ begin
 		check(B = x"16dd9203");
 		check(C = x"826afd76");
 		check(D = x"a52dae75");
-		
+
 		-- Check final result
 		wait until is_complete = '1';
 		report to_string(A);
