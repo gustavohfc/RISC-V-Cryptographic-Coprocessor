@@ -5,7 +5,8 @@ package coprocessor_constants is
 
 	type md5_error_type is (
 		MD5_ERROR_NONE,
-		MD5_ERROR_UNEXPECTED_NEW_DATA
+		MD5_ERROR_UNEXPECTED_NEW_DATA,
+		MD5_ERROR_INVALID_LAST_CHUNK_SIZE
 	);
 
 end package coprocessor_constants;

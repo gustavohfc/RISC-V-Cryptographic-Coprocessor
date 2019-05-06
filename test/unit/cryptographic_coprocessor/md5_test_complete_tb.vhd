@@ -22,6 +22,7 @@ architecture md5_test_complete_tb_arch OF md5_test_complete_tb IS
 	signal data_in               : std_logic_vector(31 downto 0) := (others => '0');
 	signal data_in_word_position : unsigned(3 downto 0);
 	signal is_last_chunk         : std_logic                     := '0';
+	signal last_chunk_size       : unsigned(9 downto 0)          := (others => '0');
 	signal is_idle               : std_logic                     := '0';
 	signal is_waiting_next_chunk : std_logic                     := '0';
 	signal is_busy               : std_logic                     := '0';
@@ -42,6 +43,7 @@ begin
 			data_in_word_position => data_in_word_position,
 			calculate_next_chunk  => calculate_next_chunk,
 			is_last_chunk         => is_last_chunk,
+			last_chunk_size       => last_chunk_size,
 			is_idle               => is_idle,
 			is_waiting_next_chunk => is_waiting_next_chunk,
 			is_busy               => is_busy,
@@ -135,15 +137,18 @@ begin
 
 		-- Start calculation
 		calculate_next_chunk <= '1';
+		is_last_chunk        <= '1';
+		last_chunk_size      <= to_unsigned(496, 10);
 		wait until rising_edge(clk);
 		calculate_next_chunk <= '0';
+		is_last_chunk        <= '0';
 
-		--wait until rising_edge(clk); -- Wait padding step
-		
+		wait until rising_edge(clk);    -- Wait padding step
+
 		wait until rising_edge(clk);
 
 		-------------------------------------------- Round 1 --------------------------------------------
-		
+
 		-- Step 0
 		wait until rising_edge(clk);
 		check(A = x"10325476");
@@ -255,7 +260,7 @@ begin
 		check(B = x"5d38e690");
 		check(C = x"fa148c8a");
 		check(D = x"b8dec763");
-		
+
 		wait for 1000 ps;
 
 		test_runner_cleanup(runner);

@@ -12,9 +12,10 @@ entity md5 is
 		start_new_hash             : in  std_logic; -- Reset the state machine to calculate a new hash
 		write_data_in              : in  std_logic;
 		data_in                    : in  std_logic_vector(31 downto 0);
-		data_in_word_position      : in  unsigned(3 downto 0); -- A number between 0 and 15 that indicates in which word of the 512 bits input buffer the data_in should be written (most significant bit/byte/word first).
+		data_in_word_position      : in  unsigned(3 downto 0); -- A number between 0 and 15
 		calculate_next_chunk       : in  std_logic;
 		is_last_chunk              : in  std_logic;
+		last_chunk_size            : in  unsigned(9 downto 0); -- A number between 1 and 512
 		-- Outputs
 		is_idle                    : out std_logic; -- Waiting for a new message
 		is_waiting_next_chunk      : out std_logic; -- Waiting for next data of a message which it already started the message digest calculation
@@ -35,7 +36,7 @@ architecture md5_arch of md5 is
 		hash_complete,
 		error_occurred
 	);
-	signal state, next_state : state_type := idle;
+	signal state : state_type := idle;
 
 	constant A0 : word32 := X"67452301";
 	constant B0 : word32 := X"efcdab89";
@@ -271,18 +272,20 @@ architecture md5_arch of md5 is
 	end function swap_byte_endianness;
 
 	-- Step of the calculation, TODO: 0 to 63
-	signal current_step, next_step : natural := 0;
+	signal current_step : natural := 0;
 
 	-- Message digest buffer
-	signal A, A_next : word32 := A0;
-	signal B, B_next : word32 := B0;
-	signal C, C_next : word32 := C0;
-	signal D, D_next : word32 := D0;
+	signal A : word32 := A0;
+	signal B : word32 := B0;
+	signal C : word32 := C0;
+	signal D : word32 := D0;
 
 	-- Buffer for the 512 bit input
 	signal input_buffer : std_logic_vector(0 to 511) := (others => '0');
 
-	signal error_next : md5_error_type;
+	signal message_size : unsigned(64 downto 0) := (others => '0');
+	
+	signal last_chunk_size_internal : unsigned(9 downto 0); -- A number between 1 and 512
 
 begin
 
@@ -297,8 +300,10 @@ begin
 	is_busy               <= '1' when state = padding_last_chunk or state = calculating else '0';
 	is_complete           <= '1' when state = hash_complete else '0';
 
-	-- Update state
 	fsm : process(clk, start_new_hash)
+		variable input_first_bit : natural; -- TODO: range 0 to 480
+		variable X_k, f_result   : unsigned(31 downto 0);
+		variable X_k_first_bit   : natural; -- TODO: range 31 downto 0
 	begin
 		if start_new_hash = '1' then
 			state        <= idle;
@@ -311,181 +316,79 @@ begin
 			C <= C0;
 			D <= D0;
 
-		elsif rising_edge(clk) then
-			if error_next = MD5_ERROR_NONE then
-				state <= next_state;
-			else
-				state <= error_occurred;
-				error <= error_next;
-			end if;
-
-			current_step <= next_step;
-
-			-- Update messsage digest buffer
-			A <= A_next;
-			B <= B_next;
-			C <= C_next;
-			D <= D_next;
-
-		end if;
-	end process;
-
-	-- Input buffer control
-	process(clk, start_new_hash)
-		variable first_bit_position : natural; -- TODO: range 0 to 480
-	begin
-		if start_new_hash = '1' then
+			-- Reset the iput buffer
 			input_buffer <= (others => '0');
-		end if;
-		if rising_edge(clk) then
-			if write_data_in = '1' then
-				if state = waiting_next_chunk or state = idle then
-					first_bit_position                                              := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
-					input_buffer(first_bit_position to first_bit_position + 31) <= swap_byte_endianness(data_in);
-				else
-					error_next <= MD5_ERROR_UNEXPECTED_NEW_DATA;
-				end if;
-			end if;
-		end if;
-	end process;
 
-	-- Calculate next state
-	process(calculate_next_chunk, is_last_chunk, state, current_step)
-	begin
-		case state is
-			when idle =>
-				if calculate_next_chunk = '1' then
-					if is_last_chunk = '0' then
-						next_state <= calculating;
-					else
-						next_state <= padding_last_chunk;
-					end if;
-				end if;
+		elsif rising_edge(clk) then
 
-			when waiting_next_chunk =>
-				if calculate_next_chunk = '1' then
-					if is_last_chunk = '0' then
-						next_state <= calculating;
-					else
-						next_state <= padding_last_chunk;
-					end if;
-				end if;
-
-			when padding_last_chunk =>
-				next_state <= calculating;
-
-			--			when calculating_round_1 =>
-			--				if current_step = 15 then
-			--					next_state <= calculating_round_2;
-			--				else
-			--					next_state <= calculating_round_1;
-			--				end if;
-			--
-			--			when calculating_round_2 =>
-			--				if current_step = 31 then
-			--					next_state <= calculating_round_3;
-			--				else
-			--					next_state <= calculating_round_2;
-			--				end if;
-			--
-			--			when calculating_round_3 =>
-			--				if current_step = 47 then
-			--					next_state <= calculating_round_4;
-			--				else
-			--					next_state <= calculating_round_3;
-			--				end if;
-			--
-			--			when calculating_round_4 =>
-			--				if current_step = 63 then
-			--					next_state <= hash_complete;
-			--				else
-			--					next_state <= calculating_round_3;
-			--				end if;
-
-			when calculating =>
-				if current_step = 63 then
-					next_state <= hash_complete;
-				else
-					next_state <= calculating;
-				end if;
-
-			when hash_complete =>
-				next_state <= hash_complete;
-
-			when error_occurred =>
-				next_state <= error_occurred;
-
-			when others =>
-				null;
-
-		end case;
-	end process;
-
-	-- Calculate
-	process(state, A, B, C, D, current_step, input_buffer)
-		variable X_k, f_result : unsigned(31 downto 0);
-		variable X_k_first_bit : natural; -- TODO: range 31 downto 0
-	begin
-		if state = padding_last_chunk then
-			null;                       -- TODO
-		elsif state = calculating then
-			X_k_first_bit := K(current_step) * 32; -- TODO: change to shift
-			X_k           := unsigned(input_buffer(X_k_first_bit to X_k_first_bit + 31));
-
-			if current_step < 16 then
-				f_result := unsigned((B and C) or (not B and D));
-			elsif current_step < 32 then
-				f_result := unsigned((B and D) or (B and not D));
-			elsif current_step < 48 then
-				f_result := unsigned(B xor C xor D);
-			else
-				f_result := unsigned(C xor (B or not D));
+			-- Validate inputs
+			if write_data_in = '1' and not (state = waiting_next_chunk or state = idle) then
+				state <= error_occurred;
+				error <= MD5_ERROR_UNEXPECTED_NEW_DATA;
 			end if;
 
-			A_next    <= D;
-			B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + f_result + X_k + T(current_step)), s(current_step))));
-			C_next    <= B;
-			D_next    <= C;
-			next_step <= current_step + 1;
+			case state is
+				when idle | waiting_next_chunk => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					if write_data_in = '1' then
+						-- Write new data
+						input_first_bit                                       := to_integer(data_in_word_position & "00000"); -- 5 left shifts = *32
+						input_buffer(input_first_bit to input_first_bit + 31) <= data_in;
+					end if;
+
+					-- Calculate next state
+					if calculate_next_chunk = '1' then
+						if is_last_chunk = '0' then
+							state <= calculating;
+						else
+							state <= padding_last_chunk;
+							last_chunk_size_internal <= last_chunk_size;
+						end if;
+					end if;
+
+				when padding_last_chunk => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					input_buffer(to_integer(last_chunk_size_internal)) <= '1';
+					input_buffer(to_integer(last_chunk_size_internal + 1) to 511) <= (others => '0');
+					
+					state <= calculating;
+
+				when calculating => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					X_k_first_bit := K(current_step) * 32; -- TODO: change to shift
+					X_k           := unsigned(swap_byte_endianness(input_buffer(X_k_first_bit to X_k_first_bit + 31)));
+
+					if current_step < 16 then
+						f_result := unsigned((B and C) or (not B and D));
+					elsif current_step < 32 then
+						f_result := unsigned((B and D) or (B and not D));
+					elsif current_step < 48 then
+						f_result := unsigned(B xor C xor D);
+					else
+						f_result := unsigned(C xor (B or not D));
+					end if;
+
+					A    <= D;
+					B    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + f_result + X_k + T(current_step)), s(current_step))));
+					C    <= B;
+					D    <= C;
+					current_step <= current_step + 1;
+					
+					if current_step = 63 then
+						state <= hash_complete;
+					else
+						state <= calculating;
+					end if;
+
+				when hash_complete => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					state <= hash_complete;
+
+				when error_occurred => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					state <= error_occurred;
+
+				when others =>
+					null;
+
+			end case;
 
 		end if;
-
-		--		case state is
-		--			when padding_last_chunk =>
-		--				null;
-		--
-		--			when calculating_round_1 =>
-		--				A_next    <= D;
-		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and C) or (not B and D)) + X_k + T(current_step)), s(current_step))));
-		--				C_next    <= B;
-		--				D_next    <= C;
-		--				next_step <= current_step + 1;
-		--
-		--			when calculating_round_2 =>
-		--				A_next    <= D;
-		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned((B and D) or (B and not D)) + X_k + T(current_step)), s(current_step))));
-		--				C_next    <= B;
-		--				D_next    <= C;
-		--				next_step <= current_step + 1;
-		--
-		--			when calculating_round_3 =>
-		--				A_next    <= D;
-		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned(B xor C xor D) + X_k + T(current_step)), s(current_step))));
-		--				C_next    <= B;
-		--				D_next    <= C;
-		--				next_step <= current_step + 1;
-		--
-		--			when calculating_round_4 =>
-		--				A_next    <= D;
-		--				B_next    <= std_logic_vector(unsigned(B) + unsigned(left_circular_shift(std_logic_vector(unsigned(a) + unsigned(C xor (B or not D)) + X_k + T(current_step)), s(current_step))));
-		--				C_next    <= B;
-		--				D_next    <= C;
-		--				next_step <= current_step + 1;
-		--
-		--			when others =>
-		--				null;
-		--
-		--		end case;
 	end process;
 
 end architecture md5_arch;
