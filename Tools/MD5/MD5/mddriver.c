@@ -163,10 +163,9 @@ static void MDTestSuite() {
     MDString("abc");
     MDString("message digest");
     MDString("abcdefghijklmnopqrstuvwxyz");
-    MDString
-        ("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
-    MDString
-        ("12345678901234567890123456789012345678901234567890123456789012345678901234567890");
+    MDString("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
+    MDString("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl");
+    MDString("12345678901234567890123456789012345678901234567890123456789012345678901234567890");
 }
 
 
