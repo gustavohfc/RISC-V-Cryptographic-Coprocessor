@@ -310,9 +310,10 @@ begin
 	is_complete           <= '1' when state = hash_complete else '0';
 
 	fsm : process(clk, start_new_hash)
-		variable input_first_bit : natural; -- TODO: range 0 to 480
-		variable X_k, f_result   : unsigned(31 downto 0);
-		variable X_k_first_bit   : natural; -- TODO: range 31 downto 0
+		variable input_first_bit                : natural; -- TODO: range 0 to 480
+		variable X_k, f_result                  : unsigned(31 downto 0);
+		variable X_k_first_bit                  : natural; -- TODO: range 31 downto 0
+		variable temp_A, temp_B, temp_C, temp_D : std_logic_vector(31 downto 0);
 	begin
 		if start_new_hash = '1' then
 			state        <= idle;
@@ -400,6 +401,8 @@ begin
 					input_buffer(448 to 479) <= std_logic_vector(message_size(7 downto 0)) & std_logic_vector(message_size(15 downto 8)) & std_logic_vector(message_size(23 downto 16)) & std_logic_vector(message_size(31 downto 24));
 					input_buffer(480 to 511) <= std_logic_vector(message_size(39 downto 32)) & std_logic_vector(message_size(47 downto 40)) & std_logic_vector(message_size(55 downto 48)) & std_logic_vector(message_size(63 downto 56));
 
+					additional_chunk_needed <= '0';
+
 					state <= calculating;
 
 				when calculating =>     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -437,18 +440,30 @@ begin
 					end if;
 
 				when complete_calculation => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-					A <= std_logic_vector(unsigned(A) + unsigned(AA));
-					B <= std_logic_vector(unsigned(B) + unsigned(BB));
-					C <= std_logic_vector(unsigned(C) + unsigned(CC));
-					D <= std_logic_vector(unsigned(D) + unsigned(DD));
+					temp_A := std_logic_vector(unsigned(A) + unsigned(AA));
+					temp_B := std_logic_vector(unsigned(B) + unsigned(BB));
+					temp_C := std_logic_vector(unsigned(C) + unsigned(CC));
+					temp_D := std_logic_vector(unsigned(D) + unsigned(DD));
 
 					if is_last_chunk_internal = '1' then
 						if additional_chunk_needed = '1' then
+							A     <= temp_A;
+							B     <= temp_B;
+							C     <= temp_C;
+							D     <= temp_D;
 							state <= preparing_additional_chunk;
 						else
+							A     <= swap_byte_endianness(temp_A);
+							B     <= swap_byte_endianness(temp_B);
+							C     <= swap_byte_endianness(temp_C);
+							D     <= swap_byte_endianness(temp_D);
 							state <= hash_complete;
 						end if;
 					else
+						A     <= temp_A;
+						B     <= temp_B;
+						C     <= temp_C;
+						D     <= temp_D;
 						state <= hash_complete; -- TODO: waiting
 					end if;
 
