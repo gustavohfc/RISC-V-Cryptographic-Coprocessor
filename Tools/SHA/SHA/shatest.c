@@ -1731,7 +1731,7 @@ int scasecmp(const char* s1, const char* s2) {
 
 FILE* redirect_stdout(char* prefix, int i) {
     static char filename[100];
-    sprintf(filename, "%s%d", prefix, i);
+    sprintf(filename, "%s%d", prefix, i + 1);
     freopen(filename, "w", stdout);
 }
 
@@ -1745,6 +1745,14 @@ void hash_sha1(char* message, int i) {
     SHA1Reset(&context);
     SHA1Input(&context, (uint8_t*)message, strlen(message));
     SHA1Result(&context, Message_Digest);
+
+    printf("-- Check final result\n");
+    printf("wait until is_complete = '1';\n");
+    printf("check(H0_out = x\"%8x\");\n", context.Intermediate_Hash[0]);
+    printf("check(H1_out = x\"%8x\");\n", context.Intermediate_Hash[1]);
+    printf("check(H2_out = x\"%8x\");\n", context.Intermediate_Hash[2]);
+    printf("check(H3_out = x\"%8x\");\n", context.Intermediate_Hash[3]);
+    printf("check(H4_out = x\"%8x\");\n\n", context.Intermediate_Hash[4]);
 
     fclose(stdout);
 }

@@ -38,6 +38,7 @@
 
 #include "sha.h"
 #include "sha-private.h"
+#include <stdio.h>
 
 /*
  *  Define the SHA1 circular left shift macro
@@ -277,6 +278,8 @@ static void SHA1ProcessMessageBlock(SHA1Context* context) {
     D = context->Intermediate_Hash[3];
     E = context->Intermediate_Hash[4];
 
+    printf("-------------------------------------------- Round  --------------------------------------------\n\n");
+
     for (t = 0; t < 20; t++) {
         temp = SHA1_ROTL(5, A) + SHA_Ch(B, C, D) + E + W[t] + K[0];
         E = D;
@@ -284,6 +287,14 @@ static void SHA1ProcessMessageBlock(SHA1Context* context) {
         C = SHA1_ROTL(30, B);
         B = A;
         A = temp;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8x\");\n", A);
+        printf("check(B = x\"%8x\");\n", B);
+        printf("check(C = x\"%8x\");\n", C);
+        printf("check(D = x\"%8x\");\n", D);
+        printf("check(E = x\"%8x\");\n\n", E);
     }
 
     for (t = 20; t < 40; t++) {
@@ -293,6 +304,14 @@ static void SHA1ProcessMessageBlock(SHA1Context* context) {
         C = SHA1_ROTL(30, B);
         B = A;
         A = temp;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8x\");\n", A);
+        printf("check(B = x\"%8x\");\n", B);
+        printf("check(C = x\"%8x\");\n", C);
+        printf("check(D = x\"%8x\");\n", D);
+        printf("check(E = x\"%8x\");\n\n", E);
     }
 
     for (t = 40; t < 60; t++) {
@@ -302,6 +321,14 @@ static void SHA1ProcessMessageBlock(SHA1Context* context) {
         C = SHA1_ROTL(30, B);
         B = A;
         A = temp;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8x\");\n", A);
+        printf("check(B = x\"%8x\");\n", B);
+        printf("check(C = x\"%8x\");\n", C);
+        printf("check(D = x\"%8x\");\n", D);
+        printf("check(E = x\"%8x\");\n\n", E);
     }
 
     for (t = 60; t < 80; t++) {
@@ -311,6 +338,14 @@ static void SHA1ProcessMessageBlock(SHA1Context* context) {
         C = SHA1_ROTL(30, B);
         B = A;
         A = temp;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8x\");\n", A);
+        printf("check(B = x\"%8x\");\n", B);
+        printf("check(C = x\"%8x\");\n", C);
+        printf("check(D = x\"%8x\");\n", D);
+        printf("check(E = x\"%8x\");\n\n", E);
     }
 
     context->Intermediate_Hash[0] += A;
