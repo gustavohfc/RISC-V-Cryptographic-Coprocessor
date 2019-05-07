@@ -244,7 +244,9 @@ struct hash {
 
     const char* randomtest;
     const char* randomresults[RANDOMCOUNT];
-} hashes[HASHCOUNT] = {
+}
+
+hashes[HASHCOUNT] = {
         {
             "SHA1", SHA1, SHA1HashSize,
                 {
@@ -1519,7 +1521,7 @@ int unhexStr(char* hexstr) {
 }
 
 
-int main(int argc, char** argv) {
+int main_original(int argc, char** argv) {
     int i, err;
     int loopno, loopnohigh = 1;
     int hashno, hashnolow = 0, hashnohigh = HASHCOUNT - 1;
@@ -1718,5 +1720,48 @@ int scasecmp(const char* s1, const char* s2) {
             return u1 - u2;
         if (u1 == '\0')
             return 0;
+    }
+}
+
+
+// The following functions aren't from the original RFC code
+
+#define N_TESTS 7
+
+
+FILE* redirect_stdout(char* prefix, int i) {
+    static char filename[100];
+    sprintf(filename, "%s%d", prefix, i);
+    freopen(filename, "w", stdout);
+}
+
+
+void hash_sha1(char* message, int i) {
+    redirect_stdout("sha1_", i);
+
+    SHA1Context context;
+    uint8_t Message_Digest[SHA1HashSize];
+
+    SHA1Reset(&context);
+    SHA1Input(&context, (uint8_t*)message, strlen(message));
+    SHA1Result(&context, Message_Digest);
+
+    fclose(stdout);
+}
+
+
+int main(int argc, char** argv) {
+    char* tests[N_TESTS] = {
+        "a",
+        "abc",
+        "message digest",
+        "abcdefghijklmnopqrstuvwxyz",
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+        "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl",
+        "12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+    };
+
+    for (int i = 0; i < N_TESTS; i++) {
+        hash_sha1(tests[i], i);
     }
 }
