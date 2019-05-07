@@ -1737,7 +1737,7 @@ FILE* redirect_stdout(char* prefix, int i) {
 
 
 void hash_sha1(char* message, int i) {
-    redirect_stdout("sha1_", i);
+    redirect_stdout("tmp_sha1_", i);
 
     SHA1Context context;
     uint8_t Message_Digest[SHA1HashSize];

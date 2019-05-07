@@ -45,3 +45,5 @@ PLLJ_PLLSPE_INFO.txt # The generated PLL specification file
 vunit_out
 
 Debug/
+
+Tools/**/tmp_*
