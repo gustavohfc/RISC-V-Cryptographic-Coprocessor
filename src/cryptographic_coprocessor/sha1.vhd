@@ -132,6 +132,12 @@ begin
 					end if;
 
 					if calculate_next_block = '1' then
+						A <= H0;
+						B <= H1;
+						C <= H2;
+						D <= H3;
+						E <= H4;
+
 						if is_last_block = '0' then
 							message_size <= message_size + 512;
 							state        <= calculating;
@@ -185,20 +191,12 @@ begin
 					state <= calculating;
 
 				when calculating =>     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-					if current_step = 0 then
-						A <= H0;
-						B <= H1;
-						C <= H2;
-						D <= H3;
-						E <= H4;
-					end if;
-
 					W_t_first_bit := current_step * 32;
 
 					if current_step < 16 then
 						W_t := message_buffer(W_t_first_bit to W_t_first_bit + 31);
 					else
-						W_t                                                 := left_circular_shift(message_buffer(W_t_first_bit - 96 to W_t_first_bit - 65) xor message_buffer(W_t_first_bit - 256 to W_t_first_bit - 225) xor message_buffer(W_t_first_bit - 448 to W_t_first_bit - 417) xor message_buffer(W_t_first_bit - 512 to W_t_first_bit - 481), x"1");
+						W_t                                                 := left_circular_shift(message_buffer(W_t_first_bit - 96 to W_t_first_bit - 65) xor message_buffer(W_t_first_bit - 256 to W_t_first_bit - 225) xor message_buffer(W_t_first_bit - 448 to W_t_first_bit - 417) xor message_buffer(W_t_first_bit - 512 to W_t_first_bit - 481), x"01");
 						message_buffer(W_t_first_bit to W_t_first_bit + 31) <= W_t;
 					end if;
 
@@ -216,7 +214,7 @@ begin
 						K_t      := x"CA62C1D6";
 					end if;
 
-					A <= left_circular_shift(A, x"5") + f_result + E + W_t + K_t;
+					A <= left_circular_shift(A, x"05") + f_result + E + W_t + K_t;
 					B <= A;
 					C <= left_circular_shift(B, x"1E");
 					D <= C;
