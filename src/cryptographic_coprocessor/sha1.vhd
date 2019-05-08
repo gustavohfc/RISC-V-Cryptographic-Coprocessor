@@ -133,6 +133,12 @@ begin
 
 					if calculate_next_block = '1' then
 						if is_last_block = '0' then
+							A            <= H0;
+							B            <= H1;
+							C            <= H2;
+							D            <= H3;
+							E            <= H4;
+							
 							message_size <= message_size + 512;
 							state        <= calculating;
 						else
