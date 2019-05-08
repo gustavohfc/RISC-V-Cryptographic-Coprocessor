@@ -21,7 +21,7 @@ entity sha1 is
 		is_waiting_next_block                  : out std_logic; -- Waiting for next data of a message which it already started the message digest calculation
 		is_busy                                : out std_logic; -- Is busy calculating the hash
 		is_complete                            : out std_logic; -- The message digest was calculated successfully
-		error                                  : out md5_error_type; -- Indicates if a error has occurred
+		error                                  : out sha1_error_type; -- Indicates if a error has occurred
 		H0_out, H1_out, H2_out, H3_out, H4_out : out unsigned(31 downto 0) -- The message digest result
 	);
 end entity sha1;

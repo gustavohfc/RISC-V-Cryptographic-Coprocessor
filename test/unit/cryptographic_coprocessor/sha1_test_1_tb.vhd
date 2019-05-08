@@ -29,7 +29,7 @@ architecture sha1_test_1_tb_arch OF sha1_test_1_tb IS
 	signal is_waiting_next_block : std_logic             := '0';
 	signal is_busy               : std_logic             := '0';
 	signal is_complete           : std_logic             := '0';
-	signal error                 : md5_error_type;
+	signal error                 : sha1_error_type;
 	signal H0_out                : unsigned(31 downto 0) := (others => '0');
 	signal H1_out                : unsigned(31 downto 0) := (others => '0');
 	signal H2_out                : unsigned(31 downto 0) := (others => '0');
