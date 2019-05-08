@@ -132,12 +132,6 @@ begin
 					end if;
 
 					if calculate_next_block = '1' then
-						A <= H0;
-						B <= H1;
-						C <= H2;
-						D <= H3;
-						E <= H4;
-
 						if is_last_block = '0' then
 							message_size <= message_size + 512;
 							state        <= calculating;
@@ -150,6 +144,12 @@ begin
 					end if;
 
 				when padding_last_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					A <= H0;
+					B <= H1;
+					C <= H2;
+					D <= H3;
+					E <= H4;
+
 					if last_block_size_internal < 447 then
 						message_buffer(to_integer(last_block_size_internal))            <= '1';
 						message_buffer(to_integer(last_block_size_internal + 1) to 447) <= (others => '0');
@@ -180,6 +180,12 @@ begin
 					end if;
 
 				when preparing_additional_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					A <= H0;
+					B <= H1;
+					C <= H2;
+					D <= H3;
+					E <= H4;
+
 					message_buffer(0)          <= padding_bit_1_on_additional_block;
 					message_buffer(1 to 447)   <= (others => '0');
 					message_buffer(448 to 511) <= message_size;
