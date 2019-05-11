@@ -193,6 +193,9 @@ begin
 	H2_out <= H2;
 	H3_out <= H3;
 	H4_out <= H4;
+	H5_out <= H5;
+	H6_out <= H6;
+	H7_out <= H7;
 
 	is_waiting_next_block <= '1' when state = waiting_next_block else '0';
 	is_busy               <= '1' when state = preparing_additional_block or state = padding_last_block or state = pre_calculation or state = calculating or state = post_calculation else '0';
@@ -309,7 +312,7 @@ begin
 					if current_step < 16 then
 						W_t := message_buffer(W_t_first_bit to W_t_first_bit + 31);
 					else
-						W_t := SSIG1(message_buffer(W_t_first_bit - 64 to W_t_first_bit - 33)) + message_buffer(W_t_first_bit - 224 to W_t_first_bit - 193) + SSIG0(message_buffer(W_t_first_bit - 480 to W_t_first_bit - 449)) + SSIG0(message_buffer(W_t_first_bit - 512 to W_t_first_bit - 481));
+						W_t := SSIG1(message_buffer(W_t_first_bit - 64 to W_t_first_bit - 33)) + message_buffer(W_t_first_bit - 224 to W_t_first_bit - 193) + SSIG0(message_buffer(W_t_first_bit - 480 to W_t_first_bit - 449)) + message_buffer(W_t_first_bit - 512 to W_t_first_bit - 481);
 						message_buffer(W_t_first_bit to W_t_first_bit + 31) <= W_t;
 					end if;
 
@@ -324,7 +327,7 @@ begin
 					G <= F;
 					H <= G;
 
-					if current_step = 62 then
+					if current_step = 63 then
 						current_step <= 0;
 						state        <= post_calculation;
 					else
