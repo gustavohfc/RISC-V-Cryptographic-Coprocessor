@@ -14,7 +14,7 @@ timing
 *.done
 *.eqn
 *.hex
-!test/integration/*.hex
+!test/integration/*/*.hex
 *.html
 *.jdi
 *.jpg

@@ -4,6 +4,7 @@ from shutil import copy2
 from itertools import zip_longest
 import re
 import os
+import glob
 
 root = dirname(__file__)
 
@@ -15,12 +16,13 @@ def copy_hex_files(vu):
     if not os.path.exists(vu._simulator_output_path):
         os.mkdir(vu._simulator_output_path)
 
-    copy2(join(root, "..", "MEM_DADOS.mif"), vu._simulator_output_path) # TODO: Use a specific data memory initialization file for each test
+    copy2(join(root, "..", "MEM_DADOS.mif"), vu._simulator_output_path) # TODO: Remove
 
-    # Copy all mif files from integration tests folder to the simulation path
-    for file in os.listdir(join(root, "integration")):
-        if file.endswith(".hex"):
-            copy2(join(root, "integration", file), vu._simulator_output_path)
+    # Copy all hex files from integration tests folder to the simulation path
+    for file_path in glob.glob(join(root, "integration", "*", "*.hex")):
+        path, filename = os.path.split(file_path)
+        _, test_name = os.path.split(path)
+        copy2(file_path, join(vu._simulator_output_path, test_name + '_' + filename))
 
 def make_integration_post_check(vu, test_name):
     """
@@ -30,9 +32,9 @@ def make_integration_post_check(vu, test_name):
     simulator_output_path = vu._simulator_output_path
 
     def post_check(output_path):
-        expected_register_changes_path = join(root, "integration", test_name + "_register_changes.txt")
+        expected_register_changes_path = join(root, "integration", test_name, "register_changes.txt")
         simulated_register_changes_path = join(simulator_output_path, test_name + "_register_changes.txt")
-        expected_memory_changes_path = join(root, "integration", test_name + "_memory_changes.txt")
+        expected_memory_changes_path = join(root, "integration", test_name, "memory_changes.txt")
         simulated_memory_changes_path = join(simulator_output_path, test_name + "_memory_changes.txt")
 
         if not compare_files(expected_register_changes_path, simulated_register_changes_path):
@@ -76,7 +78,7 @@ if __name__ == "__main__":
 
     # Add the unit tests
     if runAllTests or args.core_unit:
-        lib.add_source_files(join(root, "unit", "*_tb.vhd"))
+        lib.add_source_files(join(root, "unit", "riscv_core", "*_tb.vhd"))
     
     if runAllTests or args.coprocessor_unit:
         lib.add_source_files(join(root, "unit", "cryptographic_coprocessor", "*_tb.vhd"))
