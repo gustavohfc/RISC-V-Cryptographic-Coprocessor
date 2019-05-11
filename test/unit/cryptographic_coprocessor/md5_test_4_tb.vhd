@@ -25,7 +25,6 @@ architecture md5_test_4_tb_arch OF md5_test_4_tb IS
 	signal data_in_word_position : unsigned(3 downto 0)  := (others => '0');
 	signal is_last_block         : std_logic             := '0';
 	signal last_block_size       : unsigned(9 downto 0)  := (others => '0');
-	signal is_idle               : std_logic             := '0';
 	signal is_waiting_next_block : std_logic             := '0';
 	signal is_busy               : std_logic             := '0';
 	signal is_complete           : std_logic             := '0';
@@ -46,7 +45,6 @@ begin
 			calculate_next_block  => calculate_next_block,
 			is_last_block         => is_last_block,
 			last_block_size       => last_block_size,
-			is_idle               => is_idle,
 			is_waiting_next_block => is_waiting_next_block,
 			is_busy               => is_busy,
 			is_complete           => is_complete,
@@ -97,9 +95,11 @@ begin
 		calculate_next_block <= '0';
 		is_last_block        <= '0';
 
-		wait until rising_edge(clk);    -- Wait padding step
-
 		wait until rising_edge(clk);
+
+		wait until rising_edge(clk);    -- Wait padding step
+		
+		wait until rising_edge(clk);    -- Wait the pre calculation step
 
 		-------------------------------------------- Round 1 --------------------------------------------
 
