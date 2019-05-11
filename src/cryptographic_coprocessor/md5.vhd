@@ -17,7 +17,7 @@ entity md5 is
 		is_last_block              : in  std_logic; -- Indicates whether this block is the last
 		last_block_size            : in  unsigned(9 downto 0); -- The size of the last block, should be between 1 and 512
 		-- Outputs
-		is_waiting_next_block      : out std_logic; -- Waiting for next data of a message which it already started the message digest calculation
+		is_waiting_next_block      : out std_logic;
 		is_busy                    : out std_logic; -- Is busy calculating the hash
 		is_complete                : out std_logic; -- The message digest was calculated successfully
 		error                      : out md5_error_type; -- Indicates if a error has occurred

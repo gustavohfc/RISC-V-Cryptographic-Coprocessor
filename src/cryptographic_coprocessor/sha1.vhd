@@ -17,8 +17,7 @@ entity sha1 is
 		is_last_block                          : in  std_logic; -- Indicates whether this block is the last
 		last_block_size                        : in  unsigned(9 downto 0); -- The size of the last block, should be between 1 and 512
 		-- Outputs
-		is_idle                                : out std_logic; -- Waiting for the start of a new message
-		is_waiting_next_block                  : out std_logic; -- Waiting for next data of a message which it already started the message digest calculation
+		is_waiting_next_block                  : out std_logic;
 		is_busy                                : out std_logic; -- Is busy calculating the hash
 		is_complete                            : out std_logic; -- The message digest was calculated successfully
 		error                                  : out sha1_error_type; -- Indicates if a error has occurred
@@ -29,16 +28,16 @@ end entity sha1;
 architecture sha1_arch of sha1 is
 
 	type state_type is (
-		idle,                           -- Waiting the first block of data
-		waiting_next_block,             -- Waiting for next data of a message which it already started the message digest calculation
+		waiting_next_block,
 		padding_last_block,
 		preparing_additional_block,     -- When the padding doesn't fit on the last block it's needed to add a additional block
+		pre_calculation,
 		calculating,
-		completing_calculation,         -- Makes some adjustments to complete the round calculation
+		post_calculation,
 		hash_complete,                  -- The message digest was calculated successfully
 		error_occurred
 	);
-	signal state : state_type := idle;
+	signal state : state_type := waiting_next_block;
 
 	constant H0_initial : unsigned(31 downto 0) := X"67452301";
 	constant H1_initial : unsigned(31 downto 0) := X"EFCDAB89";
@@ -85,9 +84,8 @@ begin
 	H3_out <= H3;
 	H4_out <= H4;
 
-	is_idle               <= '1' when state = idle else '0';
 	is_waiting_next_block <= '1' when state = waiting_next_block else '0';
-	is_busy               <= '1' when state = preparing_additional_block or state = padding_last_block or state = calculating or state = completing_calculation else '0';
+	is_busy               <= '1' when state = preparing_additional_block or state = padding_last_block or state = pre_calculation or state = calculating or state = post_calculation else '0';
 	is_complete           <= '1' when state = hash_complete else '0';
 
 	fsm : process(clk, start_new_hash)
@@ -96,7 +94,7 @@ begin
 		variable W_t, K_t, f_result : unsigned(31 downto 0);
 	begin
 		if start_new_hash = '1' then
-			state        <= idle;
+			state        <= waiting_next_block;
 			current_step <= 0;
 			error        <= SHA1_ERROR_NONE;
 
@@ -118,13 +116,13 @@ begin
 		elsif rising_edge(clk) then
 
 			-- Validate inputs
-			if write_data_in = '1' and not (state = waiting_next_block or state = idle) then
+			if write_data_in = '1' and not (state = waiting_next_block) then
 				state <= error_occurred;
 				error <= SHA1_ERROR_UNEXPECTED_NEW_DATA;
 			end if;
 
 			case state is
-				when idle | waiting_next_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				when waiting_next_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					if write_data_in = '1' then
 						-- Write new data
 						input_first_bit                                         := to_integer(data_in_word_position & "00000"); -- * 32
@@ -133,14 +131,8 @@ begin
 
 					if calculate_next_block = '1' then
 						if is_last_block = '0' then
-							A            <= H0;
-							B            <= H1;
-							C            <= H2;
-							D            <= H3;
-							E            <= H4;
-							
 							message_size <= message_size + 512;
-							state        <= calculating;
+							state        <= pre_calculation;
 						else
 							message_size             <= message_size + last_block_size;
 							last_block_size_internal <= last_block_size;
@@ -150,56 +142,49 @@ begin
 					end if;
 
 				when padding_last_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-					A <= H0;
-					B <= H1;
-					C <= H2;
-					D <= H3;
-					E <= H4;
-
 					if last_block_size_internal < 447 then
 						message_buffer(to_integer(last_block_size_internal))            <= '1';
 						message_buffer(to_integer(last_block_size_internal + 1) to 447) <= (others => '0');
 						message_buffer(448 to 511)                                      <= message_size;
-						--message_buffer(448 to 479)                                      <= swap_byte_endianness(message_size(31 downto 0));
-						--message_buffer(480 to 511)                                      <= swap_byte_endianness(message_size(63 downto 32));
 						additional_block_needed                                         <= '0';
 						padding_bit_1_on_additional_block                               <= '0';
-						state                                                           <= calculating;
+						state                                                           <= pre_calculation;
 					elsif last_block_size_internal < 511 then
 						message_buffer(to_integer(last_block_size_internal))            <= '1';
 						message_buffer(to_integer(last_block_size_internal + 1) to 511) <= (others => '0');
 						additional_block_needed                                         <= '1';
 						padding_bit_1_on_additional_block                               <= '0';
-						state                                                           <= calculating;
+						state                                                           <= pre_calculation;
 					elsif last_block_size_internal = 511 then
 						message_buffer(511)               <= '1';
 						additional_block_needed           <= '1';
 						padding_bit_1_on_additional_block <= '0';
-						state                             <= calculating;
+						state                             <= pre_calculation;
 					elsif last_block_size_internal = 512 then
 						additional_block_needed           <= '1';
 						padding_bit_1_on_additional_block <= '1';
-						state                             <= calculating;
+						state                             <= pre_calculation;
 					else
 						state <= error_occurred;
 						error <= SHA1_ERROR_INVALID_LAST_BLOCK_SIZE;
 					end if;
 
 				when preparing_additional_block => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+					message_buffer(0)          <= padding_bit_1_on_additional_block;
+					message_buffer(1 to 447)   <= (others => '0');
+					message_buffer(448 to 511) <= message_size;
+
+					additional_block_needed <= '0';
+
+					state <= pre_calculation;
+
+				when pre_calculation => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					A <= H0;
 					B <= H1;
 					C <= H2;
 					D <= H3;
 					E <= H4;
-
-					message_buffer(0)          <= padding_bit_1_on_additional_block;
-					message_buffer(1 to 447)   <= (others => '0');
-					message_buffer(448 to 511) <= message_size;
-					--message_buffer(448 to 479) <= swap_byte_endianness(message_size(31 downto 0));
-					--message_buffer(480 to 511) <= swap_byte_endianness(message_size(63 downto 32));
-
-					additional_block_needed <= '0';
-
+					
 					state <= calculating;
 
 				when calculating =>     ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -234,13 +219,13 @@ begin
 
 					if current_step = 79 then
 						current_step <= 0;
-						state        <= completing_calculation;
+						state        <= post_calculation;
 					else
 						current_step <= current_step + 1;
 						state        <= calculating;
 					end if;
 
-				when completing_calculation => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+				when post_calculation => ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 					H0 <= H0 + A;
 					H1 <= H1 + B;
 					H2 <= H2 + C;

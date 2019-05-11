@@ -25,7 +25,6 @@ architecture sha1_test_7_tb_arch OF sha1_test_7_tb IS
 	signal calculate_next_block  : std_logic             := '0';
 	signal is_last_block         : std_logic             := '0';
 	signal last_block_size       : unsigned(9 downto 0)  := (others => '0');
-	signal is_idle               : std_logic             := '0';
 	signal is_waiting_next_block : std_logic             := '0';
 	signal is_busy               : std_logic             := '0';
 	signal is_complete           : std_logic             := '0';
@@ -47,7 +46,6 @@ begin
 			calculate_next_block  => calculate_next_block,
 			is_last_block         => is_last_block,
 			last_block_size       => last_block_size,
-			is_idle               => is_idle,
 			is_waiting_next_block => is_waiting_next_block,
 			is_busy               => is_busy,
 			is_complete           => is_complete,
@@ -151,6 +149,8 @@ begin
 		calculate_next_block <= '0';
 
 		wait until rising_edge(clk);
+		
+		wait until rising_edge(clk);    -- Wait the pre calculation step
 
 		-------------------------------------------- Round 1 --------------------------------------------
 
@@ -828,10 +828,12 @@ begin
 		wait until rising_edge(clk);
 		calculate_next_block <= '0';
 		is_last_block        <= '0';
+		
+		wait until rising_edge(clk);
 
 		wait until rising_edge(clk);    -- Wait padding step
-
-		wait until rising_edge(clk);
+		
+		wait until rising_edge(clk);    -- Wait the pre calculation step
 
 		-- Step 0
 		wait until rising_edge(clk);
