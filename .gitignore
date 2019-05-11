@@ -47,3 +47,5 @@ vunit_out
 Debug/
 
 Tools/**/tmp_*
+
+a.out
