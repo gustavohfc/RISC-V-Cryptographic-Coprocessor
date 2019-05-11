@@ -52,7 +52,7 @@ architecture sha512_arch of sha512 is
 	-- Functions
 	function right_circular_shift(x : in unsigned(63 downto 0); s : in unsigned(7 downto 0)) return unsigned is
 	begin
-		return shift_right(x, to_integer(s)) or shift_left(x, to_integer(63 - s));
+		return shift_right(x, to_integer(s)) or shift_left(x, to_integer(64 - s));
 	end function right_circular_shift;
 
 	function CH(x : in unsigned(63 downto 0); y : in unsigned(63 downto 0); z : in unsigned(63 downto 0)) return unsigned is
