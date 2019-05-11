@@ -1,4 +1,4 @@
-from vunit import VUnit
+from vunit import VUnit, VUnitCLI
 from os.path import join, dirname
 from shutil import copy2
 from itertools import zip_longest
@@ -54,28 +54,42 @@ def compare_files(file_path_1, file_path_2):
     return True
 
 if __name__ == "__main__":
+    # Parse command line args
+    cli = VUnitCLI()
+    cli.parser.add_argument('--all', action='store_true')
+    cli.parser.add_argument('--core-unit', action='store_true')
+    cli.parser.add_argument('--coprocessor-unit', action='store_true')
+    cli.parser.add_argument('--core-integration', action='store_true')
+    args = cli.parse_args()
+
+    runAllTests = args.all or args.test_patterns != '*'
+
     # Create VUnit instance by parsing command line arguments
-    vu = VUnit.from_argv()
+    vu = VUnit.from_args(args=args)
 
     # Create library 'lib'
     lib = vu.add_library("lib")
 
-    # Add all files ending in .vhd in current working directory to library
+    # Add the source files
     lib.add_source_files(join(root, "..", "src", "*.vhd"))
     lib.add_source_files(join(root, "..", "src", "cryptographic_coprocessor", "*.vhd"))
 
-    # Unit tests
-    lib.add_source_files(join(root, "unit", "*_tb.vhd"))
-    lib.add_source_files(join(root, "unit", "cryptographic_coprocessor", "*_tb.vhd"))
+    # Add the unit tests
+    if runAllTests or args.core_unit:
+        lib.add_source_files(join(root, "unit", "*_tb.vhd"))
+    
+    if runAllTests or args.coprocessor_unit:
+        lib.add_source_files(join(root, "unit", "cryptographic_coprocessor", "*_tb.vhd"))
 
-    # Integration tests
-    lib.add_source_files(join(root, "integration/integration_tb.vhd"))
-    tb = lib.get_test_benches("*integration_tb*")[0]
-    tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add", PC_max=24), post_check=make_integration_post_check(vu, "simple_add"))
-    tb.add_config("test_1", generics=dict(WSIZE=32, test_name="test_1", PC_max=216), post_check=make_integration_post_check(vu, "test_1"))
-    tb.add_config("fibonacci", generics=dict(WSIZE=32, test_name="fibonacci", PC_max=60), post_check=make_integration_post_check(vu, "fibonacci"))
-    tb.add_config("binary_search", generics=dict(WSIZE=32, test_name="binary_search", PC_max=180), post_check=make_integration_post_check(vu, "binary_search"))
-    tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=108), post_check=make_integration_post_check(vu, "branches"))
+    # Add the integration tests
+    if runAllTests or args.core_integration:
+        lib.add_source_files(join(root, "integration/integration_tb.vhd"))
+        tb = lib.get_test_benches("*integration_tb*")[0]
+        tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add", PC_max=24), post_check=make_integration_post_check(vu, "simple_add"))
+        tb.add_config("test_1", generics=dict(WSIZE=32, test_name="test_1", PC_max=216), post_check=make_integration_post_check(vu, "test_1"))
+        tb.add_config("fibonacci", generics=dict(WSIZE=32, test_name="fibonacci", PC_max=60), post_check=make_integration_post_check(vu, "fibonacci"))
+        tb.add_config("binary_search", generics=dict(WSIZE=32, test_name="binary_search", PC_max=180), post_check=make_integration_post_check(vu, "binary_search"))
+        tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=108), post_check=make_integration_post_check(vu, "branches"))
 
     copy_hex_files(vu)
 
