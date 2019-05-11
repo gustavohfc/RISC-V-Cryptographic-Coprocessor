@@ -1757,6 +1757,7 @@ void hash_sha1(char* message, int i) {
     fclose(stdout);
 }
 
+
 void hash_sha256(char* message, int i) {
     redirect_stdout("tmp_sha256_", i);
 
@@ -1782,6 +1783,31 @@ void hash_sha256(char* message, int i) {
 }
 
 
+void hash_sha512(char* message, int i) {
+    redirect_stdout("tmp_sha512_", i);
+
+    SHA512Context context;
+    uint8_t Message_Digest[SHA512HashSize];
+
+    SHA512Reset(&context);
+    SHA512Input(&context, (uint8_t*)message, strlen(message));
+    SHA512Result(&context, Message_Digest);
+
+    printf("-- Check final result\n");
+    printf("wait until is_complete = '1';\n");
+    printf("check(H0_out = x\"%8llx\");\n", context.Intermediate_Hash[0]);
+    printf("check(H1_out = x\"%8llx\");\n", context.Intermediate_Hash[1]);
+    printf("check(H2_out = x\"%8llx\");\n", context.Intermediate_Hash[2]);
+    printf("check(H3_out = x\"%8llx\");\n", context.Intermediate_Hash[3]);
+    printf("check(H4_out = x\"%8llx\");\n", context.Intermediate_Hash[4]);
+    printf("check(H5_out = x\"%8llx\");\n", context.Intermediate_Hash[5]);
+    printf("check(H6_out = x\"%8llx\");\n", context.Intermediate_Hash[6]);
+    printf("check(H7_out = x\"%8llx\");\n\n", context.Intermediate_Hash[7]);
+
+    fclose(stdout);
+}
+
+
 int main(int argc, char** argv) {
     char* tests[N_TESTS] = {
         "a",
@@ -1796,5 +1822,6 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N_TESTS; i++) {
         hash_sha1(tests[i], i);
         hash_sha256(tests[i], i);
+        hash_sha512(tests[i], i);
     }
 }

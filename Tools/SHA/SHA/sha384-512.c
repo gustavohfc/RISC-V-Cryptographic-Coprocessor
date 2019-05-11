@@ -44,6 +44,7 @@
  */
 
 #include "sha.h"
+#include <stdio.h>
 
 #ifdef USE_32BIT_ONLY
 /*
@@ -821,6 +822,8 @@ static void SHA384_512ProcessMessageBlock(SHA512Context* context) {
     G = context->Intermediate_Hash[6];
     H = context->Intermediate_Hash[7];
 
+    printf("-------------------------------------------- Round  --------------------------------------------\n\n");
+
     for (t = 0; t < 80; t++) {
         temp1 = H + SHA512_SIGMA1(E) + SHA_Ch(E, F, G) + K[t] + W[t];
         temp2 = SHA512_SIGMA0(A) + SHA_Maj(A, B, C);
@@ -832,6 +835,17 @@ static void SHA384_512ProcessMessageBlock(SHA512Context* context) {
         C = B;
         B = A;
         A = temp1 + temp2;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8llx\");\n", A);
+        printf("check(B = x\"%8llx\");\n", B);
+        printf("check(C = x\"%8llx\");\n", C);
+        printf("check(D = x\"%8llx\");\n", D);
+        printf("check(E = x\"%8llx\");\n", E);
+        printf("check(F = x\"%8llx\");\n", F);
+        printf("check(G = x\"%8llx\");\n", G);
+        printf("check(H = x\"%8llx\");\n\n", H);
     }
 
     context->Intermediate_Hash[0] += A;
