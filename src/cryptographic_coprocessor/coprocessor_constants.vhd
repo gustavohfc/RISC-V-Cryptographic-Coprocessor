@@ -15,6 +15,12 @@ package coprocessor_constants is
 		SHA1_ERROR_INVALID_LAST_BLOCK_SIZE
 	);
 
+	type sha256_error_type is (
+		SHA256_ERROR_NONE,
+		SHA256_ERROR_UNEXPECTED_NEW_DATA,
+		SHA256_ERROR_INVALID_LAST_BLOCK_SIZE
+	);
+
 end package coprocessor_constants;
 
 package body coprocessor_constants is
