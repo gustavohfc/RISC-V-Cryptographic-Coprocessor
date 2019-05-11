@@ -169,11 +169,15 @@ begin
 
 		-- Start calculation
 		calculate_next_block <= '1';
-		is_last_block        <= '0';
+		is_last_block        <= '1';
+		last_block_size      <= to_unsigned(640, 11);
 		wait until rising_edge(clk);
 		calculate_next_block <= '0';
+		is_last_block        <= '0';
 
 		wait until rising_edge(clk);
+
+		wait until rising_edge(clk);    -- Wait the padding step
 
 		wait until rising_edge(clk);    -- Wait the pre calculation step
 
