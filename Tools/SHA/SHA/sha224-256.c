@@ -42,6 +42,7 @@
 
 #include "sha.h"
 #include "sha-private.h"
+#include <stdio.h>
 
 /* Define the SHA shift, rotate left, and rotate right macros */
 #define SHA256_SHR(bits,word)      ((word) >> (bits))
@@ -476,6 +477,8 @@ static void SHA224_256ProcessMessageBlock(SHA256Context* context) {
     G = context->Intermediate_Hash[6];
     H = context->Intermediate_Hash[7];
 
+    printf("-------------------------------------------- Round  --------------------------------------------\n\n");
+
     for (t = 0; t < 64; t++) {
         temp1 = H + SHA256_SIGMA1(E) + SHA_Ch(E, F, G) + K[t] + W[t];
         temp2 = SHA256_SIGMA0(A) + SHA_Maj(A, B, C);
@@ -487,6 +490,17 @@ static void SHA224_256ProcessMessageBlock(SHA256Context* context) {
         C = B;
         B = A;
         A = temp1 + temp2;
+
+        printf("-- Step %d\n", t);
+        printf("wait until rising_edge(clk);\n");
+        printf("check(A = x\"%8x\");\n", A);
+        printf("check(B = x\"%8x\");\n", B);
+        printf("check(C = x\"%8x\");\n", C);
+        printf("check(D = x\"%8x\");\n", D);
+        printf("check(E = x\"%8x\");\n", E);
+        printf("check(F = x\"%8x\");\n", F);
+        printf("check(G = x\"%8x\");\n", G);
+        printf("check(H = x\"%8x\");\n\n", H);
     }
 
     context->Intermediate_Hash[0] += A;

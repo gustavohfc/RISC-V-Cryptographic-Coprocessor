@@ -1757,6 +1757,30 @@ void hash_sha1(char* message, int i) {
     fclose(stdout);
 }
 
+void hash_sha256(char* message, int i) {
+    redirect_stdout("tmp_sha256_", i);
+
+    SHA256Context context;
+    uint8_t Message_Digest[SHA256HashSize];
+
+    SHA256Reset(&context);
+    SHA256Input(&context, (uint8_t*)message, strlen(message));
+    SHA256Result(&context, Message_Digest);
+
+    printf("-- Check final result\n");
+    printf("wait until is_complete = '1';\n");
+    printf("check(H0_out = x\"%8x\");\n", context.Intermediate_Hash[0]);
+    printf("check(H1_out = x\"%8x\");\n", context.Intermediate_Hash[1]);
+    printf("check(H2_out = x\"%8x\");\n", context.Intermediate_Hash[2]);
+    printf("check(H3_out = x\"%8x\");\n", context.Intermediate_Hash[3]);
+    printf("check(H4_out = x\"%8x\");\n", context.Intermediate_Hash[4]);
+    printf("check(H5_out = x\"%8x\");\n", context.Intermediate_Hash[5]);
+    printf("check(H6_out = x\"%8x\");\n", context.Intermediate_Hash[6]);
+    printf("check(H7_out = x\"%8x\");\n\n", context.Intermediate_Hash[7]);
+
+    fclose(stdout);
+}
+
 
 int main(int argc, char** argv) {
     char* tests[N_TESTS] = {
@@ -1771,5 +1795,6 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < N_TESTS; i++) {
         hash_sha1(tests[i], i);
+        hash_sha256(tests[i], i);
     }
 }
