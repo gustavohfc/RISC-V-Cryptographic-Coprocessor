@@ -8,6 +8,7 @@ USE STD.textio.all;
 USE ieee.std_logic_textio.all;
 
 use work.constants.all;
+use work.riscv_core_constants.all;
 
 ENTITY integration_tb IS
 	generic(

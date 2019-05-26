@@ -5,7 +5,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.constants.all;
 use work.coprocessor_constants.all;
 
 -- 640 bits message ("12345678901234567890123456789012345678901234567890123456789012345678901234567890")

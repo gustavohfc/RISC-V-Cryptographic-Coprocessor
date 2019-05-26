@@ -6,6 +6,7 @@ USE ieee.std_logic_1164.all;
 USE ieee.numeric_std.all;
 
 use work.constants.all;
+use work.riscv_core_constants.all;
 
 ENTITY unit_register_file_tb IS
 	generic(
