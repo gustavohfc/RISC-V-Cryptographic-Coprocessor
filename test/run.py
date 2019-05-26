@@ -73,7 +73,7 @@ if __name__ == "__main__":
     lib = vu.add_library("lib")
 
     # Add the source files
-    lib.add_source_files(join(root, "..", "src", "*.vhd"))
+    lib.add_source_files(join(root, "..", "src", "riscv_core", "*.vhd"))
     lib.add_source_files(join(root, "..", "src", "cryptographic_coprocessor", "*.vhd"))
 
     # Add the unit tests
