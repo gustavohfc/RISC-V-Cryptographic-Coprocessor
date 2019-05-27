@@ -25,7 +25,7 @@ ARCHITECTURE integration_tb_arch OF integration_tb IS
 	signal stop         : std_logic := '0';
 
 BEGIN
-	riscv : entity work.RISCV
+	riscv : entity work.riscv_core
 		generic map(
 			WSIZE                  => WSIZE,
 			instructions_init_file => test_name & "_instructions.hex",

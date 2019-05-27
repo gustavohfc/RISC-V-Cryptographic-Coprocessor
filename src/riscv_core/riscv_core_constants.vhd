@@ -14,36 +14,36 @@ package riscv_core_constants is
 
 	-- Opcodes
 	constant OPCODE_LOAD       : std_logic_vector(6 downto 0) := "0000011";
-	constant OPCODE_LOAD_FP    : std_logic_vector(6 downto 0) := "0000111"; -- TODO: Not implemented
-	constant OPCODE_CUSTOM_0   : std_logic_vector(6 downto 0) := "0001011"; -- TODO: Not implemented
-	constant OPCODE_MISC_MEM   : std_logic_vector(6 downto 0) := "0001111"; -- TODO: Not implemented
+	constant OPCODE_LOAD_FP    : std_logic_vector(6 downto 0) := "0000111"; -- Not implemented
+	constant OPCODE_CUSTOM_0   : std_logic_vector(6 downto 0) := "0001011"; -- Cryptographic coprocessor
+	constant OPCODE_MISC_MEM   : std_logic_vector(6 downto 0) := "0001111"; -- Not implemented
 	constant OPCODE_OP_IMM     : std_logic_vector(6 downto 0) := "0010011";
 	constant OPCODE_AUIPC      : std_logic_vector(6 downto 0) := "0010111";
-	constant OPCODE_OP_IMM_32  : std_logic_vector(6 downto 0) := "0011011"; -- TODO: Not implemented
+	constant OPCODE_OP_IMM_32  : std_logic_vector(6 downto 0) := "0011011"; -- Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "0011111";
 	constant OPCODE_STORE      : std_logic_vector(6 downto 0) := "0100011";
-	constant OPCODE_STORE_FP   : std_logic_vector(6 downto 0) := "0100111"; -- TODO: Not implemented
-	constant OPCODE_CUSTOM_1   : std_logic_vector(6 downto 0) := "0101011"; -- TODO: Not implemented
-	constant OPCODE_AMO        : std_logic_vector(6 downto 0) := "0101111"; -- TODO: Not implemented
+	constant OPCODE_STORE_FP   : std_logic_vector(6 downto 0) := "0100111"; -- Not implemented
+	constant OPCODE_CUSTOM_1   : std_logic_vector(6 downto 0) := "0101011"; -- Not implemented
+	constant OPCODE_AMO        : std_logic_vector(6 downto 0) := "0101111"; -- Not implemented
 	constant OPCODE_OP         : std_logic_vector(6 downto 0) := "0110011";
 	constant OPCODE_LUI        : std_logic_vector(6 downto 0) := "0110111";
-	constant OPCODE_OP_32      : std_logic_vector(6 downto 0) := "0111011"; -- TODO: Not implemented
+	constant OPCODE_OP_32      : std_logic_vector(6 downto 0) := "0111011"; -- Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "0111111";
-	constant OPCODE_MADD       : std_logic_vector(6 downto 0) := "1000011"; -- TODO: Not implemented
-	constant OPCODE_MSUB       : std_logic_vector(6 downto 0) := "1000111"; -- TODO: Not implemented
-	constant OPCODE_NMSUB      : std_logic_vector(6 downto 0) := "1001011"; -- TODO: Not implemented
-	constant OPCODE_NMADD      : std_logic_vector(6 downto 0) := "1001111"; -- TODO: Not implemented
-	constant OPCODE_OP_FP      : std_logic_vector(6 downto 0) := "1010011"; -- TODO: Not implemented
-	constant OPCODE_RESERVED_1 : std_logic_vector(6 downto 0) := "1010111"; -- TODO: Not implemented
-	constant OPCODE_CUSTOM_2   : std_logic_vector(6 downto 0) := "1011011"; -- TODO: Not implemented
+	constant OPCODE_MADD       : std_logic_vector(6 downto 0) := "1000011"; -- Not implemented
+	constant OPCODE_MSUB       : std_logic_vector(6 downto 0) := "1000111"; -- Not implemented
+	constant OPCODE_NMSUB      : std_logic_vector(6 downto 0) := "1001011"; -- Not implemented
+	constant OPCODE_NMADD      : std_logic_vector(6 downto 0) := "1001111"; -- Not implemented
+	constant OPCODE_OP_FP      : std_logic_vector(6 downto 0) := "1010011"; -- Not implemented
+	constant OPCODE_RESERVED_1 : std_logic_vector(6 downto 0) := "1010111"; -- Not implemented
+	constant OPCODE_CUSTOM_2   : std_logic_vector(6 downto 0) := "1011011"; -- Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "1011111";
 	constant OPCODE_BRANCH     : std_logic_vector(6 downto 0) := "1100011";
 	constant OPCODE_JALR       : std_logic_vector(6 downto 0) := "1100111";
-	constant OPCODE_RESERVED_2 : std_logic_vector(6 downto 0) := "1101011"; -- TODO: Not implemented
+	constant OPCODE_RESERVED_2 : std_logic_vector(6 downto 0) := "1101011"; -- Not implemented
 	constant OPCODE_JAL        : std_logic_vector(6 downto 0) := "1101111";
-	constant OPCODE_SYSTEM     : std_logic_vector(6 downto 0) := "1110011"; -- TODO: Not implemented
-	constant OPCODE_RESERVED_3 : std_logic_vector(6 downto 0) := "1110111"; -- TODO: Not implemented
-	constant OPCODE_CUSTOM_3   : std_logic_vector(6 downto 0) := "1111011"; -- TODO: Not implemented
+	constant OPCODE_SYSTEM     : std_logic_vector(6 downto 0) := "1110011"; -- Not implemented
+	constant OPCODE_RESERVED_3 : std_logic_vector(6 downto 0) := "1110111"; -- Not implemented
+	constant OPCODE_CUSTOM_3   : std_logic_vector(6 downto 0) := "1111011"; -- Not implemented
 	--	constant OPCODE_           : std_logic_vector(6 downto 0) := "1111111";
 
 	-- IMMEDIATE FUNCT3 ALU FUNCTIONS
@@ -143,8 +143,6 @@ package riscv_core_constants is
 	constant PC_SELECT_JAL   : std_logic_vector(1 downto 0) := "01";
 	constant PC_SELECT_JALR  : std_logic_vector(1 downto 0) := "10";
 	constant PC_SELECT_BR    : std_logic_vector(1 downto 0) := "11";
-
-	constant BUBBLE : std_logic_vector((WORD_SIZE - 1) downto 0) := (others => '0');
 
 end package riscv_core_constants;
 

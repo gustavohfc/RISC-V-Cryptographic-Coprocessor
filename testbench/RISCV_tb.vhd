@@ -13,7 +13,7 @@ ARCHITECTURE RISCV_tb_arch OF RISCV_tb IS
 	signal clk_unset       : std_logic                                := '0';
 
 BEGIN
-	riscv : entity work.RISCV
+	riscv : entity work.riscv_core
 		port map(
 			clk             => clk
 		);

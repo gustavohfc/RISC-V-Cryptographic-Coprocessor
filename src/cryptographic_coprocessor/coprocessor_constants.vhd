@@ -20,7 +20,7 @@ package coprocessor_constants is
 		SHA256_ERROR_UNEXPECTED_NEW_DATA,
 		SHA256_ERROR_INVALID_LAST_BLOCK_SIZE
 	);
-	
+
 	type sha512_error_type is (
 		SHA512_ERROR_NONE,
 		SHA512_ERROR_UNEXPECTED_NEW_DATA,

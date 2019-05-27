@@ -5,7 +5,7 @@ use ieee.numeric_std.all;
 use work.constants.all;
 use work.riscv_core_constants.all;
 
-entity RISCV is
+entity riscv_core is
 	generic(
 		WSIZE                  : natural := WORD_SIZE;
 		instructions_init_file : string  := DEFAULT_INSTRUCTIONS_INIT_FILE;
@@ -23,9 +23,9 @@ entity RISCV is
 		--		hex7, hex6, hex5, hex4, hex3, hex2, hex1, hex0 : out std_logic_vector(7 downto 0)
 		--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 	);
-end RISCV;
+end riscv_core;
 
-architecture RISCV_arch of RISCV is
+architecture riscv_core_arch of riscv_core is
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 	--	signal clk, clk_out                                                           : std_logic;
 	--	signal registers_array                                                        : ARRAY_32X32;
@@ -185,4 +185,4 @@ begin
 			WB_data_out       => WB_data
 		);
 
-end RISCV_arch;
+end riscv_core_arch;
