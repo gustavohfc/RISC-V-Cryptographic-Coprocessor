@@ -23,7 +23,6 @@ ARCHITECTURE unit_register_file_tb_arch OF unit_register_file_tb IS
 	signal write_data      : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
 	signal r1              : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
 	signal r2              : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
-	signal registers_array : ARRAY_32X32;
 
 BEGIN
 	register_file : entity work.register_file
@@ -38,8 +37,7 @@ BEGIN
 			rd              => rd,
 			write_data      => write_data,
 			r1              => r1,
-			r2              => r2,
-			registers_array => registers_array
+			r2              => r2
 		);
 
 	clk <= not clk after 10 ps;

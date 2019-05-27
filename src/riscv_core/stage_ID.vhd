@@ -21,8 +21,7 @@ entity stage_ID is
 		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
-		next_pc_select                     : out std_logic_vector(1 downto 0);
-		registers_array                    : out ARRAY_32X32
+		next_pc_select                     : out std_logic_vector(1 downto 0)
 	);
 end entity stage_ID;
 
@@ -64,15 +63,14 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk             => clk,
-			write_enable    => wren_register_in,
-			rs1             => rs1,
-			rs2             => rs2,
-			rd              => WB_address,
-			write_data      => WB_data,
-			r1              => r1,
-			r2              => r2,
-			registers_array => registers_array
+			clk          => clk,
+			write_enable => wren_register_in,
+			rs1          => rs1,
+			rs2          => rs2,
+			rd           => WB_address,
+			write_data   => WB_data,
+			r1           => r1,
+			r2           => r2
 		);
 
 	imm_decoder : entity work.immediate_decoder
@@ -137,19 +135,19 @@ begin
 	begin
 		if rising_edge(clk) then
 			if stall_aux = '1' then
-				instruction_out <= BUBBLE;
+				instruction_out   <= BUBBLE;
 				wren_memory_out   <= '0';
 				wren_register_out <= '0';
 			else
-				instruction_out <= instruction_in;
+				instruction_out   <= instruction_in;
 				wren_memory_out   <= wren_memory;
 				wren_register_out <= wren_register;
 			end if;
 
-			ALU_A_out         <= mux_ALUA_out;
-			ALU_B_out         <= mux_ALUB_out;
-			wdata_out         <= r2;
-			WB_select_out     <= WB_select;
+			ALU_A_out     <= mux_ALUA_out;
+			ALU_B_out     <= mux_ALUB_out;
+			wdata_out     <= r2;
+			WB_select_out <= WB_select;
 		end if;
 	end process;
 

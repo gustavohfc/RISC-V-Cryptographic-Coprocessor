@@ -20,11 +20,9 @@ ENTITY integration_tb IS
 END integration_tb;
 
 ARCHITECTURE integration_tb_arch OF integration_tb IS
-	constant clk_period    : time                                     := 20 ps;
-	signal clk             : std_logic                                := '1';
-	signal stop            : std_logic                                := '0';
-	signal instruction     : std_logic_vector(WORD_SIZE - 1 downto 0) := (others => '0');
-	signal registers_array : ARRAY_32X32;
+	constant clk_period : time      := 20 ps;
+	signal clk          : std_logic := '1';
+	signal stop         : std_logic := '0';
 
 BEGIN
 	riscv : entity work.RISCV
@@ -35,9 +33,7 @@ BEGIN
 		)
 
 		port map(
-			clk             => clk,
-			instruction     => instruction,
-			registers_array => registers_array
+			clk => clk
 		);
 
 	clk <= not clk after clk_period / 2 when stop = '0' else '0';
@@ -75,7 +71,7 @@ BEGIN
 
 		-- Watch changes to the memory
 		if falling_edge(clk) and memory_write_enable = '1' then
-			report(to_string(memory_address));
+			report (to_string(memory_address));
 			write(row, to_string(memory_address), right);
 			write(row, " " & to_string(memory_wdata));
 			writeline(memory_changes, row);

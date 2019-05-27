@@ -37,13 +37,13 @@ begin
 	immediate(30 downto 20) <= ((0 to 10 => U) and instruction(30 downto 20)) or ((0 to 10 => not U) and (0 to 10 => instruction(31)));
 
 	immediate(31) <= instruction(31);
-	
---	with instruction_type select immediate <=
---		(31 downto 11 => instruction(31)) & instruction(30 downto 20) when I_type,
---		(31 downto 11 => instruction(31)) & instruction(30 downto 25) & instruction(11 downto 8) & instruction(7) when S_type,
---		(31 downto 12 => instruction(31)) & instruction(7) & instruction(30 downto 25) & instruction(11 downto 8) & '0' when B_type,
---		instruction(31 downto 12) & (11 downto 0 => '0') when U_type,
---		(31 downto 20 => instruction(31)) & instruction(19 downto 12) & instruction(20) & instruction(30 downto 25) & instruction(24 downto 21) & '0' when J_type,
---		(others => '-') when others;
+
+	--	with instruction_type select immediate <=
+	--		(31 downto 11 => instruction(31)) & instruction(30 downto 20) when I_type,
+	--		(31 downto 11 => instruction(31)) & instruction(30 downto 25) & instruction(11 downto 8) & instruction(7) when S_type,
+	--		(31 downto 12 => instruction(31)) & instruction(7) & instruction(30 downto 25) & instruction(11 downto 8) & '0' when B_type,
+	--		instruction(31 downto 12) & (11 downto 0 => '0') when U_type,
+	--		(31 downto 20 => instruction(31)) & instruction(19 downto 12) & instruction(20) & instruction(30 downto 25) & instruction(24 downto 21) & '0' when J_type,
+	--		(others => '-') when others;
 
 end architecture immediate_decoder_arch;
