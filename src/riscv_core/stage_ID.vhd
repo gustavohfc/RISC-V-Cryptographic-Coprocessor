@@ -36,7 +36,6 @@ architecture stage_ID_arch of stage_ID is
 
 	alias rs1    : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
 	alias rs2    : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
-	alias rd     : std_logic_vector(4 downto 0) is instruction_in(11 downto 7);
 	alias funct3 : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
 	alias opcode : std_logic_vector(6 downto 0) is instruction_in(6 downto 0);
 
@@ -122,12 +121,10 @@ begin
 			next_pc_select => next_pc_select
 		);
 
-	register_queue_inst : entity work.register_queue
+	register_queue_inst : entity work.data_hazard_control
 		port map(
 			clk              => clk,
-			rs1              => rs1,
-			rs2              => rs2,
-			rd               => rd,
+			instruction      => instruction_in,
 			instruction_type => instruction_type,
 			stall            => stall_aux
 		);
