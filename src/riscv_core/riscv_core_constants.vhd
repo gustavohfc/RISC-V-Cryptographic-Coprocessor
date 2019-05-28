@@ -121,7 +121,8 @@ package riscv_core_constants is
 		S_type,
 		B_type,
 		U_type,
-		J_type
+		J_type,
+		Coprocessor
 	);
 
 	-- ULA selector

@@ -15,47 +15,41 @@ entity data_hazard_control is
 end entity data_hazard_control;
 
 architecture data_hazard_control_arch of data_hazard_control is
-	constant ZERO                     : std_logic_vector(4 downto 0) := (others => '0');
-	signal rq1, rq2, rq3              : std_logic_vector(4 downto 0) := (others => '0');
-	signal stall_aux                  : std_logic;
-	signal rs1_hazard, rs2_hazard     : std_logic;
-	signal is_coprocessor_instruction : std_logic;
-	signal rs1, rs2, rd               : std_logic_vector(4 downto 0);
+	constant ZERO                   : std_logic_vector(4 downto 0) := (others => '0');
+	signal rq1, rq2, rq3            : std_logic_vector(4 downto 0) := (others => '0');
+	signal coprocessor_funct3       : std_logic_vector(2 downto 0) := (others => '0');
+	signal rs1_hazard, rs2_hazard   : std_logic;
+	signal rs1, rs2, rd             : std_logic_vector(4 downto 0);
+	signal has_rs1, has_rs2, has_rd : std_logic;
 
 begin
-	stall <= stall_aux;
 
-	is_coprocessor_instruction <= '1' when instruction(6 downto 0) = CRYPTOGRAPHIC_COPROCESSOR_OPCODE else '0';
+	coprocessor_funct3 <= instruction(31 downto 29);
 
-	rs1 <= instruction(19 downto 15) when not is_coprocessor_instruction
-		else instruction(19 downto 15) when instruction(31 downto 29) = FUNCT3_LW or instruction(31 downto 29) = FUNCT3_LAST or instruction(31 downto 29) = FUNCT3_DIGEST
-	;
+	has_rs1 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or instruction_type = I_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_LW or coprocessor_funct3 = FUNCT3_LAST or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
+	has_rs2 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or (instruction_type = Coprocessor and coprocessor_funct3 = FUNCT3_LW) else '0';
+	has_rd  <= '1' when instruction_type = R_type or instruction_type = I_type or instruction_type = U_type or instruction_type = J_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_COMPLETED or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
 
-	rs2 <= instruction(24 downto 20) when not is_coprocessor_instruction
-		else instruction(24 downto 20) when instruction(31 downto 29) = FUNCT3_LW
-	;
+	rs1 <= instruction(19 downto 15) when has_rs1 else (others => '0');
 
-	rd <= instruction(11 downto 7) when not is_coprocessor_instruction
-		else instruction(24 downto 20) when instruction(31 downto 29) = FUNCT3_COMPLETED or instruction(31 downto 29) = FUNCT3_DIGEST
-	;
+	rs2 <= instruction(24 downto 20) when has_rs2 else (others => '0');
 
-	rs1_hazard <= '1' when (instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or instruction_type = I_type) and (rs1 = rq1 or rs1 = rq2) and (rs1 /= ZERO) else '0';
-	rs2_hazard <= '1' when (instruction_type = R_type or instruction_type = S_type or instruction_type = B_type) and (rs2 = rq1 or rs2 = rq2) and (rs2 /= ZERO) else '0';
+	rd <= (others => '0') when stall = '1'
+		else instruction(11 downto 7) when has_rd = '1' and not (instruction_type = Coprocessor)
+		else instruction(24 downto 20) when has_rd = '1' and (instruction_type = Coprocessor)
+		else (others => '0');
 
-	stall_aux <= '1' when rs2_hazard or rs1_hazard else '0';
+	rs1_hazard <= '1' when (rs1 = rq1 or rs1 = rq2) and (rs1 /= ZERO) else '0';
+	rs2_hazard <= '1' when (rs2 = rq1 or rs2 = rq2) and (rs2 /= ZERO) else '0';
+
+	stall <= '1' when rs2_hazard or rs1_hazard else '0';
 
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			if instruction_type = S_type or instruction_type = B_type or stall_aux = '1' then
-				rq3 <= rq2;
-				rq2 <= rq1;
-				rq1 <= (others => '0');
-			else
-				rq3 <= rq2;
-				rq2 <= rq1;
-				rq1 <= rd;
-			end if;
+			rq3 <= rq2;
+			rq2 <= rq1;
+			rq1 <= rd;
 		end if;
 	end process;
 
