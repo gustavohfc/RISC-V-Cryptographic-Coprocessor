@@ -20,6 +20,7 @@ package constants is
 	constant FUNCT3_LAST      : std_logic_vector(2 downto 0) := "010";
 	constant FUNCT3_COMPLETED : std_logic_vector(2 downto 0) := "011";
 	constant FUNCT3_DIGEST    : std_logic_vector(2 downto 0) := "100";
+	constant FUNCT3_RESET     : std_logic_vector(2 downto 0) := "101";
 
 	constant BUBBLE : std_logic_vector((WORD_SIZE - 1) downto 0) := (others => '0');
 
