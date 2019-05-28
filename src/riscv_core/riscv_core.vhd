@@ -34,7 +34,7 @@ architecture riscv_core_arch of riscv_core is
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
 	signal instruction_IF_ID, instruction_ID_EX, instruction_EX_MEM, instruction_MEM_WB : std_logic_vector((WSIZE - 1) downto 0);
-	signal ALU_A, ALU_B, ALU_Z, wdata_ID_EX, wdata_EX_MEM                               : std_logic_vector((WSIZE - 1) downto 0);
+	signal ALU_A, ALU_B, ALU_Z, r2_ID_EX, r2_EX_MEM, r2_MEM_WB                          : std_logic_vector((WSIZE - 1) downto 0);
 	signal WB_data, data_MEM_WB, immediate, rs1                                         : std_logic_vector((WSIZE - 1) downto 0);
 	signal PC_IF_ID                                                                     : std_logic_vector((WSIZE - 1) downto 0);
 
@@ -43,7 +43,7 @@ architecture riscv_core_arch of riscv_core is
 
 	signal wren_register_ID_EX, wren_register_EX_MEM, wren_register_MEM_WB, wren_register_WB : std_logic;
 	signal wren_memory_ID_EX, wren_memory_EX_MEM                                             : std_logic;
-	signal WB_select_ID_EX, WB_select_EX_MEM, stall                                          : std_logic;
+	signal stage_MEM_output_select_ID_EX, stage_MEM_output_select_EX_MEM, stall              : std_logic;
 
 begin
 
@@ -113,23 +113,23 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk               => clk,
-			instruction_in    => instruction_IF_ID,
-			instruction_out   => instruction_ID_EX,
-			WB_data           => WB_data,
-			WB_address        => WB_address,
-			wren_register_in  => wren_register_WB,
-			wren_memory_out   => wren_memory_ID_EX,
-			wren_register_out => wren_register_ID_EX,
-			WB_select_out     => WB_select_ID_EX,
-			stall             => stall,
-			wdata_out         => wdata_ID_EX,
-			ALU_A_out         => ALU_A,
-			ALU_B_out         => ALU_B,
-			immediate_out     => immediate,
-			rs1_out           => rs1,
-			PC_IF_ID          => PC_IF_ID,
-			next_pc_select    => next_pc_select
+			clk                         => clk,
+			instruction_in              => instruction_IF_ID,
+			instruction_out             => instruction_ID_EX,
+			WB_data                     => WB_data,
+			WB_address                  => WB_address,
+			wren_register_in            => wren_register_WB,
+			wren_memory_out             => wren_memory_ID_EX,
+			wren_register_out           => wren_register_ID_EX,
+			stage_MEM_output_select_out => stage_MEM_output_select_ID_EX,
+			stall                       => stall,
+			r2_out                      => r2_ID_EX,
+			ALU_A_out                   => ALU_A,
+			ALU_B_out                   => ALU_B,
+			immediate_out               => immediate,
+			rs1_out                     => rs1,
+			PC_IF_ID                    => PC_IF_ID,
+			next_pc_select              => next_pc_select
 		);
 
 	stage_EX_inst : entity work.stage_EX
@@ -137,20 +137,20 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk               => clk,
-			instruction_in    => instruction_ID_EX,
-			instruction_out   => instruction_EX_MEM,
-			wdata_in          => wdata_ID_EX,
-			wdata_out         => wdata_EX_MEM,
-			ALU_A             => ALU_A,
-			ALU_B             => ALU_B,
-			ALU_Z             => ALU_Z,
-			wren_memory_in    => wren_memory_ID_EX,
-			wren_register_in  => wren_register_ID_EX,
-			WB_select_in      => WB_select_ID_EX,
-			wren_memory_out   => wren_memory_EX_MEM,
-			wren_register_out => wren_register_EX_MEM,
-			WB_select_out     => WB_select_EX_MEM
+			clk                         => clk,
+			instruction_in              => instruction_ID_EX,
+			instruction_out             => instruction_EX_MEM,
+			r2_in                       => r2_ID_EX,
+			r2_out                      => r2_EX_MEM,
+			ALU_A                       => ALU_A,
+			ALU_B                       => ALU_B,
+			ALU_Z                       => ALU_Z,
+			wren_memory_in              => wren_memory_ID_EX,
+			wren_register_in            => wren_register_ID_EX,
+			stage_MEM_output_select_in  => stage_MEM_output_select_ID_EX,
+			wren_memory_out             => wren_memory_EX_MEM,
+			wren_register_out           => wren_register_EX_MEM,
+			stage_MEM_output_select_out => stage_MEM_output_select_EX_MEM
 		);
 
 	stage_MEM_inst : entity work.stage_MEM
@@ -162,12 +162,13 @@ begin
 			clk               => clk,
 			instruction_in    => instruction_EX_MEM,
 			instruction_out   => instruction_MEM_WB,
-			wdata_in          => wdata_EX_MEM,
-			address           => ALU_Z,
+			r2_in             => r2_EX_MEM,
+			r2_out            => r2_MEM_WB, -- TODO: Connect to coprocessor
+			ALU_Z             => ALU_Z,
 			data_out          => data_MEM_WB,
 			wren_memory_in    => wren_memory_EX_MEM,
 			wren_register_in  => wren_register_EX_MEM,
-			WB_select_in      => WB_select_EX_MEM,
+			output_select     => stage_MEM_output_select_EX_MEM,
 			wren_register_out => wren_register_MEM_WB
 		);
 

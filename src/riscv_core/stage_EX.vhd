@@ -8,20 +8,22 @@ entity stage_EX is
 	generic(WSIZE : natural);
 
 	port(
-		clk                                               : in  std_logic;
-		instruction_in                                    : in  std_logic_vector((WSIZE - 1) downto 0);
-		instruction_out                                   : out std_logic_vector((WSIZE - 1) downto 0);
-		wdata_in                                          : in  std_logic_vector((WSIZE - 1) downto 0);
-		wdata_out                                         : out std_logic_vector((WSIZE - 1) downto 0);
-		ALU_A, ALU_B                                      : in  std_logic_vector((WSIZE - 1) downto 0);
-		ALU_Z                                             : out std_logic_vector((WSIZE - 1) downto 0);
-		wren_memory_in, wren_register_in, WB_select_in    : in  std_logic;
-		wren_memory_out, wren_register_out, WB_select_out : out std_logic
+		clk                                : in  std_logic;
+		instruction_in                     : in  std_logic_vector((WSIZE - 1) downto 0);
+		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
+		r2_in                              : in  std_logic_vector((WSIZE - 1) downto 0);
+		r2_out                             : out std_logic_vector((WSIZE - 1) downto 0);
+		ALU_A, ALU_B                       : in  std_logic_vector((WSIZE - 1) downto 0);
+		ALU_Z                              : out std_logic_vector((WSIZE - 1) downto 0);
+		wren_memory_in, wren_register_in   : in  std_logic;
+		wren_memory_out, wren_register_out : out std_logic;
+		stage_MEM_output_select_in         : in  std_logic;
+		stage_MEM_output_select_out        : out std_logic
 	);
 end entity stage_EX;
 
 architecture stage_EX_arch of stage_EX is
---	signal zero         : std_logic;
+	--	signal zero         : std_logic;
 	signal Z            : std_logic_vector((WSIZE - 1) downto 0);
 	signal ALU_function : FUNCTION_TYPE;
 
@@ -52,12 +54,12 @@ begin
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			instruction_out   <= instruction_in;
-			wdata_out         <= wdata_in;
-			wren_memory_out   <= wren_memory_in;
-			wren_register_out <= wren_register_in;
-			WB_select_out     <= WB_select_in;
-			ALU_Z             <= Z;
+			instruction_out             <= instruction_in;
+			r2_out                      <= r2_in;
+			wren_memory_out             <= wren_memory_in;
+			wren_register_out           <= wren_register_in;
+			stage_MEM_output_select_out <= stage_MEM_output_select_in;
+			ALU_Z                       <= Z;
 		end if;
 	end process;
 

@@ -135,9 +135,13 @@ package riscv_core_constants is
 	constant ALUB_SELECT_4      : std_logic_vector(1 downto 0) := "10";
 	constant ALUB_SELECT_BUBBLE : std_logic_vector(1 downto 0) := "11";
 
-	-- WriteBack selector
-	constant WB_SELECT_ALU : std_logic := '0';
-	constant WB_SELECT_MEM : std_logic := '1';
+	-- EX result selector
+	constant EX_STAGE_RESULT_SELECT_ULA         : std_logic := '0';
+	constant EX_STAGE_RESULT_SELECT_COPROCESSOR : std_logic := '1';
+
+	-- Stage MEM output selector
+	constant MEM_OUTPUT_SELECT_ALU_Z  : std_logic := '0';
+	constant MEM_OUTPUT_SELECT_MEMORY : std_logic := '1';
 
 	-- Next PC selector
 	constant PC_SELECT_PLUS4 : std_logic_vector(1 downto 0) := "00";

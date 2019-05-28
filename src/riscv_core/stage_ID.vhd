@@ -16,10 +16,10 @@ entity stage_ID is
 		WB_address                         : in  std_logic_vector(4 downto 0);
 		wren_register_in                   : in  std_logic;
 		wren_memory_out, wren_register_out : out std_logic;
-		WB_select_out                      : out std_logic;
+		stage_MEM_output_select_out        : out std_logic;
 		stall                              : out std_logic;
 		instruction_out                    : out std_logic_vector((WSIZE - 1) downto 0);
-		wdata_out                          : out std_logic_vector((WSIZE - 1) downto 0);
+		r2_out                             : out std_logic_vector((WSIZE - 1) downto 0);
 		ALU_A_out, ALU_B_out               : out std_logic_vector((WSIZE - 1) downto 0);
 		immediate_out, rs1_out             : out std_logic_vector((WSIZE - 1) downto 0);
 		next_pc_select                     : out std_logic_vector(1 downto 0)
@@ -27,12 +27,13 @@ entity stage_ID is
 end entity stage_ID;
 
 architecture stage_ID_arch of stage_ID is
-	signal r2, r1, immediate                     : std_logic_vector((WSIZE - 1) downto 0);
-	signal wren_memory, wren_register, WB_select : std_logic;
-	signal ALUA_select, ALUB_select              : std_logic_vector(1 downto 0);
-	signal instruction_type                      : instruction_types;
-	signal mux_ALUB_out, mux_ALUA_out            : std_logic_vector((WSIZE - 1) downto 0);
-	signal stall_aux                             : std_logic;
+	signal r2, r1, immediate          : std_logic_vector((WSIZE - 1) downto 0);
+	signal wren_memory, wren_register : std_logic;
+	signal stage_MEM_output_select    : std_logic;
+	signal ALUA_select, ALUB_select   : std_logic_vector(1 downto 0);
+	signal instruction_type           : instruction_types;
+	signal mux_ALUB_out, mux_ALUA_out : std_logic_vector((WSIZE - 1) downto 0);
+	signal stall_aux                  : std_logic;
 
 	alias rs1    : std_logic_vector(4 downto 0) is instruction_in(19 downto 15);
 	alias rs2    : std_logic_vector(4 downto 0) is instruction_in(24 downto 20);
@@ -49,13 +50,13 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			instruction      => instruction_in,
-			instruction_type => instruction_type,
-			ALUA_select      => ALUA_select,
-			ALUB_select      => ALUB_select,
-			wren_memory      => wren_memory,
-			wren_register    => wren_register,
-			WB_select        => WB_select
+			instruction             => instruction_in,
+			instruction_type        => instruction_type,
+			ALUA_select             => ALUA_select,
+			ALUB_select             => ALUB_select,
+			wren_memory             => wren_memory,
+			wren_register           => wren_register,
+			stage_MEM_output_select => stage_MEM_output_select
 		);
 
 	registers : entity work.register_file
@@ -142,10 +143,10 @@ begin
 				wren_register_out <= wren_register;
 			end if;
 
-			ALU_A_out     <= mux_ALUA_out;
-			ALU_B_out     <= mux_ALUB_out;
-			wdata_out     <= r2;
-			WB_select_out <= WB_select;
+			ALU_A_out                   <= mux_ALUA_out;
+			ALU_B_out                   <= mux_ALUB_out;
+			r2_out                      <= r2;
+			stage_MEM_output_select_out <= stage_MEM_output_select;
 		end if;
 	end process;
 
