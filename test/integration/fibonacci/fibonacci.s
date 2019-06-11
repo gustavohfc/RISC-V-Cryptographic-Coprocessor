@@ -4,7 +4,7 @@ F1:	.word 0
 F2:	.word 1
 
 .text
-	li s0, 0x2000 # TODO: It can be replaced with 'la s0, mem' when the instruction auipc is implemented
+	la s0, N_fib
 	lw s1, 0(s0)	# s1 = N_fib
 	lw s2, 4(s0)	# s2 = F1
 	lw s3, 8(s0)	# s3 = F2
