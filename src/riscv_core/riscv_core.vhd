@@ -163,7 +163,7 @@ begin
 			instruction_in    => instruction_EX_MEM,
 			instruction_out   => instruction_MEM_WB,
 			r2_in             => r2_EX_MEM,
-			r2_out            => r2_MEM_WB, -- TODO: Connect to coprocessor
+			r2_out            => r2_MEM_WB,
 			ALU_Z             => ALU_Z,
 			data_out          => data_MEM_WB,
 			wren_memory_in    => wren_memory_EX_MEM,
@@ -180,6 +180,7 @@ begin
 			clk               => clk,
 			instruction_in    => instruction_MEM_WB,
 			data_in           => data_MEM_WB,
+			r2                => r2_MEM_WB,
 			wren_register_in  => wren_register_MEM_WB,
 			wren_register_out => wren_register_WB,
 			WB_address        => WB_address,
