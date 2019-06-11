@@ -2,6 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.riscv_core_constants.all;
+
 entity PC is
 	generic(WSIZE : natural);
 
@@ -13,8 +15,7 @@ entity PC is
 end PC;
 
 architecture PC_arch of PC is
-	signal aux : std_logic_vector(WSIZE - 1 downto 0) := std_logic_vector(to_unsigned(0, WSIZE));
-
+	signal aux : std_logic_vector(WSIZE - 1 downto 0) := std_logic_vector(to_unsigned(PC_START_ADDRESS, WSIZE));
 begin
 	current_pc <= aux;
 	process(clk)

@@ -44,7 +44,7 @@ architecture stage_MEM_arch of stage_MEM is
 
 begin
 
-	address_offset      <= std_logic_vector(signed(ALU_Z) + DATA_MEMORY_ADDRESS_OFFSET); -- TODO
+	address_offset      <= ALU_Z;
 	rdata_byte_signed   <= ((WSIZE - 1) downto (WSIZE / 4) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 4) - 1) downto 0);
 	rdata_half_signed   <= ((WSIZE - 1) downto (WSIZE / 2) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 2) - 1) downto 0);
 	rdata_byte_unsigned <= ((WSIZE - 1) downto (WSIZE / 4) => '0') & rdata(((WSIZE / 4) - 1) downto 0);
