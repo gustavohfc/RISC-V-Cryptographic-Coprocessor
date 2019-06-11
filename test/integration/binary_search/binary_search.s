@@ -18,7 +18,7 @@ arr_size:	.word 30	# First index is 0 arr_size would be n_elements - 1
 arr:		.word 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946, 17711, 28657, 46368, 75025, 121393, 196418, 317811, 514229, 832040, 1346269, 2178309
 
 .text
-	li s0, 0x2000 # Load memory address offset
+	la s0, target # Load memory address offset
 	
 	# Load target value
 	la t0, target
