@@ -24,6 +24,11 @@ ARCHITECTURE integration_tb_arch OF integration_tb IS
 	signal clk          : std_logic := '1';
 	signal stop         : std_logic := '0';
 
+	signal stall_external : std_logic                     := '0';
+	signal address_b      : std_logic_vector(7 DOWNTO 0)  := (others => '0');
+	signal data_b         : std_logic_vector(31 DOWNTO 0) := (others => '0');
+	signal wren_b         : std_logic                     := '0';
+
 BEGIN
 	riscv : entity work.riscv_core
 		generic map(
@@ -33,7 +38,11 @@ BEGIN
 		)
 
 		port map(
-			clk => clk
+			clk            => clk,
+			stall_external => stall_external,
+			address_b      => address_b,
+			data_b         => data_b,
+			wren_b         => wren_b
 		);
 
 	clk <= not clk after clk_period / 2 when stop = '0' else '0';
@@ -50,7 +59,6 @@ BEGIN
 	END PROCESS;
 
 	watch_changes : PROCESS(clk)
-		
 		file register_changes : text open write_mode is test_name & "_register_changes.txt";
 		file memory_changes   : text open write_mode is test_name & "_memory_changes.txt";
 		variable row          : line;
@@ -62,7 +70,7 @@ BEGIN
 		alias memory_write_enable is <<signal riscv.stage_MEM_inst.wren_memory_in : std_logic>>;
 		alias memory_address is <<signal riscv.stage_MEM_inst.ALU_Z : std_logic_vector(WSIZE - 1 downto 0)>>;
 		alias r2_in is <<signal riscv.stage_MEM_inst.r2_in : std_logic_vector(WSIZE - 1 downto 0)>>;
-		
+
 	BEGIN
 		-- Watch changes in the registers
 		if falling_edge(clk) and register_write_enable = '1' and unsigned(register_rd) /= 0 then

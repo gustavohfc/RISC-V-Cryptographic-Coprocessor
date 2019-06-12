@@ -13,7 +13,12 @@ entity riscv_core is
 	);
 
 	port(
-		clk : in std_logic
+		clk            : in  std_logic;
+		stall_external : in  std_logic;
+		address_b      : in  std_logic_vector(7 DOWNTO 0);
+		data_b         : in  std_logic_vector(31 DOWNTO 0);
+		wren_b         : in  std_logic;
+		q_b            : out std_logic_vector(31 DOWNTO 0)
 		--		instruction     : out std_logic_vector(WSIZE - 1 downto 0);
 		--		registers_array : out ARRAY_32X32
 		--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim and uncomment above --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
@@ -43,7 +48,7 @@ architecture riscv_core_arch of riscv_core is
 
 	signal wren_register_ID_EX, wren_register_EX_MEM, wren_register_MEM_WB, wren_register_WB : std_logic;
 	signal wren_memory_ID_EX, wren_memory_EX_MEM                                             : std_logic;
-	signal stage_MEM_output_select_ID_EX, stage_MEM_output_select_EX_MEM, stall              : std_logic;
+	signal stage_MEM_output_select_ID_EX, stage_MEM_output_select_EX_MEM, stall, stall_ID    : std_logic;
 
 begin
 
@@ -93,6 +98,8 @@ begin
 	--	clk <= not clk_out;
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
+	stall <= stall_ID or stall_external;
+
 	stage_IF_inst : entity work.stage_IF
 		generic map(
 			WSIZE                  => WSIZE,
@@ -122,7 +129,7 @@ begin
 			wren_memory_out             => wren_memory_ID_EX,
 			wren_register_out           => wren_register_ID_EX,
 			stage_MEM_output_select_out => stage_MEM_output_select_ID_EX,
-			stall                       => stall,
+			stall                       => stall_ID,
 			r2_out                      => r2_ID_EX,
 			ALU_A_out                   => ALU_A,
 			ALU_B_out                   => ALU_B,
@@ -169,7 +176,11 @@ begin
 			wren_memory_in    => wren_memory_EX_MEM,
 			wren_register_in  => wren_register_EX_MEM,
 			output_select     => stage_MEM_output_select_EX_MEM,
-			wren_register_out => wren_register_MEM_WB
+			wren_register_out => wren_register_MEM_WB,
+			address_b         => address_b,
+			data_b            => data_b,
+			wren_b            => wren_b,
+			q_b               => q_b
 		);
 
 	stage_WB_inst : entity work.stage_WB

@@ -20,7 +20,11 @@ entity stage_MEM is
 		data_out                         : out std_logic_vector((WSIZE - 1) downto 0);
 		wren_memory_in, wren_register_in : in  std_logic;
 		output_select                    : in  std_logic;
-		wren_register_out                : out std_logic
+		wren_register_out                : out std_logic;
+		address_b                        : in  std_logic_vector(7 DOWNTO 0);
+		data_b                           : in  std_logic_vector(31 DOWNTO 0);
+		wren_b                           : in  std_logic;
+		q_b                              : out std_logic_vector(31 DOWNTO 0)
 	);
 end entity stage_MEM;
 
@@ -57,12 +61,16 @@ begin
 			init_file => data_init_file
 		)
 		port map(
-			address => address_offset_div4,
-			byteena => byteena,
-			clock   => not_clk,         -- Update the memory input on the falling edge
-			data    => r2_in,
-			wren    => wren_memory_in,
-			q       => rdata
+			clock     => not_clk,       -- Update the memory input on the falling edge
+			address_a => address_offset_div4,
+			byteena_a => byteena,
+			data_a    => r2_in,
+			wren_a    => wren_memory_in,
+			q_a       => rdata,
+			address_b => address_b,
+			data_b    => data_b,
+			wren_b    => wren_b,
+			q_b       => q_b
 		);
 
 	byteena_decoder_inst : entity work.byteena_decoder
