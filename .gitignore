@@ -13,8 +13,6 @@ timing
 *.cmp
 *.done
 *.eqn
-*.hex
-!test/integration/*/*.hex
 *.html
 *.jdi
 *.jpg
