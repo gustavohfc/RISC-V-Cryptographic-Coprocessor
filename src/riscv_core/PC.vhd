@@ -18,6 +18,7 @@ architecture PC_arch of PC is
 	signal aux : std_logic_vector(WSIZE - 1 downto 0) := std_logic_vector(to_unsigned(PC_START_ADDRESS, WSIZE));
 begin
 	current_pc <= aux;
+
 	process(clk)
 	begin
 		if (rising_edge(clk)) then

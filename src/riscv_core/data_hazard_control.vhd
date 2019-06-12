@@ -26,18 +26,15 @@ begin
 
 	coprocessor_funct3 <= instruction(31 downto 29);
 
-	has_rs1 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or instruction_type = I_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_LW or coprocessor_funct3 = FUNCT3_LAST or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
-	has_rs2 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or (instruction_type = Coprocessor and coprocessor_funct3 = FUNCT3_LW) else '0';
+	has_rs1 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or instruction_type = I_type or (instruction_type = Coprocessor and coprocessor_funct3 = FUNCT3_LW) else '0';
+	has_rs2 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_LW or coprocessor_funct3 = FUNCT3_LAST or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
 	has_rd  <= '1' when instruction_type = R_type or instruction_type = I_type or instruction_type = U_type or instruction_type = J_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_COMPLETED or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
 
 	rs1 <= instruction(19 downto 15) when has_rs1 else (others => '0');
 
 	rs2 <= instruction(24 downto 20) when has_rs2 else (others => '0');
 
-	rd <= (others => '0') when stall = '1'
-		else instruction(11 downto 7) when has_rd = '1' and not (instruction_type = Coprocessor)
-		else instruction(24 downto 20) when has_rd = '1' and (instruction_type = Coprocessor)
-		else (others => '0');
+	rd <= instruction(11 downto 7) when stall /= '1' else (others => '0');
 
 	rs1_hazard <= '1' when (rs1 = rq1 or rs1 = rq2) and (rs1 /= ZERO) else '0';
 	rs2_hazard <= '1' when (rs2 = rq1 or rs2 = rq2) and (rs2 /= ZERO) else '0';
