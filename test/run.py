@@ -17,6 +17,20 @@ coprocessor_tests = [
         'sha256': 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
         'sha512': 'ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f'
     }
+    # {
+    #     'message': 'RISC-V',
+    #     'md5': '61eadfbcdffdebf7c01d9aa685edd597',
+    #     'sha1': '6c2f38c24f65569b89f9fc8f94f82701644c4af9',
+    #     'sha256': '4200109c969f2698d34d7d84e3ff87cd584c227004a9b675f251aed43c9c412f',
+    #     'sha512': '4e8a5d313c5f412cff7b8f844f057189a97b2ae816c3ea2bd1a42dd7c15860b6cddbcd50be49e9a9c830b2f3a2428ffe9dfcf111056077b89acf3f2619104b72'
+    # },
+    # {
+    #     'message': '',
+    #     'md5': '',
+    #     'sha1': '',
+    #     'sha256': '',
+    #     'sha512': ''
+    # },
 ]
 
 
@@ -120,12 +134,12 @@ if __name__ == "__main__":
 
         for i, test in enumerate(coprocessor_tests):
             message = encode_string(test['message'])
-            message_len = len(test['message']) * 8
+            message_len = len(test['message']) * 32
             md5 = encode_string(test['md5'])
             sha1 = encode_string(test['sha1'])
             sha256 = encode_string(test['sha256'])
             sha512 = encode_string(test['sha512'])
-            tb.add_config("test_" + str(i), generics=dict(WSIZE=32, PC_max=24, message=message, message_len=message_len, md5=md5, sha1=sha1, sha256=sha256, sha512=sha512))
+            tb.add_config("test_" + str(i), generics=dict(WSIZE=32, message=message, message_len=message_len, md5=md5, sha1=sha1, sha256=sha256, sha512=sha512))
 
     copy_hex_files(vu)
 

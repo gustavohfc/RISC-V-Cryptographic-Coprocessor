@@ -14,7 +14,6 @@ ENTITY coprocessor_integration_tb IS
 	generic(
 		runner_cfg  : string;
 		WSIZE       : natural;
-		PC_max      : natural;
 		message     : string;
 		message_len : natural;
 		md5         : string;
@@ -46,7 +45,7 @@ ARCHITECTURE coprocessor_integration_tb_arch OF coprocessor_integration_tb IS
 	constant sha256_decoded  : integer_vector := decode_string(sha256);
 	constant sha512_decoded  : integer_vector := decode_string(sha512);
 
-	signal stall_external : std_logic                     := '1';
+	signal stall_external : std_logic                     := '0';
 	signal address_b      : std_logic_vector(7 DOWNTO 0)  := (others => '0');
 	signal data_b         : std_logic_vector(31 DOWNTO 0) := (others => '0');
 	signal wren_b         : std_logic                     := '0';
@@ -74,27 +73,39 @@ BEGIN
 	main : PROCESS
 		alias PC is <<signal riscv.PC_IF_ID : std_logic_vector(WORD_SIZE - 1 downto 0)>>;
 
-		variable next_addr : unsigned(WORD_SIZE - 1 downto 0);
+		variable next_addr : unsigned(WORD_SIZE - 1 downto 0) := to_unsigned(1, WSIZE); -- The first addr is used for communication
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 
+		wait until falling_edge(clk);
+
 		----------- Write the message size to the memory -----------
-		next_addr := (others => '0');
 		wren_b    <= '1';
-		address_b <= (others => '0');
+		address_b <= std_logic_vector(next_addr(7 downto 0));
 		data_b    <= std_logic_vector(to_unsigned(message_len, WSIZE));
-		wait until rising_edge(clk);
-		next_addr := next_addr + 4;
+		wait until falling_edge(clk);
+		next_addr := next_addr + 1;
 
 		----------- Write the message to the memory -----------
 		for i in 0 to message_decoded'length - 1 loop
+			wren_b    <= '1';
 			address_b <= std_logic_vector(next_addr(7 downto 0));
 			data_b    <= std_logic_vector(to_unsigned(message_decoded(i), WSIZE));
-			wait until rising_edge(clk);
-			next_addr := next_addr + 4;
+			wait until falling_edge(clk);
+			next_addr := next_addr + 1;
 		end loop;
 
-		--		wait until PC >= std_logic_vector(to_unsigned(PC_max + PC_START_ADDRESS, WORD_SIZE));
+		-- Make the RISC-V start calculating the hash
+		wren_b    <= '1';
+		address_b <= (others => '0');
+		data_b    <= std_logic_vector(to_unsigned(1, WSIZE));
+		wait until falling_edge(clk);
+		
+		-- Wait the RISC-V complete the calculation
+		wren_b    <= '0';
+		address_b <= (others => '0');
+		wait until q_b = std_logic_vector(to_unsigned(3, WSIZE));
+
 
 		test_runner_cleanup(runner);
 		wait;
