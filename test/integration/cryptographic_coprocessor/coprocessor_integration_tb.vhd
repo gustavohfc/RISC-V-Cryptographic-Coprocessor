@@ -64,7 +64,7 @@ BEGIN
 
 		variable byte1, byte2, byte3, byte4 : integer;
 
-		file input_file : text open read_mode is "cryptographic_coprocessor_" & test_name & "_in.hex";
+		file input_file : text open read_mode is test_name & "_in.hex";
 		variable line   : line;
 	BEGIN
 		test_runner_setup(runner, runner_cfg);

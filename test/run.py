@@ -169,12 +169,12 @@ if __name__ == "__main__":
     # Add the coprocessor integration tests
     if runAllTests or args.coprocessor_integration:
         lib.add_source_files(join(root, "integration", "cryptographic_coprocessor", "coprocessor_integration_tb.vhd"))
-        tb = lib.get_test_benches("*integration_tb*")[0]
+        tb = lib.get_test_benches("*coprocessor_integration_tb*")[0]
 
         generate_coprocessor_test_files(vu)
 
         for i, test in enumerate(coprocessor_tests):
-            test_name = "test_" + str(i)
+            test_name = "cryptographic_coprocessor_test_" + str(i)
             tb.add_config(test_name, generics=dict(test_name=test_name))
 
     copy_hex_files(vu)
