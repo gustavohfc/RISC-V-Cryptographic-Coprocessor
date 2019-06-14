@@ -21,7 +21,7 @@ architecture cryptographic_coprocessor_arch of cryptographic_coprocessor is
 
 	alias opcode : std_logic_vector(6 downto 0) is instruction(6 downto 0);
 	alias funct3 : std_logic_vector(2 downto 0) is instruction(31 downto 29);
-	alias funct2 : std_logic_vector(1 downto 0) is instruction(8 downto 7);
+	alias funct2 : std_logic_vector(1 downto 0) is instruction(13 downto 12);
 
 	-- MD5
 	signal md5_start_new_hash        : std_logic;

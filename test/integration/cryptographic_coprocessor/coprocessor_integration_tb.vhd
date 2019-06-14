@@ -12,14 +12,8 @@ use work.riscv_core_constants.all;
 
 ENTITY coprocessor_integration_tb IS
 	generic(
-		runner_cfg  : string;
-		WSIZE       : natural;
-		message     : string;
-		message_len : natural;
-		md5         : string;
-		sha1        : string;
-		sha256      : string;
-		sha512      : string
+		runner_cfg : string;
+		test_name  : string
 	);
 END coprocessor_integration_tb;
 
@@ -27,23 +21,6 @@ ARCHITECTURE coprocessor_integration_tb_arch OF coprocessor_integration_tb IS
 	constant clk_half_period : time      := 10 ps;
 	signal clk               : std_logic := '1';
 	signal stop              : std_logic := '0';
-
-	impure function decode_string(encoded_integer_vector : string) return integer_vector is
-		variable parts        : lines_t := split(encoded_integer_vector, ", ");
-		variable return_value : integer_vector(parts'range);
-	begin
-		for i in parts'range loop
-			return_value(i) := integer'value(parts(i).all);
-		end loop;
-
-		return return_value;
-	end;
-
-	constant message_decoded : integer_vector := decode_string(message);
-	constant md5_decoded     : integer_vector := decode_string(md5);
-	constant sha1_decoded    : integer_vector := decode_string(sha1);
-	constant sha256_decoded  : integer_vector := decode_string(sha256);
-	constant sha512_decoded  : integer_vector := decode_string(sha512);
 
 	signal stall_external : std_logic                     := '0';
 	signal address_b      : std_logic_vector(7 DOWNTO 0)  := (others => '0');
@@ -54,7 +31,7 @@ ARCHITECTURE coprocessor_integration_tb_arch OF coprocessor_integration_tb IS
 BEGIN
 	riscv : entity work.riscv_core
 		generic map(
-			WSIZE                  => WSIZE,
+			WSIZE                  => WORD_SIZE,
 			instructions_init_file => "cryptographic_coprocessor_instructions.hex",
 			data_init_file         => "cryptographic_coprocessor_data.hex"
 		)
@@ -71,41 +48,158 @@ BEGIN
 	clk <= not clk after clk_half_period when stop = '0' else '0';
 
 	main : PROCESS
-		alias PC is <<signal riscv.PC_IF_ID : std_logic_vector(WORD_SIZE - 1 downto 0)>>;
+		-- The memory mapping is as follows:
+		-- 0x0 - Used for communication between the testbench or the UART module with the RISC-V program
+		-- 0x4 to 0x16 - MD5 resul
+		-- 0x14 to 0x24 - SHA1 resul
+		-- 0x28 to 0x44 - SHA256 resul
+		-- 0x48 to 0x84 - SHA512 resul
+		-- 0x88 - Message length
+		-- 0x8C to memory end - Message
+		variable next_addr : unsigned(WORD_SIZE - 1 downto 0) := (others => '0');
 
-		variable next_addr : unsigned(WORD_SIZE - 1 downto 0) := to_unsigned(1, WSIZE); -- The first addr is used for communication
+		variable md5result, md5expected : unsigned(127 downto 0) := (others => '0');
+
+		variable message_len : integer;
+
+		variable byte1, byte2, byte3, byte4 : integer;
+
+		file input_file : text open read_mode is "cryptographic_coprocessor_" & test_name & "_in.hex";
+		variable line   : line;
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 
 		wait until falling_edge(clk);
 
-		----------- Write the message size to the memory -----------
+		----------- Load the MD5 expected result -----------
+		readline(input_file, line);
+		for i in 0 to 3 loop
+			read(line, byte1);
+			read(line, byte2);
+			read(line, byte3);
+			read(line, byte4);
+			md5expected(127 - (i * 32) downto 96 - (i * 32)) := to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8);
+		end loop;
+
+		----------- Load the SHA1 expected result -----------
+		readline(input_file, line);
+
+		----------- Load the SHA256 expected result -----------
+		readline(input_file, line);
+
+		----------- Load the SHA512 expected result -----------
+		readline(input_file, line);
+
+		----------- Write the message length to the memory -----------
+		next_addr := to_unsigned(34, WORD_SIZE); -- Addr 0x88
+		readline(input_file, line);
+		read(line, message_len);
 		wren_b    <= '1';
 		address_b <= std_logic_vector(next_addr(7 downto 0));
-		data_b    <= std_logic_vector(to_unsigned(message_len, WSIZE));
+		data_b    <= std_logic_vector(to_unsigned(message_len, WORD_SIZE));
 		wait until falling_edge(clk);
 		next_addr := next_addr + 1;
 
 		----------- Write the message to the memory -----------
-		for i in 0 to message_decoded'length - 1 loop
+		readline(input_file, line);
+		next_addr := to_unsigned(35, WORD_SIZE); -- Addr 0x8C
+		while line'length > 0 loop
+			read(line, byte1);
+
+			if line'length > 0 then
+				read(line, byte2);
+			end if;
+
+			if line'length > 0 then
+				read(line, byte3);
+			end if;
+
+			if line'length > 0 then
+				read(line, byte4);
+			end if;
+
 			wren_b    <= '1';
 			address_b <= std_logic_vector(next_addr(7 downto 0));
-			data_b    <= std_logic_vector(to_unsigned(message_decoded(i), WSIZE));
+			data_b    <= std_logic_vector(to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8));
+
 			wait until falling_edge(clk);
+
 			next_addr := next_addr + 1;
 		end loop;
 
-		-- Make the RISC-V start calculating the hash
+		----------- Make the RISC-V start calculating the hash -----------
 		wren_b    <= '1';
 		address_b <= (others => '0');
-		data_b    <= std_logic_vector(to_unsigned(1, WSIZE));
+		data_b    <= std_logic_vector(to_unsigned(1, WORD_SIZE));
 		wait until falling_edge(clk);
-		
-		-- Wait the RISC-V complete the calculation
+
+		----------- Wait the RISC-V complete the calculation -----------
 		wren_b    <= '0';
 		address_b <= (others => '0');
-		wait until q_b = std_logic_vector(to_unsigned(3, WSIZE));
+		wait until q_b = std_logic_vector(to_unsigned(3, WORD_SIZE));
 
+		----------- Check the md5 results -----------
+		next_addr := to_unsigned(1, WORD_SIZE);
+		for i in 0 to 3 loop
+			address_b <= (others => '0');
+
+			wait until falling_edge(clk);
+
+			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
+
+			next_addr := next_addr + 1;
+		end loop;
+
+		check_equal(md5result, md5expected, "MD5 fail");
+
+		----------- Write the message to the memory -----------
+
+		--		----------- Write the message size to the memory -----------
+		--		next_addr := to_unsigned(22, WSIZE); -- Address 0x88
+		--		wren_b    <= '1';
+		--		address_b <= std_logic_vector(next_addr(7 downto 0));
+		--		data_b    <= std_logic_vector(to_unsigned(message_len, WSIZE));
+		--		wait until falling_edge(clk);
+		--		next_addr := next_addr + 1;
+		--
+		--		----------- Write the message to the memory -----------
+		--		for i in 0 to message_decoded'length - 1 loop
+		--			wren_b    <= '1';
+		--			address_b <= std_logic_vector(next_addr(7 downto 0));
+		--			data_b    <= std_logic_vector(to_unsigned(message_decoded(i), WSIZE));
+		--			wait until falling_edge(clk);
+		--			next_addr := next_addr + 1;
+		--		end loop;
+		--
+		--		----------- Make the RISC-V start calculating the hash -----------
+		--		wren_b    <= '1';
+		--		address_b <= (others => '0');
+		--		data_b    <= std_logic_vector(to_unsigned(1, WSIZE));
+		--		wait until falling_edge(clk);
+		--
+		--		----------- Wait the RISC-V complete the calculation -----------
+		--		wren_b    <= '0';
+		--		address_b <= (others => '0');
+		--		wait until q_b = std_logic_vector(to_unsigned(3, WSIZE));
+		--
+		--		----------- Check the md5 results -----------
+		--		next_addr := to_unsigned(1, WSIZE);
+		--
+		--		for i in 0 to 3 loop
+		--			address_b <= (others => '0');
+		--
+		--			wait until falling_edge(clk);
+		--
+		--			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
+		--
+		--			next_addr := next_addr + 1;
+		--		end loop;
+
+		-- Check the sha1 results
+
+		-- Check the sha256 results
+
+		-- Check the sha512 results
 
 		test_runner_cleanup(runner);
 		wait;

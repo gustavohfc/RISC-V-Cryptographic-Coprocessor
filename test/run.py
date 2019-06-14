@@ -5,6 +5,7 @@ from itertools import zip_longest
 import re
 import os
 import glob
+import textwrap
 
 root = dirname(__file__)
 
@@ -84,9 +85,41 @@ def compare_files(file_path_1, file_path_2):
                 return False
     return True
 
-def encode_string(s):
-    return ', '.join(map(str, [ord(letter) for letter in s]))
+def encode(s):
+    return ' '.join(map(str, [ord(letter) for letter in s]))
 
+def generate_coprocessor_test_files(vu):
+    """ 
+        TODO: Find a better way to copy this files without accessing private properties.
+        More info about this workaround at https://github.com/VUnit/vunit/issues/236
+    """
+    if not os.path.exists(vu._simulator_output_path):
+        os.mkdir(vu._simulator_output_path)
+
+    # for i, test in enumerate(coprocessor_tests):
+    #     ih = IntelHex()
+
+    #     ih[0x88] = len(test['message']) * 32
+    #     # ih.puts(0x88, len(test['message']) * 32)
+
+    #     next_addr = 0x8C
+    #     for word in textwrap.wrap(test['message'], 8):
+    #         ih.puts(next_addr, word)
+
+    #     ih.write_hex_file(join(vu._simulator_output_path, "cryptographic_coprocessor_test_" + str(i) + "_data.hex"))
+
+    for i, test in enumerate(coprocessor_tests):
+        f = open(join(vu._simulator_output_path, "cryptographic_coprocessor_test_" + str(i) + "_in.hex"), 'w')
+
+        f.write(encode(test['md5']) + '\n')
+        f.write(encode(test['sha1']) + '\n')
+        f.write(encode(test['sha256']) + '\n')
+        f.write(encode(test['sha512']) + '\n')
+        f.write(str(len(test['message']) * 32) + '\n')
+        f.write(encode(test['message']) + '\n')
+
+        f.close()
+        
 if __name__ == "__main__":
     # Parse command line args
     cli = VUnitCLI()
@@ -119,6 +152,9 @@ if __name__ == "__main__":
 
     # Add the RISC-V core integration tests
     if runAllTests or args.core_integration:
+
+        copy_hex_files(vu)
+
         lib.add_source_files(join(root, "integration", "riscv_core", "integration_tb.vhd"))
         tb = lib.get_test_benches("*integration_tb*")[0]
         tb.add_config("simple_add", generics=dict(WSIZE=32, test_name="simple_add", PC_max=24), post_check=make_integration_post_check(vu, "simple_add"))
@@ -132,14 +168,11 @@ if __name__ == "__main__":
         lib.add_source_files(join(root, "integration", "cryptographic_coprocessor", "coprocessor_integration_tb.vhd"))
         tb = lib.get_test_benches("*integration_tb*")[0]
 
+        generate_coprocessor_test_files(vu)
+
         for i, test in enumerate(coprocessor_tests):
-            message = encode_string(test['message'])
-            message_len = len(test['message']) * 32
-            md5 = encode_string(test['md5'])
-            sha1 = encode_string(test['sha1'])
-            sha256 = encode_string(test['sha256'])
-            sha512 = encode_string(test['sha512'])
-            tb.add_config("test_" + str(i), generics=dict(WSIZE=32, message=message, message_len=message_len, md5=md5, sha1=sha1, sha256=sha256, sha512=sha512))
+            test_name = "test_" + str(i)
+            tb.add_config(test_name, generics=dict(test_name=test_name))
 
     copy_hex_files(vu)
 
