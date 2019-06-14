@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.constants.all;
 use work.riscv_core_constants.all;
 
 entity stage_MEM is
@@ -34,6 +35,7 @@ architecture stage_MEM_arch of stage_MEM is
 	signal mux8_out    : std_logic_vector((WSIZE - 1) downto 0);
 	signal byteena     : std_logic_vector(((WSIZE / 8) - 1) downto 0);
 
+	signal memory_out_byte_sel : std_logic_vector(2 downto 0);
 	signal rdata_byte_signed   : std_logic_vector((WSIZE - 1) downto 0);
 	signal rdata_half_signed   : std_logic_vector((WSIZE - 1) downto 0);
 	signal rdata_byte_unsigned : std_logic_vector((WSIZE - 1) downto 0);
@@ -82,13 +84,15 @@ begin
 			address => ALU_Z,
 			byteena => byteena
 		);
+		
+	memory_out_byte_sel <= "010" when instruction_in(6 downto 0) = CRYPTOGRAPHIC_COPROCESSOR_OPCODE else funct3;
 
 	mux8_inst : entity work.mux8
 		generic map(
 			WSIZE => WSIZE
 		)
 		port map(
-			S  => funct3,
+			S  => memory_out_byte_sel,
 			I0 => rdata_byte_signed,
 			I1 => rdata_half_signed,
 			I2 => rdata,

@@ -25,15 +25,15 @@ WAIT_DATA_READY:
 	li s3, 16 # Number of words per block (512/32)
 	
 MD5_NEXT_BLOCK:
-	li s2, 0 # s2 is current number of blocks loaded to the coprocessor
+	li s2, 0 # s2 is current number of words loaded to the coprocessor
 	
 MD5_NEXT_WORD:
 	lw t0, 0(s1)
 	crypto.md5.lw s1, s2
 	addi s0, s0, -32
 	addi s1, s1, 4
-	addi s2, s2, 1
 	blez s0, MD5_LAST
+	addi s2, s2, 1
 	bne s2, s3, MD5_NEXT_WORD
 	
 	crypto.md5.next
@@ -44,7 +44,11 @@ MD5_WAIT_BLOCK_PROC:
 	j MD5_NEXT_BLOCK
 
 MD5_LAST:
-	slli t0, s2, 5 # s2*32 is the number of bits in the last block
+	# Calculate the numer of bits in the last block
+	addi t0, s0, 32
+	slli t1, s2, 5 # s2*32
+	add t0, t0, t1
+	
 	crypto.md5.last t0
 
 MD5_WAIT_LAST:

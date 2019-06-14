@@ -17,14 +17,14 @@ coprocessor_tests = [
         'sha1': 'a9993e364706816aba3e25717850c26c9cd0d89d',
         'sha256': 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad',
         'sha512': 'ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f'
-    }
-    # {
-    #     'message': 'RISC-V',
-    #     'md5': '61eadfbcdffdebf7c01d9aa685edd597',
-    #     'sha1': '6c2f38c24f65569b89f9fc8f94f82701644c4af9',
-    #     'sha256': '4200109c969f2698d34d7d84e3ff87cd584c227004a9b675f251aed43c9c412f',
-    #     'sha512': '4e8a5d313c5f412cff7b8f844f057189a97b2ae816c3ea2bd1a42dd7c15860b6cddbcd50be49e9a9c830b2f3a2428ffe9dfcf111056077b89acf3f2619104b72'
-    # },
+    },
+    {
+        'message': 'RISC-V',
+        'md5': '61eadfbcdffdebf7c01d9aa685edd597',
+        'sha1': '6c2f38c24f65569b89f9fc8f94f82701644c4af9',
+        'sha256': '4200109c969f2698d34d7d84e3ff87cd584c227004a9b675f251aed43c9c412f',
+        'sha512': '4e8a5d313c5f412cff7b8f844f057189a97b2ae816c3ea2bd1a42dd7c15860b6cddbcd50be49e9a9c830b2f3a2428ffe9dfcf111056077b89acf3f2619104b72'
+    },
     # {
     #     'message': '',
     #     'md5': '',
@@ -85,8 +85,11 @@ def compare_files(file_path_1, file_path_2):
                 return False
     return True
 
-def encode(s):
-    return ' '.join(map(str, [ord(letter) for letter in s]))
+def encode_message(m):
+    return ' '.join(map(str, [ord(letter) for letter in m]))
+
+def encode_hash(h):
+    return ' '.join(map(str, [int(byte, 16) for byte in textwrap.wrap(h, 2)]))
 
 def generate_coprocessor_test_files(vu):
     """ 
@@ -111,12 +114,12 @@ def generate_coprocessor_test_files(vu):
     for i, test in enumerate(coprocessor_tests):
         f = open(join(vu._simulator_output_path, "cryptographic_coprocessor_test_" + str(i) + "_in.hex"), 'w')
 
-        f.write(encode(test['md5']) + '\n')
-        f.write(encode(test['sha1']) + '\n')
-        f.write(encode(test['sha256']) + '\n')
-        f.write(encode(test['sha512']) + '\n')
-        f.write(str(len(test['message']) * 32) + '\n')
-        f.write(encode(test['message']) + '\n')
+        f.write(encode_hash(test['md5']) + '\n')
+        f.write(encode_hash(test['sha1']) + '\n')
+        f.write(encode_hash(test['sha256']) + '\n')
+        f.write(encode_hash(test['sha512']) + '\n')
+        f.write(str(len(test['message']) * 8) + '\n')
+        f.write(encode_message(test['message']) + '\n')
 
         f.close()
         

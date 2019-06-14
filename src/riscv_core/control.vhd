@@ -99,12 +99,11 @@ begin
 			-- Cryptographic coprocessor
 			when OPCODE_CUSTOM_0 =>
 				instruction_type        <= Coprocessor;
-				ALUA_select             <= ALUA_SELECT_BUBBLE;
+				ALUA_select             <= ALUA_SELECT_RS1;
 				ALUB_select             <= ALUB_SELECT_BUBBLE;
 				wren_memory             <= '0';
 				wren_register           <= '1';
-				stage_MEM_output_select <= MEM_OUTPUT_SELECT_ALU_Z;
-			-- TODO: Select coprocessor output
+				stage_MEM_output_select <= MEM_OUTPUT_SELECT_MEMORY;
 
 			when others =>
 				instruction_type        <= J_type;

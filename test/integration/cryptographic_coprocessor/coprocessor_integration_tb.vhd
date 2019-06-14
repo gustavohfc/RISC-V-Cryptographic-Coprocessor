@@ -69,8 +69,6 @@ BEGIN
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 
-		wait until falling_edge(clk);
-
 		----------- Load the MD5 expected result -----------
 		readline(input_file, line);
 		for i in 0 to 3 loop
@@ -97,7 +95,7 @@ BEGIN
 		wren_b    <= '1';
 		address_b <= std_logic_vector(next_addr(7 downto 0));
 		data_b    <= std_logic_vector(to_unsigned(message_len, WORD_SIZE));
-		wait until falling_edge(clk);
+		wait until rising_edge(clk);
 		next_addr := next_addr + 1;
 
 		----------- Write the message to the memory -----------
@@ -122,7 +120,7 @@ BEGIN
 			address_b <= std_logic_vector(next_addr(7 downto 0));
 			data_b    <= std_logic_vector(to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8));
 
-			wait until falling_edge(clk);
+			wait until rising_edge(clk);
 
 			next_addr := next_addr + 1;
 		end loop;
@@ -131,19 +129,20 @@ BEGIN
 		wren_b    <= '1';
 		address_b <= (others => '0');
 		data_b    <= std_logic_vector(to_unsigned(1, WORD_SIZE));
-		wait until falling_edge(clk);
+		wait until rising_edge(clk);
 
 		----------- Wait the RISC-V complete the calculation -----------
 		wren_b    <= '0';
 		address_b <= (others => '0');
 		wait until q_b = std_logic_vector(to_unsigned(3, WORD_SIZE));
+		wait until rising_edge(clk);
 
 		----------- Check the md5 results -----------
 		next_addr := to_unsigned(1, WORD_SIZE);
 		for i in 0 to 3 loop
-			address_b <= (others => '0');
+			address_b <= std_logic_vector(next_addr(7 downto 0));
 
-			wait until falling_edge(clk);
+			wait until rising_edge(clk);
 
 			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
 
@@ -159,7 +158,7 @@ BEGIN
 		--		wren_b    <= '1';
 		--		address_b <= std_logic_vector(next_addr(7 downto 0));
 		--		data_b    <= std_logic_vector(to_unsigned(message_len, WSIZE));
-		--		wait until falling_edge(clk);
+		--		wait until rising_edge(clk);
 		--		next_addr := next_addr + 1;
 		--
 		--		----------- Write the message to the memory -----------
@@ -167,7 +166,7 @@ BEGIN
 		--			wren_b    <= '1';
 		--			address_b <= std_logic_vector(next_addr(7 downto 0));
 		--			data_b    <= std_logic_vector(to_unsigned(message_decoded(i), WSIZE));
-		--			wait until falling_edge(clk);
+		--			wait until rising_edge(clk);
 		--			next_addr := next_addr + 1;
 		--		end loop;
 		--
@@ -175,7 +174,7 @@ BEGIN
 		--		wren_b    <= '1';
 		--		address_b <= (others => '0');
 		--		data_b    <= std_logic_vector(to_unsigned(1, WSIZE));
-		--		wait until falling_edge(clk);
+		--		wait until rising_edge(clk);
 		--
 		--		----------- Wait the RISC-V complete the calculation -----------
 		--		wren_b    <= '0';
@@ -188,7 +187,7 @@ BEGIN
 		--		for i in 0 to 3 loop
 		--			address_b <= (others => '0');
 		--
-		--			wait until falling_edge(clk);
+		--			wait until rising_edge(clk);
 		--
 		--			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
 		--
@@ -216,14 +215,14 @@ BEGIN
 	--		
 	--	BEGIN
 	--		-- Watch changes in the registers
-	--		if falling_edge(clk) and register_write_enable = '1' and unsigned(register_rd) /= 0 then
+	--		if rising_edge(clk) and register_write_enable = '1' and unsigned(register_rd) /= 0 then
 	--			write(row, to_string(register_rd), right);
 	--			write(row, " " & to_string(register_write_data));
 	--			writeline(register_changes, row);
 	--		end if;
 	--
 	--		-- Watch changes in the memory
-	--		if falling_edge(clk) and memory_write_enable = '1' then
+	--		if rising_edge(clk) and memory_write_enable = '1' then
 	--			report (to_string(memory_address));
 	--			write(row, to_string(memory_address), right);
 	--			write(row, " " & to_string(r2_in));
