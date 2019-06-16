@@ -16,7 +16,7 @@ end entity data_hazard_control;
 
 architecture data_hazard_control_arch of data_hazard_control is
 	constant ZERO                   : std_logic_vector(4 downto 0) := (others => '0');
-	signal rq1, rq2, rq3            : std_logic_vector(4 downto 0) := (others => '0');
+	signal rq1, rq2                 : std_logic_vector(4 downto 0) := (others => '0');
 	signal coprocessor_funct3       : std_logic_vector(2 downto 0) := (others => '0');
 	signal rs1_hazard, rs2_hazard   : std_logic;
 	signal rs1, rs2, rd             : std_logic_vector(4 downto 0);
@@ -34,7 +34,7 @@ begin
 
 	rs2 <= instruction(24 downto 20) when has_rs2 else (others => '0');
 
-	rd <= instruction(11 downto 7) when stall /= '1' else (others => '0');
+	rd <= instruction(11 downto 7) when stall /= '1' and has_rd = '1' else (others => '0');
 
 	rs1_hazard <= '1' when (rs1 = rq1 or rs1 = rq2) and (rs1 /= ZERO) else '0';
 	rs2_hazard <= '1' when (rs2 = rq1 or rs2 = rq2) and (rs2 /= ZERO) else '0';
@@ -44,7 +44,6 @@ begin
 	process(clk) is
 	begin
 		if rising_edge(clk) then
-			rq3 <= rq2;
 			rq2 <= rq1;
 			rq1 <= rd;
 		end if;

@@ -41,8 +41,6 @@ architecture stage_MEM_arch of stage_MEM is
 	signal rdata_byte_unsigned : std_logic_vector((WSIZE - 1) downto 0);
 	signal rdata_half_unsigend : std_logic_vector((WSIZE - 1) downto 0);
 
-	signal address_offset : std_logic_vector((WSIZE - 1) downto 0);
-
 	alias funct3              : std_logic_vector(2 downto 0) is instruction_in(14 downto 12);
 	alias address_offset_div4 : std_logic_vector(7 downto 0) is ALU_Z(9 downto 2);
 
@@ -50,7 +48,6 @@ architecture stage_MEM_arch of stage_MEM is
 
 begin
 
-	address_offset      <= ALU_Z;
 	rdata_byte_signed   <= ((WSIZE - 1) downto (WSIZE / 4) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 4) - 1) downto 0);
 	rdata_half_signed   <= ((WSIZE - 1) downto (WSIZE / 2) => rdata((WSIZE / 4) - 1)) & rdata(((WSIZE / 2) - 1) downto 0);
 	rdata_byte_unsigned <= ((WSIZE - 1) downto (WSIZE / 4) => '0') & rdata(((WSIZE / 4) - 1) downto 0);

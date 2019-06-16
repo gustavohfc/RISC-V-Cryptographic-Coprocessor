@@ -16,8 +16,8 @@ entity cryptographic_coprocessor is
 end entity;
 
 architecture cryptographic_coprocessor_arch of cryptographic_coprocessor is
-	signal is_lw_inst, is_next_inst, is_last_inst, is_busy_inst, is_digest_inst, is_reset_inst : std_logic := '0';
-	signal is_md5, is_sha1, is_sha256, is_sha512                                               : std_logic := '0';
+	signal is_lw_inst, is_next_inst, is_last_inst, is_reset_inst : std_logic := '0';
+	signal is_md5, is_sha1, is_sha256, is_sha512                 : std_logic := '0';
 
 	alias opcode : std_logic_vector(6 downto 0) is instruction(6 downto 0);
 	alias funct3 : std_logic_vector(2 downto 0) is instruction(31 downto 29);
@@ -89,8 +89,6 @@ begin
 	is_lw_inst     <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LW else '0';
 	is_next_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_NEXT else '0';
 	is_last_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LAST else '0';
-	is_busy_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_BUSY else '0';
-	is_digest_inst <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_DIGEST else '0';
 	is_reset_inst  <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_RESET else '0';
 	is_md5         <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_MD5 else '0';
 	is_sha1        <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA1 else '0';
