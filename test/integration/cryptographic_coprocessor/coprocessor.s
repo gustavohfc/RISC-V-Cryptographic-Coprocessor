@@ -39,8 +39,8 @@ MD5_NEXT_WORD:
 	crypto.md5.next
 	
 MD5_WAIT_BLOCK_PROC:
-	crypto.md5.completed t0
-	beqz  t0, MD5_WAIT_BLOCK_PROC
+	crypto.md5.busy t0
+	bnez t0, MD5_WAIT_BLOCK_PROC
 	j MD5_NEXT_BLOCK
 
 MD5_LAST:
@@ -52,8 +52,8 @@ MD5_LAST:
 	crypto.md5.last t0
 
 MD5_WAIT_LAST:
-	crypto.md5.completed t0
-	beqz t0, MD5_WAIT_LAST
+	crypto.md5.busy t0
+	bnez t0, MD5_WAIT_LAST
 
 # Get the message digest
 	li t0, 0

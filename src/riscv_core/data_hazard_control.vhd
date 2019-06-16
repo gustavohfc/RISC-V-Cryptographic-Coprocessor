@@ -28,7 +28,7 @@ begin
 
 	has_rs1 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or instruction_type = I_type or (instruction_type = Coprocessor and coprocessor_funct3 = FUNCT3_LW) else '0';
 	has_rs2 <= '1' when instruction_type = R_type or instruction_type = S_type or instruction_type = B_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_LW or coprocessor_funct3 = FUNCT3_LAST or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
-	has_rd  <= '1' when instruction_type = R_type or instruction_type = I_type or instruction_type = U_type or instruction_type = J_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_COMPLETED or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
+	has_rd  <= '1' when instruction_type = R_type or instruction_type = I_type or instruction_type = U_type or instruction_type = J_type or (instruction_type = Coprocessor and (coprocessor_funct3 = FUNCT3_BUSY or coprocessor_funct3 = FUNCT3_DIGEST)) else '0';
 
 	rs1 <= instruction(19 downto 15) when has_rs1 else (others => '0');
 

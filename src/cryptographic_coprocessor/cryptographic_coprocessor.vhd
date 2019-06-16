@@ -16,8 +16,8 @@ entity cryptographic_coprocessor is
 end entity;
 
 architecture cryptographic_coprocessor_arch of cryptographic_coprocessor is
-	signal is_lw, is_next, is_last, is_completed, is_digest, is_reset : std_logic := '0';
-	signal is_md5, is_sha1, is_sha256, is_sha512                      : std_logic := '0';
+	signal is_lw_inst, is_next_inst, is_last_inst, is_busy_inst, is_digest_inst, is_reset_inst : std_logic := '0';
+	signal is_md5, is_sha1, is_sha256, is_sha512                                               : std_logic := '0';
 
 	alias opcode : std_logic_vector(6 downto 0) is instruction(6 downto 0);
 	alias funct3 : std_logic_vector(2 downto 0) is instruction(31 downto 29);
@@ -86,46 +86,46 @@ architecture cryptographic_coprocessor_arch of cryptographic_coprocessor is
 
 begin
 
-	is_lw        <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LW else '0';
-	is_next      <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_NEXT else '0';
-	is_last      <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LAST else '0';
-	is_completed <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_COMPLETED else '0';
-	is_digest    <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_DIGEST else '0';
-	is_reset     <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_RESET else '0';
-	is_md5       <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_MD5 else '0';
-	is_sha1      <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA1 else '0';
-	is_sha256    <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA256 else '0';
-	is_sha512    <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA512 else '0';
+	is_lw_inst     <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LW else '0';
+	is_next_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_NEXT else '0';
+	is_last_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_LAST else '0';
+	is_busy_inst   <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_BUSY else '0';
+	is_digest_inst <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_DIGEST else '0';
+	is_reset_inst  <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct3 = FUNCT3_RESET else '0';
+	is_md5         <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_MD5 else '0';
+	is_sha1        <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA1 else '0';
+	is_sha256      <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA256 else '0';
+	is_sha512      <= '1' when opcode = CRYPTOGRAPHIC_COPROCESSOR_OPCODE and funct2 = FUNCT2_SHA512 else '0';
 
 	-- Start new hash
-	md5_start_new_hash    <= is_md5 and is_reset;
-	sha1_start_new_hash   <= is_sha1 and is_reset;
-	sha256_start_new_hash <= is_sha256 and is_reset;
-	sha512_start_new_hash <= is_sha512 and is_reset;
+	md5_start_new_hash    <= is_md5 and is_reset_inst;
+	sha1_start_new_hash   <= is_sha1 and is_reset_inst;
+	sha256_start_new_hash <= is_sha256 and is_reset_inst;
+	sha512_start_new_hash <= is_sha512 and is_reset_inst;
 
 	-- Load data
-	md5_write_data_in    <= is_md5 and is_lw;
-	sha1_write_data_in   <= is_sha1 and is_lw;
-	sha256_write_data_in <= is_sha256 and is_lw;
-	sha512_write_data_in <= is_sha512 and is_lw;
+	md5_write_data_in    <= is_md5 and is_lw_inst;
+	sha1_write_data_in   <= is_sha1 and is_lw_inst;
+	sha256_write_data_in <= is_sha256 and is_lw_inst;
+	sha512_write_data_in <= is_sha512 and is_lw_inst;
 
 	-- Calculate next block
-	md5_calculate_next_block    <= is_md5 and (is_next or is_last);
-	sha1_calculate_next_block   <= is_sha1 and (is_next or is_last);
-	sha256_calculate_next_block <= is_sha256 and (is_next or is_last);
-	sha512_calculate_next_block <= is_sha512 and (is_next or is_last);
+	md5_calculate_next_block    <= is_md5 and (is_next_inst or is_last_inst);
+	sha1_calculate_next_block   <= is_sha1 and (is_next_inst or is_last_inst);
+	sha256_calculate_next_block <= is_sha256 and (is_next_inst or is_last_inst);
+	sha512_calculate_next_block <= is_sha512 and (is_next_inst or is_last_inst);
 
 	-- Update output
-	process(funct3, funct2, r2, md5_A_out, md5_B_out, md5_C_out, md5_D_out, md5_is_complete, sha1_H0_out, sha1_H1_out, sha1_H2_out, sha1_H3_out, sha1_H4_out, sha1_is_complete, sha256_H0_out, sha256_H1_out, sha256_H2_out, sha256_H3_out, sha256_H4_out, sha256_H5_out, sha256_H6_out, sha256_H7_out, sha256_is_complete, sha512_H0_out, sha512_H1_out, sha512_H2_out, sha512_H3_out, sha512_H4_out, sha512_H5_out, sha512_H6_out, sha512_H7_out, sha512_is_complete) is
+	process(funct3, funct2, r2, md5_A_out, md5_B_out, md5_C_out, md5_D_out, sha1_H0_out, sha1_H1_out, sha1_H2_out, sha1_H3_out, sha1_H4_out, sha256_H0_out, sha256_H1_out, sha256_H2_out, sha256_H3_out, sha256_H4_out, sha256_H5_out, sha256_H6_out, sha256_H7_out, sha512_H0_out, sha512_H1_out, sha512_H2_out, sha512_H3_out, sha512_H4_out, sha512_H5_out, sha512_H6_out, sha512_H7_out, md5_is_busy, sha1_is_busy, sha256_is_busy, sha512_is_busy) is
 	begin
 		case funct3 is
-			when FUNCT3_COMPLETED =>
+			when FUNCT3_BUSY =>
 				output(31 downto 1) <= (others => '0');
 				case funct2 is
-					when FUNCT2_MD5    => output(0) <= md5_is_complete;
-					when FUNCT2_SHA1   => output(0) <= sha1_is_complete;
-					when FUNCT2_SHA256 => output(0) <= sha256_is_complete;
-					when FUNCT2_SHA512 => output(0) <= sha512_is_complete;
+					when FUNCT2_MD5    => output(0) <= md5_is_busy;
+					when FUNCT2_SHA1   => output(0) <= sha1_is_busy;
+					when FUNCT2_SHA256 => output(0) <= sha256_is_busy;
+					when FUNCT2_SHA512 => output(0) <= sha512_is_busy;
 					when others        => output(0) <= '0'; -- TODO: ERROR
 				end case;
 
@@ -200,7 +200,7 @@ begin
 			data_in               => data_in,
 			data_in_word_position => r2(3 downto 0),
 			calculate_next_block  => md5_calculate_next_block,
-			is_last_block         => is_last,
+			is_last_block         => is_last_inst,
 			last_block_size       => r2(9 downto 0),
 			is_waiting_next_block => md5_is_waiting_next_block,
 			is_busy               => md5_is_busy,
@@ -220,7 +220,7 @@ begin
 			data_in               => data_in,
 			data_in_word_position => r2(3 downto 0),
 			calculate_next_block  => sha1_calculate_next_block,
-			is_last_block         => is_last,
+			is_last_block         => is_last_inst,
 			last_block_size       => r2(9 downto 0),
 			is_waiting_next_block => sha1_is_waiting_next_block,
 			is_busy               => sha1_is_busy,
@@ -241,7 +241,7 @@ begin
 			data_in               => data_in,
 			data_in_word_position => r2(3 downto 0),
 			calculate_next_block  => sha256_calculate_next_block,
-			is_last_block         => is_last,
+			is_last_block         => is_last_inst,
 			last_block_size       => r2(9 downto 0),
 			is_waiting_next_block => sha256_is_waiting_next_block,
 			is_busy               => sha256_is_busy,
@@ -265,7 +265,7 @@ begin
 			data_in               => data_in,
 			data_in_word_position => r2(4 downto 0),
 			calculate_next_block  => sha512_calculate_next_block,
-			is_last_block         => is_last,
+			is_last_block         => is_last_inst,
 			last_block_size       => r2(10 downto 0),
 			is_waiting_next_block => sha512_is_waiting_next_block,
 			is_busy               => sha512_is_busy,
