@@ -9,13 +9,13 @@ use work.coprocessor_constants.all;
 
 -- 112 bits message ("message digest")
 
-entity sha1_test_3_tb IS
+entity unit_sha1_test_3_tb IS
 	generic(
 		runner_cfg : string
 	);
-end sha1_test_3_tb;
+end unit_sha1_test_3_tb;
 
-architecture sha1_test_3_tb_arch OF sha1_test_3_tb IS
+architecture unit_sha1_test_3_tb_arch OF unit_sha1_test_3_tb IS
 	signal clk                   : std_logic             := '0';
 	signal start_new_hash        : std_logic             := '0';
 	signal write_data_in         : std_logic             := '0';
@@ -760,4 +760,4 @@ begin
 		test_runner_cleanup(runner);
 	end process;
 
-end sha1_test_3_tb_arch;
+end unit_sha1_test_3_tb_arch;

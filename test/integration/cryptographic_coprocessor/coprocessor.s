@@ -176,7 +176,7 @@ SHA256_DIGEST_LOOP:
 	la t0, MESSAGE_LEN
 	lw s0, 0(t0) # s0 is the remaining bits of the message
 	la s1, MESSAGE # s1 is the address of the next word to be loaded
-	li s3, 32 # Number of words per block (512/32)
+	li s3, 32 # Number of words per block (1024/32)
 	
 SHA512_NEXT_BLOCK:
 	li s2, 0 # s2 is current number of words loaded to the coprocessor

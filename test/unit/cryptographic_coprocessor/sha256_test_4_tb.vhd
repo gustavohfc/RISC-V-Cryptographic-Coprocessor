@@ -9,13 +9,13 @@ use work.coprocessor_constants.all;
 
 -- 208 bits message ("abcdefghijklmnopqrstuvwxyz")
 
-entity sha256_test_4_tb IS
+entity unit_sha256_test_4_tb IS
 	generic(
 		runner_cfg : string
 	);
-end sha256_test_4_tb;
+end unit_sha256_test_4_tb;
 
-architecture sha256_test_4_tb_arch OF sha256_test_4_tb IS
+architecture unit_sha256_test_4_tb_arch OF unit_sha256_test_4_tb IS
 	signal clk                   : std_logic             := '0';
 	signal start_new_hash        : std_logic             := '0';
 	signal write_data_in         : std_logic             := '0';
@@ -848,4 +848,4 @@ begin
 		test_runner_cleanup(runner);
 	end process;
 
-end sha256_test_4_tb_arch;
+end unit_sha256_test_4_tb_arch;

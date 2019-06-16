@@ -8,13 +8,13 @@ USE ieee.numeric_std.all;
 use work.constants.all;
 use work.riscv_core_constants.all;
 
-ENTITY immediate_decoder_tb IS
+ENTITY unit_immediate_decoder_tb IS
 	generic(
 		runner_cfg : string
 	);
-END immediate_decoder_tb;
+END unit_immediate_decoder_tb;
 
-ARCHITECTURE immediate_decoder_tb_arch OF immediate_decoder_tb IS
+ARCHITECTURE unit_immediate_decoder_tb_arch OF unit_immediate_decoder_tb IS
 	signal instruction : std_logic_vector(WORD_SIZE - 1 downto 0);
 	signal instruction_type : instruction_types;
 	signal immediate : std_logic_vector(WORD_SIZE - 1 downto 0);
@@ -102,4 +102,4 @@ BEGIN
 		wait;
 	END PROCESS;
 		
-END immediate_decoder_tb_arch;
+END unit_immediate_decoder_tb_arch;

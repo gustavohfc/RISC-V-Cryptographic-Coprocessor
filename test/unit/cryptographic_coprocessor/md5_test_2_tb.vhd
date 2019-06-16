@@ -9,13 +9,13 @@ use work.coprocessor_constants.all;
 
 -- 8 bits message ("a")
 
-entity md5_test_2_tb IS
+entity unit_md5_test_2_tb IS
 	generic(
 		runner_cfg : string
 	);
-end md5_test_2_tb;
+end unit_md5_test_2_tb;
 
-architecture md5_test_2_tb_arch OF md5_test_2_tb IS
+architecture unit_md5_test_2_tb_arch OF unit_md5_test_2_tb IS
 	signal clk                   : std_logic             := '0';
 	signal start_new_hash        : std_logic             := '0';
 	signal calculate_next_block  : std_logic             := '0';
@@ -550,4 +550,4 @@ begin
 		test_runner_cleanup(runner);
 	end process;
 
-end md5_test_2_tb_arch;
+end unit_md5_test_2_tb_arch;

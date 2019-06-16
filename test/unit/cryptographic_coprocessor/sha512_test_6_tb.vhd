@@ -9,13 +9,13 @@ use work.coprocessor_constants.all;
 
 -- 512 bits message ("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijkl")
 
-entity sha512_test_6_tb IS
+entity unit_sha512_test_6_tb IS
 	generic(
 		runner_cfg : string
 	);
-end sha512_test_6_tb;
+end unit_sha512_test_6_tb;
 
-architecture sha512_test_6_tb_arch OF sha512_test_6_tb IS
+architecture unit_sha512_test_6_tb_arch OF unit_sha512_test_6_tb IS
 	signal clk                   : std_logic             := '0';
 	signal start_new_hash        : std_logic             := '0';
 	signal write_data_in         : std_logic             := '0';
@@ -1060,4 +1060,4 @@ begin
 		test_runner_cleanup(runner);
 	end process;
 
-end sha512_test_6_tb_arch;
+end unit_sha512_test_6_tb_arch;
