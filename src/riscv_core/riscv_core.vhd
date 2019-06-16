@@ -13,12 +13,17 @@ entity riscv_core is
 	);
 
 	port(
-		clk            : in  std_logic;
-		stall_external : in  std_logic;
-		address_b      : in  std_logic_vector(7 DOWNTO 0);
-		data_b         : in  std_logic_vector(31 DOWNTO 0);
-		wren_b         : in  std_logic;
-		q_b            : out std_logic_vector(31 DOWNTO 0)
+		clk                     : in  std_logic;
+		-- Coprocessor communication
+		coprocessor_instruction : out std_logic_vector(31 downto 0);
+		coprocessor_data        : out std_logic_vector(31 downto 0);
+		coprocessor_r2          : out std_logic_vector(31 downto 0);
+		coprocessor_output      : in  std_logic_vector(31 downto 0);
+		-- Direct memory access
+		memory_word_addr        : in  std_logic_vector(7 downto 0);
+		memory_data_in          : in  std_logic_vector(31 downto 0);
+		memory_wren             : in  std_logic;
+		memory_output           : out std_logic_vector(31 downto 0)
 		--		instruction     : out std_logic_vector(WSIZE - 1 downto 0);
 		--		registers_array : out ARRAY_32X32
 		--*--*--*--*--*--*--*--*--*--*--*--*--*--*--* Signals necessary to FPGA, comment when simulating in modelsim and uncomment above --*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
@@ -38,17 +43,17 @@ architecture riscv_core_arch of riscv_core is
 	--	signal hex0aux, hex1aux, hex2aux, hex3aux, hex4aux, hex5aux, hex6aux, hex7aux : std_logic_vector(7 downto 0);
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
-	signal instruction_IF_ID, instruction_ID_EX, instruction_EX_MEM, instruction_MEM_WB : std_logic_vector((WSIZE - 1) downto 0);
-	signal ALU_A, ALU_B, ALU_Z, r2_ID_EX, r2_EX_MEM, r2_MEM_WB                          : std_logic_vector((WSIZE - 1) downto 0);
-	signal WB_data, data_MEM_WB, immediate, rs1                                         : std_logic_vector((WSIZE - 1) downto 0);
-	signal PC_IF_ID                                                                     : std_logic_vector((WSIZE - 1) downto 0);
+	signal instruction_IF_ID, instruction_ID_EX, instruction_EX_MEM, instruction_MEM_WB_CO : std_logic_vector((WSIZE - 1) downto 0);
+	signal ALU_A, ALU_B, ALU_Z, r2_ID_EX, r2_EX_MEM, r2_MEM_CO                             : std_logic_vector((WSIZE - 1) downto 0);
+	signal data_register_write, WB_data, data_MEM_WB_CO, immediate, rs1                    : std_logic_vector((WSIZE - 1) downto 0);
+	signal PC_IF_ID                                                                        : std_logic_vector((WSIZE - 1) downto 0);
 
 	signal WB_address     : std_logic_vector(4 downto 0);
 	signal next_pc_select : std_logic_vector(1 downto 0);
 
 	signal wren_register_ID_EX, wren_register_EX_MEM, wren_register_MEM_WB, wren_register_WB : std_logic;
 	signal wren_memory_ID_EX, wren_memory_EX_MEM                                             : std_logic;
-	signal stage_MEM_output_select_ID_EX, stage_MEM_output_select_EX_MEM, stall, stall_ID    : std_logic;
+	signal stage_MEM_output_select_ID_EX, stage_MEM_output_select_EX_MEM, stall              : std_logic;
 
 begin
 
@@ -98,8 +103,6 @@ begin
 	--	clk <= not clk_out;
 	--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*
 
-	stall <= stall_ID or stall_external;
-
 	stage_IF_inst : entity work.stage_IF
 		generic map(
 			WSIZE                  => WSIZE,
@@ -123,13 +126,13 @@ begin
 			clk                         => clk,
 			instruction_in              => instruction_IF_ID,
 			instruction_out             => instruction_ID_EX,
-			WB_data                     => WB_data,
+			WB_data                     => data_register_write,
 			WB_address                  => WB_address,
 			wren_register_in            => wren_register_WB,
 			wren_memory_out             => wren_memory_ID_EX,
 			wren_register_out           => wren_register_ID_EX,
 			stage_MEM_output_select_out => stage_MEM_output_select_ID_EX,
-			stall                       => stall_ID,
+			stall                       => stall,
 			r2_out                      => r2_ID_EX,
 			ALU_A_out                   => ALU_A,
 			ALU_B_out                   => ALU_B,
@@ -168,19 +171,19 @@ begin
 		port map(
 			clk               => clk,
 			instruction_in    => instruction_EX_MEM,
-			instruction_out   => instruction_MEM_WB,
+			instruction_out   => instruction_MEM_WB_CO,
 			r2_in             => r2_EX_MEM,
-			r2_out            => r2_MEM_WB,
+			r2_out            => r2_MEM_CO,
 			ALU_Z             => ALU_Z,
-			data_out          => data_MEM_WB,
+			data_out          => data_MEM_WB_CO,
 			wren_memory_in    => wren_memory_EX_MEM,
 			wren_register_in  => wren_register_EX_MEM,
 			output_select     => stage_MEM_output_select_EX_MEM,
 			wren_register_out => wren_register_MEM_WB,
-			address_b         => address_b,
-			data_b            => data_b,
-			wren_b            => wren_b,
-			q_b               => q_b
+			address_b         => memory_word_addr,
+			data_b            => memory_data_in,
+			wren_b            => memory_wren,
+			q_b               => memory_output
 		);
 
 	stage_WB_inst : entity work.stage_WB
@@ -188,14 +191,18 @@ begin
 			WSIZE => WSIZE
 		)
 		port map(
-			clk               => clk,
-			instruction_in    => instruction_MEM_WB,
-			data_in           => data_MEM_WB,
-			r2                => r2_MEM_WB,
+			instruction_in    => instruction_MEM_WB_CO,
+			data_in           => data_MEM_WB_CO,
 			wren_register_in  => wren_register_MEM_WB,
 			wren_register_out => wren_register_WB,
 			WB_address        => WB_address,
 			WB_data_out       => WB_data
 		);
+
+	coprocessor_instruction <= instruction_MEM_WB_CO;
+	coprocessor_data        <= data_MEM_WB_CO;
+	coprocessor_r2          <= r2_MEM_CO;
+
+	data_register_write <= std_logic_vector(coprocessor_output) when instruction_MEM_WB_CO(6 downto 0) = CRYPTOGRAPHIC_COPROCESSOR_OPCODE else WB_data;
 
 end riscv_core_arch;

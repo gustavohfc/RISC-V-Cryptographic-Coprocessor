@@ -24,10 +24,10 @@ ARCHITECTURE integration_tb_arch OF integration_tb IS
 	signal clk          : std_logic := '1';
 	signal stop         : std_logic := '0';
 
-	signal stall_external : std_logic                     := '0';
-	signal address_b      : std_logic_vector(7 DOWNTO 0)  := (others => '0');
-	signal data_b         : std_logic_vector(31 DOWNTO 0) := (others => '0');
-	signal wren_b         : std_logic                     := '0';
+	signal memory_word_addr   : std_logic_vector(7 DOWNTO 0)  := (others => '0');
+	signal memory_data_in     : std_logic_vector(31 DOWNTO 0) := (others => '0');
+	signal memory_wren        : std_logic                     := '0';
+	signal coprocessor_output : std_logic_vector(31 downto 0) := (others => '0');
 
 BEGIN
 	riscv : entity work.riscv_core
@@ -38,11 +38,11 @@ BEGIN
 		)
 
 		port map(
-			clk            => clk,
-			stall_external => stall_external,
-			address_b      => address_b,
-			data_b         => data_b,
-			wren_b         => wren_b
+			clk                => clk,
+			memory_word_addr   => memory_word_addr,
+			memory_data_in     => memory_data_in,
+			memory_wren        => memory_wren,
+			coprocessor_output => coprocessor_output
 		);
 
 	clk <= not clk after clk_period / 2 when stop = '0' else '0';

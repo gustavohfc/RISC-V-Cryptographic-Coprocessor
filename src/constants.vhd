@@ -3,7 +3,9 @@ use ieee.std_logic_1164.all;
 
 package constants is
 	-- Configuration
-	constant WORD_SIZE : natural := 32;
+	constant WORD_SIZE                      : natural := 32;
+	constant DEFAULT_INSTRUCTIONS_INIT_FILE : string  := "MEM_INSTR.mif";
+	constant DEFAULT_DATA_INIT_FILE         : string  := "MEM_DADOS.mif";
 
 	-- Opcode and functs
 	constant CRYPTOGRAPHIC_COPROCESSOR_OPCODE : std_logic_vector(6 downto 0) := "0001011";

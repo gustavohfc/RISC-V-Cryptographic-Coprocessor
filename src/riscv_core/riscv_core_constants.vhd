@@ -5,9 +5,7 @@ use work.constants.all;
 
 package riscv_core_constants is
 	-- Configuration
-	constant DEFAULT_INSTRUCTIONS_INIT_FILE : string  := "MEM_INSTR.mif";
-	constant DEFAULT_DATA_INIT_FILE         : string  := "MEM_DADOS.mif";
-	constant PC_START_ADDRESS               : integer := 16#400000#;
+	constant PC_START_ADDRESS : integer := 16#400000#;
 
 	-- Breg typedef
 	TYPE ARRAY_32X32 is array (0 to WORD_SIZE - 1) of std_logic_vector(WORD_SIZE - 1 downto 0);

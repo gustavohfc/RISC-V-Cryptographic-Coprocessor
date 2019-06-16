@@ -22,27 +22,24 @@ ARCHITECTURE coprocessor_integration_tb_arch OF coprocessor_integration_tb IS
 	signal clk               : std_logic := '1';
 	signal stop              : std_logic := '0';
 
-	signal stall_external : std_logic                     := '0';
-	signal address_b      : std_logic_vector(7 DOWNTO 0)  := (others => '0');
-	signal data_b         : std_logic_vector(31 DOWNTO 0) := (others => '0');
-	signal wren_b         : std_logic                     := '0';
-	signal q_b            : std_logic_vector(31 DOWNTO 0) := (others => '0');
+	signal memory_word_addr : std_logic_vector(7 DOWNTO 0)  := (others => '0');
+	signal memory_data_in   : std_logic_vector(31 DOWNTO 0) := (others => '0');
+	signal memory_wren      : std_logic                     := '0';
+	signal memory_output    : std_logic_vector(31 DOWNTO 0) := (others => '0');
 
 BEGIN
-	riscv : entity work.riscv_core
+	riscv : entity work.riscv_coprocessor_top
 		generic map(
 			WSIZE                  => WORD_SIZE,
 			instructions_init_file => "cryptographic_coprocessor_instructions.hex",
 			data_init_file         => "cryptographic_coprocessor_data.hex"
 		)
-
 		port map(
-			clk            => clk,
-			stall_external => stall_external,
-			address_b      => address_b,
-			data_b         => data_b,
-			wren_b         => wren_b,
-			q_b            => q_b
+			clk              => clk,
+			memory_word_addr => memory_word_addr,
+			memory_data_in   => memory_data_in,
+			memory_wren      => memory_wren,
+			memory_output    => memory_output
 		);
 
 	clk <= not clk after clk_half_period when stop = '0' else '0';
@@ -113,14 +110,14 @@ BEGIN
 		end loop;
 
 		----------- Write the message length to the memory -----------
-		next_addr := to_unsigned(34, WORD_SIZE); -- Addr 0x88
+		next_addr        := to_unsigned(34, WORD_SIZE); -- Addr 0x88
 		readline(input_file, line);
 		read(line, message_len);
-		wren_b    <= '1';
-		address_b <= std_logic_vector(next_addr(7 downto 0));
-		data_b    <= std_logic_vector(to_unsigned(message_len, WORD_SIZE));
+		memory_wren      <= '1';
+		memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
+		memory_data_in   <= std_logic_vector(to_unsigned(message_len, WORD_SIZE));
 		wait until rising_edge(clk);
-		next_addr := next_addr + 1;
+		next_addr        := next_addr + 1;
 
 		----------- Write the message to the memory -----------
 		readline(input_file, line);
@@ -140,9 +137,9 @@ BEGIN
 				read(line, byte4);
 			end if;
 
-			wren_b    <= '1';
-			address_b <= std_logic_vector(next_addr(7 downto 0));
-			data_b    <= std_logic_vector(to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8));
+			memory_wren      <= '1';
+			memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
+			memory_data_in   <= std_logic_vector(to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8));
 
 			wait until rising_edge(clk);
 
@@ -150,25 +147,25 @@ BEGIN
 		end loop;
 
 		----------- Make the RISC-V start calculating the hash -----------
-		wren_b    <= '1';
-		address_b <= (others => '0');
-		data_b    <= std_logic_vector(to_unsigned(1, WORD_SIZE));
+		memory_wren      <= '1';
+		memory_word_addr <= (others => '0');
+		memory_data_in   <= std_logic_vector(to_unsigned(1, WORD_SIZE));
 		wait until rising_edge(clk);
 
 		----------- Wait the RISC-V complete the calculation -----------
-		wren_b    <= '0';
-		address_b <= (others => '0');
-		wait until q_b = std_logic_vector(to_unsigned(3, WORD_SIZE));
+		memory_wren      <= '0';
+		memory_word_addr <= (others => '0');
+		wait until memory_output = std_logic_vector(to_unsigned(3, WORD_SIZE));
 		wait until rising_edge(clk);
 
 		----------- Check the md5 results -----------
 		next_addr := to_unsigned(1, WORD_SIZE);
 		for i in 0 to 3 loop
-			address_b <= std_logic_vector(next_addr(7 downto 0));
+			memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
 
 			wait until rising_edge(clk);
 
-			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
+			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(memory_output);
 
 			next_addr := next_addr + 1;
 		end loop;
@@ -177,37 +174,37 @@ BEGIN
 
 		----------- Check the sha1 results -----------
 		for i in 0 to 4 loop
-			address_b <= std_logic_vector(next_addr(7 downto 0));
+			memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
 
 			wait until rising_edge(clk);
 
-			sha1result(159 - (i * 32) downto 128 - (i * 32)) := unsigned(q_b);
+			sha1result(159 - (i * 32) downto 128 - (i * 32)) := unsigned(memory_output);
 
 			next_addr := next_addr + 1;
 		end loop;
 
 		check_equal(sha1result, sha1expected, "SHA1 fail");
-		
+
 		----------- Check the sha256 results -----------
 		for i in 0 to 7 loop
-			address_b <= std_logic_vector(next_addr(7 downto 0));
+			memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
 
 			wait until rising_edge(clk);
 
-			sha256result(255 - (i * 32) downto 224 - (i * 32)) := unsigned(q_b);
+			sha256result(255 - (i * 32) downto 224 - (i * 32)) := unsigned(memory_output);
 
 			next_addr := next_addr + 1;
 		end loop;
 
 		check_equal(sha256result, sha256expected, "SHA256 fail");
-		
+
 		----------- Check the sha512 results -----------
 		for i in 0 to 15 loop
-			address_b <= std_logic_vector(next_addr(7 downto 0));
+			memory_word_addr <= std_logic_vector(next_addr(7 downto 0));
 
 			wait until rising_edge(clk);
 
-			sha512result(511 - (i * 32) downto 480 - (i * 32)) := unsigned(q_b);
+			sha512result(511 - (i * 32) downto 480 - (i * 32)) := unsigned(memory_output);
 
 			next_addr := next_addr + 1;
 		end loop;
