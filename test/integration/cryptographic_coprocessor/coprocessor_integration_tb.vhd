@@ -58,7 +58,10 @@ BEGIN
 		-- 0x8C to memory end - Message
 		variable next_addr : unsigned(WORD_SIZE - 1 downto 0) := (others => '0');
 
-		variable md5result, md5expected : unsigned(127 downto 0) := (others => '0');
+		variable md5result, md5expected       : unsigned(127 downto 0) := (others => '0');
+		variable sha1result, sha1expected     : unsigned(159 downto 0) := (others => '0');
+		variable sha256result, sha256expected : unsigned(255 downto 0) := (others => '0');
+		variable sha512result, sha512expected : unsigned(511 downto 0) := (others => '0');
 
 		variable message_len : integer;
 
@@ -81,12 +84,33 @@ BEGIN
 
 		----------- Load the SHA1 expected result -----------
 		readline(input_file, line);
+		for i in 0 to 4 loop
+			read(line, byte1);
+			read(line, byte2);
+			read(line, byte3);
+			read(line, byte4);
+			sha1expected(159 - (i * 32) downto 128 - (i * 32)) := to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8);
+		end loop;
 
 		----------- Load the SHA256 expected result -----------
 		readline(input_file, line);
+		for i in 0 to 7 loop
+			read(line, byte1);
+			read(line, byte2);
+			read(line, byte3);
+			read(line, byte4);
+			sha256expected(255 - (i * 32) downto 224 - (i * 32)) := to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8);
+		end loop;
 
 		----------- Load the SHA512 expected result -----------
 		readline(input_file, line);
+		for i in 0 to 15 loop
+			read(line, byte1);
+			read(line, byte2);
+			read(line, byte3);
+			read(line, byte4);
+			sha512expected(511 - (i * 32) downto 480 - (i * 32)) := to_unsigned(byte1, 8) & to_unsigned(byte2, 8) & to_unsigned(byte3, 8) & to_unsigned(byte4, 8);
+		end loop;
 
 		----------- Write the message length to the memory -----------
 		next_addr := to_unsigned(34, WORD_SIZE); -- Addr 0x88
@@ -151,83 +175,47 @@ BEGIN
 
 		check_equal(md5result, md5expected, "MD5 fail");
 
-		----------- Write the message to the memory -----------
+		----------- Check the sha1 results -----------
+		for i in 0 to 4 loop
+			address_b <= std_logic_vector(next_addr(7 downto 0));
 
-		--		----------- Write the message size to the memory -----------
-		--		next_addr := to_unsigned(22, WSIZE); -- Address 0x88
-		--		wren_b    <= '1';
-		--		address_b <= std_logic_vector(next_addr(7 downto 0));
-		--		data_b    <= std_logic_vector(to_unsigned(message_len, WSIZE));
-		--		wait until rising_edge(clk);
-		--		next_addr := next_addr + 1;
-		--
-		--		----------- Write the message to the memory -----------
-		--		for i in 0 to message_decoded'length - 1 loop
-		--			wren_b    <= '1';
-		--			address_b <= std_logic_vector(next_addr(7 downto 0));
-		--			data_b    <= std_logic_vector(to_unsigned(message_decoded(i), WSIZE));
-		--			wait until rising_edge(clk);
-		--			next_addr := next_addr + 1;
-		--		end loop;
-		--
-		--		----------- Make the RISC-V start calculating the hash -----------
-		--		wren_b    <= '1';
-		--		address_b <= (others => '0');
-		--		data_b    <= std_logic_vector(to_unsigned(1, WSIZE));
-		--		wait until rising_edge(clk);
-		--
-		--		----------- Wait the RISC-V complete the calculation -----------
-		--		wren_b    <= '0';
-		--		address_b <= (others => '0');
-		--		wait until q_b = std_logic_vector(to_unsigned(3, WSIZE));
-		--
-		--		----------- Check the md5 results -----------
-		--		next_addr := to_unsigned(1, WSIZE);
-		--
-		--		for i in 0 to 3 loop
-		--			address_b <= (others => '0');
-		--
-		--			wait until rising_edge(clk);
-		--
-		--			md5result(127 - (i * 32) downto 96 - (i * 32)) := unsigned(q_b);
-		--
-		--			next_addr := next_addr + 1;
-		--		end loop;
+			wait until rising_edge(clk);
 
-		-- Check the sha1 results
+			sha1result(159 - (i * 32) downto 128 - (i * 32)) := unsigned(q_b);
 
-		-- Check the sha256 results
+			next_addr := next_addr + 1;
+		end loop;
 
-		-- Check the sha512 results
+		check_equal(sha1result, sha1expected, "SHA1 fail");
+		
+		----------- Check the sha256 results -----------
+		for i in 0 to 7 loop
+			address_b <= std_logic_vector(next_addr(7 downto 0));
+
+			wait until rising_edge(clk);
+
+			sha256result(255 - (i * 32) downto 224 - (i * 32)) := unsigned(q_b);
+
+			next_addr := next_addr + 1;
+		end loop;
+
+		check_equal(sha256result, sha256expected, "SHA256 fail");
+		
+		----------- Check the sha512 results -----------
+		for i in 0 to 15 loop
+			address_b <= std_logic_vector(next_addr(7 downto 0));
+
+			wait until rising_edge(clk);
+
+			sha512result(511 - (i * 32) downto 480 - (i * 32)) := unsigned(q_b);
+
+			next_addr := next_addr + 1;
+		end loop;
+
+		check_equal(sha512result, sha512expected, "SHA512 fail");
 
 		test_runner_cleanup(runner);
 		wait;
 	END PROCESS;
-
-	--	watch_changes : PROCESS(clk)
-	--		alias register_write_enable is <<signal riscv.stage_ID_inst.registers.write_enable : std_logic>>;
-	--		alias register_rd is <<signal riscv.stage_ID_inst.registers.rd : std_logic_vector(4 downto 0)>>;
-	--		alias register_write_data is <<signal riscv.stage_ID_inst.registers.write_data : std_logic_vector(WSIZE - 1 downto 0)>>;
-	--
-	--		alias memory_write_enable is <<signal riscv.stage_MEM_inst.wren_memory_in : std_logic>>;
-	--		alias memory_address is <<signal riscv.stage_MEM_inst.ALU_Z : std_logic_vector(WSIZE - 1 downto 0)>>;
-	--		alias r2_in is <<signal riscv.stage_MEM_inst.r2_in : std_logic_vector(WSIZE - 1 downto 0)>>;
-	--		
-	--	BEGIN
-	--		-- Watch changes in the registers
-	--		if rising_edge(clk) and register_write_enable = '1' and unsigned(register_rd) /= 0 then
-	--			write(row, to_string(register_rd), right);
-	--			write(row, " " & to_string(register_write_data));
-	--			writeline(register_changes, row);
-	--		end if;
-	--
-	--		-- Watch changes in the memory
-	--		if rising_edge(clk) and memory_write_enable = '1' then
-	--			report (to_string(memory_address));
-	--			write(row, to_string(memory_address), right);
-	--			write(row, " " & to_string(r2_in));
-	--			writeline(memory_changes, row);
-	--		end if;
-	--	END PROCESS;
 
 END coprocessor_integration_tb_arch;

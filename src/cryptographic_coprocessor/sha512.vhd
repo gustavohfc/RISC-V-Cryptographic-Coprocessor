@@ -212,7 +212,7 @@ begin
 	is_complete           <= '1' when state = hash_complete else '0';
 
 	fsm : process(clk, start_new_hash)
-		variable input_first_bit : natural range 0 to 960;
+		variable input_first_bit : natural range 0 to 992;
 		variable W_t_first_bit   : natural range 0 to 5056;
 		variable W_t, T1         : unsigned(63 downto 0);
 	begin
