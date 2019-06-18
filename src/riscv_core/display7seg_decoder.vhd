@@ -3,14 +3,14 @@ use IEEE.std_logic_1164.all;
 
 entity display7seg_decoder is
 	port(
-		input : in  std_logic_vector(3 downto 0);
-		output   : out std_logic_vector(7 downto 0)
+		input  : in  std_logic_vector(3 downto 0);
+		output : out std_logic_vector(7 downto 0)
 	);
 end display7seg_decoder;
 
 architecture display7seg_decoder_arch of display7seg_decoder is
 begin
-	-- oito bits, sendo o ultimo o ponto decimal, que deve estar sempre desativado
+
 	with input select output <=
 		"11000000" when "0000",
 		"11111001" when "0001",

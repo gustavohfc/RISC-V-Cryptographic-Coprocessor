@@ -47,10 +47,10 @@ BEGIN
 	main : PROCESS
 		-- The memory mapping is as follows:
 		-- 0x0 - Used for communication between the testbench or the UART module with the RISC-V program
-		-- 0x4 to 0x16 - MD5 resul
-		-- 0x14 to 0x24 - SHA1 resul
-		-- 0x28 to 0x44 - SHA256 resul
-		-- 0x48 to 0x84 - SHA512 resul
+		-- 0x4 to 0x16 - MD5 result
+		-- 0x14 to 0x24 - SHA1 result
+		-- 0x28 to 0x44 - SHA256 result
+		-- 0x48 to 0x84 - SHA512 result
 		-- 0x88 - Message length
 		-- 0x8C to memory end - Message
 		variable next_addr : unsigned(WORD_SIZE - 1 downto 0) := (others => '0');

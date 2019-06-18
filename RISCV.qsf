@@ -46,19 +46,11 @@ set_location_assignment PIN_Y2 -to clk50
 #============================================================
 # KEY
 #============================================================
-set_location_assignment PIN_M23 -to clk_key
 
 #============================================================
 # SW
 #============================================================
-set_location_assignment PIN_AB28 -to reg_number[0]
-set_location_assignment PIN_AC28 -to reg_number[1]
-set_location_assignment PIN_AC27 -to reg_number[2]
-set_location_assignment PIN_AD27 -to reg_number[3]
-set_location_assignment PIN_AB27 -to reg_number[4]
 
-set_location_assignment PIN_Y24 -to MUX_FPGA_select[0]
-set_location_assignment PIN_Y23 -to MUX_FPGA_select[1]
 
 
 #============================================================
@@ -195,4 +187,40 @@ set_global_assignment -name QIP_FILE src/riscv_core/data_memory.qip
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
 set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_location_assignment PIN_G19 -to ledr[0]
+set_location_assignment PIN_F19 -to ledr[1]
+set_location_assignment PIN_E19 -to ledr[2]
+set_location_assignment PIN_F21 -to ledr[3]
+set_location_assignment PIN_F18 -to ledr[4]
+set_location_assignment PIN_E18 -to ledr[5]
+set_location_assignment PIN_J19 -to ledr[6]
+set_location_assignment PIN_H19 -to ledr[7]
+set_location_assignment PIN_J17 -to ledr[8]
+set_location_assignment PIN_G17 -to ledr[9]
+set_location_assignment PIN_J15 -to ledr[10]
+set_location_assignment PIN_H16 -to ledr[11]
+set_location_assignment PIN_J16 -to ledr[12]
+set_location_assignment PIN_H17 -to ledr[13]
+set_location_assignment PIN_F15 -to ledr[14]
+set_location_assignment PIN_G15 -to ledr[15]
+set_location_assignment PIN_G16 -to ledr[16]
+set_location_assignment PIN_H15 -to ledr[17]
+set_location_assignment PIN_AB28 -to sw[0]
+set_location_assignment PIN_AC28 -to sw[1]
+set_location_assignment PIN_AC27 -to sw[2]
+set_location_assignment PIN_AD27 -to sw[3]
+set_location_assignment PIN_AB27 -to sw[4]
+set_location_assignment PIN_AC26 -to sw[5]
+set_location_assignment PIN_AD26 -to sw[6]
+set_location_assignment PIN_AB26 -to sw[7]
+set_location_assignment PIN_AC25 -to sw[8]
+set_location_assignment PIN_AB25 -to sw[9]
+set_location_assignment PIN_AC24 -to sw[10]
+set_location_assignment PIN_AB24 -to sw[11]
+set_location_assignment PIN_AB23 -to sw[12]
+set_location_assignment PIN_AA24 -to sw[13]
+set_location_assignment PIN_AA23 -to sw[14]
+set_location_assignment PIN_AA22 -to sw[15]
+set_location_assignment PIN_Y24 -to sw[16]
+set_location_assignment PIN_Y23 -to sw[17]
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
