@@ -249,6 +249,7 @@ if __name__ == "__main__":
         tb.add_config("fibonacci", generics=dict(WSIZE=32, test_name="fibonacci", PC_max=60), post_check=make_integration_post_check(vu, "fibonacci"))
         tb.add_config("binary_search", generics=dict(WSIZE=32, test_name="binary_search", PC_max=180), post_check=make_integration_post_check(vu, "binary_search"))
         tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=108), post_check=make_integration_post_check(vu, "branches"))
+        tb.add_config("md5_gcc", generics=dict(WSIZE=32, test_name="md5_gcc", PC_max=8248), post_check=make_integration_post_check(vu, "md5_gcc"))
 
     # Add the coprocessor integration tests
     if runAllTests or args.coprocessor_integration:
