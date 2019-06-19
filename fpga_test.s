@@ -8,6 +8,7 @@
 	MESSAGE:	.byte 67 83 73 82 00 00 86 45 # RISC-V
 
 .text
+nop
 
 ################################################################## MD5
 	la t0, MESSAGE_LEN
@@ -219,3 +220,5 @@ SHA512_DIGEST_LOOP:
 FINISH:
 	li t0, 3
 	sw t0, 0(zero)
+	
+END: j END

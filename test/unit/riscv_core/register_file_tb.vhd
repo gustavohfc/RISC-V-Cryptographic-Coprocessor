@@ -43,7 +43,6 @@ BEGIN
 	clk <= not clk after 10 ps;
 
 	main : PROCESS
-		alias registers is <<signal register_file.registers : ARRAY_32X32>>;
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 

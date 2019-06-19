@@ -22,6 +22,8 @@ end entity riscv_coprocessor_fpga_top;
 
 architecture riscv_coprocessor_fpga_top_arch of riscv_coprocessor_fpga_top is
 
+	signal clk25 : std_logic := '0';
+
 	signal memory_word_addr : std_logic_vector(7 downto 0)  := (others => '0');
 	signal memory_data_in   : std_logic_vector(31 downto 0) := (others => '0');
 	signal memory_wren      : std_logic                     := '0';
@@ -33,6 +35,13 @@ architecture riscv_coprocessor_fpga_top_arch of riscv_coprocessor_fpga_top is
 begin
 
 	ledr <= sw;
+
+	clk_divider : process(clk50) is
+	begin
+		if rising_edge(clk50) then
+			clk25 <= not clk25;
+		end if;
+	end process;
 
 	HEX_7 : entity work.display7seg_decoder
 		port map(memory_output(31 downto 28), hex7);
@@ -53,7 +62,7 @@ begin
 
 	riscv : entity work.riscv_coprocessor_top
 		port map(
-			clk              => clk50,
+			clk              => clk25,
 			memory_word_addr => memory_word_addr,
 			memory_data_in   => memory_data_in,
 			memory_wren      => memory_wren,
