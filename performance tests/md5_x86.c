@@ -26,7 +26,7 @@ documentation and/or software.
 
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
+#include <stdint.h>
 
 #ifndef PROTOTYPES
 #define PROTOTYPES 0
@@ -345,9 +345,15 @@ static void MD5_memset(POINTER output, int value, unsigned int len) {
         ((char *)output)[i] = (char)value;
 }
 
+uint64_t rdtsc() {
+    unsigned int lo, hi;
+    __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
+    return ((uint64_t)hi << 32) | lo;
+}
+
 int main() {
 
-    long start_clock = clock();
+    long start_clock = rdtsc();
 
     char *message = "abc";
 
@@ -364,10 +370,9 @@ int main() {
     MD5Update(&context, message, len);
     MD5Final(digest, &context);
 
-    long end_clock = clock();
+    long end_clock = rdtsc();
 
     printf("Start clock: %ld\n", start_clock);
-    printf("End clock: %ld\n", start_clock);
-    printf("Elapsed clocks: %ld\n", start_clock);
-    printf("Clocks per sec: %ld\n", CLOCKS_PER_SEC);
+    printf("End clock: %ld\n", end_clock);
+    printf("Elapsed clocks: %ld\n", end_clock - start_clock);
 }
