@@ -350,7 +350,7 @@ static void MD5_memset(POINTER output, int value, unsigned int len) {
 }
 
 int main() {
-  char* message = "abc";
+    char* message = "abc";
 
     MD5_CTX context;
     unsigned char digest[16];
