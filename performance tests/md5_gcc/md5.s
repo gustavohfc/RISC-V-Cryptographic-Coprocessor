@@ -2117,6 +2117,6 @@ main:
 	lw	ra,124(sp)
 	lw	s0,120(sp)
 	addi	sp,sp,128
-	jr	ra, 0
+	#jr	ra, 0
 	.size	main, .-main
 	.ident	"GCC: (GNU) 8.3.0"
