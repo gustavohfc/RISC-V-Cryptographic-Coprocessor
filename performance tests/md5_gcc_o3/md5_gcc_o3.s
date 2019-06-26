@@ -1,8 +1,17 @@
+.data
+.LANCHOR0:
+
+.text
 	.file	"md5_gcc.c"
 	.option nopic
 	.text
-	.align	2
-	.type	MD5Transform, @function
+#	.align	2
+#	.type	MD5Transform, @function
+
+
+	j main
+
+
 MD5Transform:
 	addi	sp,sp,-48
 	sw	s0,44(sp)
@@ -961,11 +970,11 @@ MD5Transform:
 	lw	s10,4(sp)
 	lw	s11,0(sp)
 	addi	sp,sp,48
-	jr	ra
+#	jr	ra, 0
 	.size	MD5Transform, .-MD5Transform
-	.align	2
+#	.align	2
 	.globl	MD5Init
-	.type	MD5Init, @function
+#	.type	MD5Init, @function
 MD5Init:
 	li	a5,1732583424
 	addi	a5,a5,769
@@ -983,9 +992,9 @@ MD5Init:
 	sw	a5,12(a0)
 	ret
 	.size	MD5Init, .-MD5Init
-	.align	2
+#	.align	2
 	.globl	MD5Update
-	.type	MD5Update, @function
+#	.type	MD5Update, @function
 MD5Update:
 	addi	sp,sp,-32
 	sw	s5,4(sp)
@@ -1186,7 +1195,7 @@ MD5Update:
 	lw	s4,8(sp)
 	lw	s5,4(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 .L8:
 	mv	a5,s3
 	add	a3,s0,s3
@@ -1214,9 +1223,9 @@ MD5Update:
 	mv	a5,s0
 	j	.L7
 	.size	MD5Update, .-MD5Update
-	.align	2
+#	.align	2
 	.globl	MD5Final
-	.type	MD5Final, @function
+#	.type	MD5Final, @function
 MD5Final:
 	lw	a5,16(a1)
 	lw	a3,20(a1)
@@ -1235,9 +1244,12 @@ MD5Final:
 	li	a5,56
 	sub	a2,a5,a2
 .L44:
-	lui	a1,%hi(.LANCHOR0)
+	#lui	a1,%hi(.LANCHOR0)
 	mv	a0,s0
-	addi	a1,a1,%lo(.LANCHOR0)
+	#addi	a1,a1,%lo(.LANCHOR0)
+	
+	la a1, .LANCHOR0
+	
 	call	MD5Update
 	addi	a1,sp,8
 	mv	a0,s0
@@ -1286,20 +1298,23 @@ MD5Final:
 	lw	s0,24(sp)
 	lw	s1,20(sp)
 	addi	sp,sp,32
-	tail	memset
+#	tail	memset
 .L43:
 	li	a5,120
 	sub	a2,a5,a2
 	j	.L44
 	.size	MD5Final, .-MD5Final
-	.section	.text.startup,"ax",@progbits
-	.align	2
+#	.section	.text.startup,"ax",@progbits
+#	.align	2
 	.globl	main
-	.type	main, @function
+#	.type	main, @function
 main:
-	lui	a1,%hi(.LC0)
+	#lui	a1,%hi(.LC0)
 	addi	sp,sp,-128
-	addi	a5,a1,%lo(.LC0)
+	#addi	a5,a1,%lo(.LC0)
+	
+	la a5, .LC0
+	
 	li	a3,1
 	sw	ra,124(sp)
 	sub	a3,a3,a5
@@ -1320,7 +1335,10 @@ main:
 	li	a5,271732736
 	addi	a0,sp,24
 	addi	a5,a5,1142
-	addi	a1,a1,%lo(.LC0)
+	
+	#addi	a1,a1,%lo(.LC0)
+	la a1, .LC0 # TODO: Is this correct?
+	
 	sw	a5,36(sp)
 	sw	zero,44(sp)
 	sw	zero,40(sp)
@@ -1331,12 +1349,12 @@ main:
 	lw	ra,124(sp)
 	li	a0,0
 	addi	sp,sp,128
-	jr	ra
+	jr	ra, 0
 	.size	main, .-main
 	.data
 	.align	2
-	.set	.LANCHOR0,. + 0
-	.type	PADDING, @object
+#	.set	.LANCHOR0,. + 0
+#	.type	PADDING, @object
 	.size	PADDING, 64
 PADDING:
 	.byte	-128
@@ -1403,7 +1421,7 @@ PADDING:
 	.byte	0
 	.byte	0
 	.byte	0
-	.section	.rodata.str1.4,"aMS",@progbits,1
+#	.section	.rodata.str1.4,"aMS",@progbits,1
 	.align	2
 .LC0:
 	.string	"abc"
