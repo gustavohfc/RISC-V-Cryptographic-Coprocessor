@@ -251,6 +251,8 @@ if __name__ == "__main__":
         tb.add_config("branches", generics=dict(WSIZE=32, test_name="branches", PC_max=108), post_check=make_integration_post_check(vu, "branches"))
         tb.add_config("loop", generics=dict(WSIZE=32, test_name="loop", PC_max=52), post_check=make_integration_post_check(vu, "loop"))
 
+        tb.add_config("perf", generics=dict(WSIZE=32, test_name="sha512", PC_max=200), post_check=make_integration_post_check(vu, "perf"))
+
     # Add the coprocessor integration tests
     if runAllTests or args.coprocessor_integration:
         lib.add_source_files(join(root, "integration", "cryptographic_coprocessor", "coprocessor_integration_tb.vhd"))

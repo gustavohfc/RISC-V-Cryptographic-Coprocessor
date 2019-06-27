@@ -30,7 +30,7 @@ ARCHITECTURE integration_tb_arch OF integration_tb IS
 	signal coprocessor_output : std_logic_vector(31 downto 0) := (others => '0');
 
 BEGIN
-	riscv : entity work.riscv_core
+	riscv : entity work.riscv_coprocessor_top
 		generic map(
 			WSIZE                  => WSIZE,
 			instructions_init_file => test_name & "_instructions.hex",
@@ -41,14 +41,13 @@ BEGIN
 			clk                => clk,
 			memory_word_addr   => memory_word_addr,
 			memory_data_in     => memory_data_in,
-			memory_wren        => memory_wren,
-			coprocessor_output => coprocessor_output
+			memory_wren        => memory_wren
 		);
 
 	clk <= not clk after clk_period / 2 when stop = '0' else '0';
 
 	main : PROCESS
-		alias PC is <<signal riscv.PC_IF_ID : std_logic_vector(WORD_SIZE - 1 downto 0)>>;
+		alias PC is <<signal riscv.core.PC_IF_ID : std_logic_vector(WORD_SIZE - 1 downto 0)>>;
 	BEGIN
 		test_runner_setup(runner, runner_cfg);
 
@@ -63,13 +62,13 @@ BEGIN
 		file memory_changes   : text open write_mode is test_name & "_memory_changes.txt";
 		variable row          : line;
 
-		alias register_write_enable is <<signal riscv.stage_ID_inst.registers.write_enable : std_logic>>;
-		alias register_rd is <<signal riscv.stage_ID_inst.registers.rd : std_logic_vector(4 downto 0)>>;
-		alias register_write_data is <<signal riscv.stage_ID_inst.registers.write_data : std_logic_vector(WSIZE - 1 downto 0)>>;
+		alias register_write_enable is <<signal riscv.core.stage_ID_inst.registers.write_enable : std_logic>>;
+		alias register_rd is <<signal riscv.core.stage_ID_inst.registers.rd : std_logic_vector(4 downto 0)>>;
+		alias register_write_data is <<signal riscv.core.stage_ID_inst.registers.write_data : std_logic_vector(WSIZE - 1 downto 0)>>;
 
-		alias memory_write_enable is <<signal riscv.stage_MEM_inst.wren_memory_in : std_logic>>;
-		alias memory_address is <<signal riscv.stage_MEM_inst.ALU_Z : std_logic_vector(WSIZE - 1 downto 0)>>;
-		alias r2_in is <<signal riscv.stage_MEM_inst.r2_in : std_logic_vector(WSIZE - 1 downto 0)>>;
+		alias memory_write_enable is <<signal riscv.core.stage_MEM_inst.wren_memory_in : std_logic>>;
+		alias memory_address is <<signal riscv.core.stage_MEM_inst.ALU_Z : std_logic_vector(WSIZE - 1 downto 0)>>;
+		alias r2_in is <<signal riscv.core.stage_MEM_inst.r2_in : std_logic_vector(WSIZE - 1 downto 0)>>;
 
 	BEGIN
 		-- Watch changes in the registers
