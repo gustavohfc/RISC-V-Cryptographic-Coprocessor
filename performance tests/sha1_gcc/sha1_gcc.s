@@ -1,9 +1,41 @@
 .data
-
 addTemp: .word 0
 
-.text
+.LC0:
+	.string	"abc"
 	
+masks.1619:
+	.byte	0
+	.byte	-128
+	.byte	-64
+	.byte	-32
+	.byte	-16
+	.byte	-8
+	.byte	-4
+	.byte	-2
+	.align	2
+#	.type	markbit.1620, @object
+	.size	markbit.1620, 8
+markbit.1620:
+	.byte	-128
+	.byte	64
+	.byte	32
+	.byte	16
+	.byte	8
+	.byte	4
+	.byte	2
+	.byte	1
+	.section	.rodata
+	.align	2
+#	.type	K.1632, @object
+	.size	K.1632, 16
+K.1632:
+	.word	1518500249
+	.word	1859775393
+	.word	-1894007588
+	.word	-899497514
+	.ident	"GCC: (GNU) 8.3.0"
+		
 	.file	"sha1_gcc.c"
 	.option nopic
 	.text
@@ -12,6 +44,11 @@ addTemp: .word 0
 #	.align	2
 	.globl	SHA1Reset
 #	.type	SHA1Reset, @function
+
+
+	j main
+	
+
 SHA1Reset:
 	addi	sp,sp,-32
 	sw	s0,28(sp)
@@ -139,7 +176,7 @@ SHA1Input:
 #	lw	a5,%lo(addTemp)(a5)
 
 	la a5, addTemp
-	sw a5, 0(a5)
+	lw a5, 0(a5)
 
 	bgeu	a4,a5,.L12
 	lw	a5,-20(s0)
@@ -255,7 +292,7 @@ SHA1FinalBits:
 #	lw	a5,%lo(addTemp)(a5)
 	
 	la a5, addTemp
-	sw a5, 0(a5)
+	lw a5, 0(a5)
 	
 	bgeu	a4,a5,.L24
 	lw	a5,-20(s0)
@@ -275,10 +312,10 @@ SHA1FinalBits:
 .L26:
 	lw	a4,-20(s0)
 	sw	a5,100(a4)
-	lui	a5,%hi(masks.1619)
-	addi	a4,a5,%lo(masks.1619)
+#	lui	a5,%hi(masks.1619)
+#	addi	a4,a5,%lo(masks.1619)
 	
-	la a4 
+	la a4, masks.1619
 	
 	lw	a5,-28(s0)
 	add	a5,a4,a5
@@ -286,8 +323,11 @@ SHA1FinalBits:
 	lbu	a5,-21(s0)
 	and	a5,a4,a5
 	andi	a4,a5,0xff
-	lui	a5,%hi(markbit.1620)
-	addi	a3,a5,%lo(markbit.1620)
+#	lui	a5,%hi(markbit.1620)
+#	addi	a3,a5,%lo(markbit.1620)
+	
+	la a3, markbit.1620
+	
 	lw	a5,-28(s0)
 	add	a5,a3,a5
 	lbu	a5,0(a5)
@@ -303,9 +343,9 @@ SHA1FinalBits:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA1FinalBits, .-SHA1FinalBits
-	.align	2
+#	.align	2
 	.globl	SHA1Result
 #	.type	SHA1Result, @function
 SHA1Result:
@@ -371,9 +411,9 @@ SHA1Result:
 	lw	ra,44(sp)
 	lw	s0,40(sp)
 	addi	sp,sp,48
-	jr	ra
+	jr	ra, 0
 	.size	SHA1Result, .-SHA1Result
-	.align	2
+#	.align	2
 #	.type	SHA1ProcessMessageBlock, @function
 SHA1ProcessMessageBlock:
 	addi	sp,sp,-384
@@ -539,8 +579,13 @@ SHA1ProcessMessageBlock:
 	add	a5,a3,a5
 	lw	a5,-348(a5)
 	add	a4,a4,a5
-	lui	a5,%hi(K.1632)
-	lw	a5,%lo(K.1632)(a5)
+#	lui	a5,%hi(K.1632)
+#	lw	a5,%lo(K.1632)(a5)
+
+	la a5, K.1632
+	lw a5, 0(a5)
+	
+	
 	add	a5,a4,a5
 	sw	a5,-44(s0)
 	lw	a5,-36(s0)
@@ -585,8 +630,11 @@ SHA1ProcessMessageBlock:
 	add	a5,a3,a5
 	lw	a5,-348(a5)
 	add	a4,a4,a5
-	lui	a5,%hi(K.1632)
-	addi	a5,a5,%lo(K.1632)
+#	lui	a5,%hi(K.1632)
+#	addi	a5,a5,%lo(K.1632)
+	
+	la a5, K.1632
+	
 	lw	a5,4(a5)
 	add	a5,a4,a5
 	sw	a5,-44(s0)
@@ -636,8 +684,11 @@ SHA1ProcessMessageBlock:
 	add	a5,a3,a5
 	lw	a5,-348(a5)
 	add	a4,a4,a5
-	lui	a5,%hi(K.1632)
-	addi	a5,a5,%lo(K.1632)
+#	lui	a5,%hi(K.1632)
+#	addi	a5,a5,%lo(K.1632)
+	
+	la a5, K.1632
+	
 	lw	a5,8(a5)
 	add	a5,a4,a5
 	sw	a5,-44(s0)
@@ -683,8 +734,11 @@ SHA1ProcessMessageBlock:
 	add	a5,a3,a5
 	lw	a5,-348(a5)
 	add	a4,a4,a5
-	lui	a5,%hi(K.1632)
-	addi	a5,a5,%lo(K.1632)
+#	lui	a5,%hi(K.1632)
+#	addi	a5,a5,%lo(K.1632)
+	
+	la a5, K.1632
+	
 	lw	a5,12(a5)
 	add	a5,a4,a5
 	sw	a5,-44(s0)
@@ -743,9 +797,9 @@ SHA1ProcessMessageBlock:
 	nop
 	lw	s0,380(sp)
 	addi	sp,sp,384
-	jr	ra
+	jr	ra, 0
 	.size	SHA1ProcessMessageBlock, .-SHA1ProcessMessageBlock
-	.align	2
+#	.align	2
 #	.type	SHA1Finalize, @function
 SHA1Finalize:
 	addi	sp,sp,-48
@@ -784,9 +838,9 @@ SHA1Finalize:
 	lw	ra,44(sp)
 	lw	s0,40(sp)
 	addi	sp,sp,48
-	jr	ra
+	jr	ra, 0
 	.size	SHA1Finalize, .-SHA1Finalize
-	.align	2
+#	.align	2
 #	.type	SHA1PadMessage, @function
 SHA1PadMessage:
 	addi	sp,sp,-32
@@ -932,14 +986,12 @@ SHA1PadMessage:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA1PadMessage, .-SHA1PadMessage
 	.section	.rodata
-	.align	2
-.LC0:
-	.string	"abc"
-	.text
-	.align	2
+#	.align	2
+
+#	.align	2
 	.globl	main
 #	.type	main, @function
 main:
@@ -949,8 +1001,11 @@ main:
 	addi	s0,sp,176
 	sw	a0,-164(s0)
 	sw	a1,-168(s0)
-	lui	a5,%hi(.LC0)
-	addi	a5,a5,%lo(.LC0)
+#	lui	a5,%hi(.LC0)
+#	addi	a5,a5,%lo(.LC0)
+	
+	la a5, .LC0
+	
 	sw	a5,-24(s0)
 	sw	zero,-20(s0)
 	j	.L59
@@ -982,40 +1037,9 @@ main:
 	lw	ra,172(sp)
 	lw	s0,168(sp)
 	addi	sp,sp,176
-	jr	ra
+#	jr	ra, 0
 	.size	main, .-main
 	.section	.sdata,"aw"
-	.align	2
+#	.align	2
 #	.type	masks.1619, @object
 	.size	masks.1619, 8
-masks.1619:
-	.byte	0
-	.byte	-128
-	.byte	-64
-	.byte	-32
-	.byte	-16
-	.byte	-8
-	.byte	-4
-	.byte	-2
-	.align	2
-#	.type	markbit.1620, @object
-	.size	markbit.1620, 8
-markbit.1620:
-	.byte	-128
-	.byte	64
-	.byte	32
-	.byte	16
-	.byte	8
-	.byte	4
-	.byte	2
-	.byte	1
-	.section	.rodata
-	.align	2
-#	.type	K.1632, @object
-	.size	K.1632, 16
-K.1632:
-	.word	1518500249
-	.word	1859775393
-	.word	-1894007588
-	.word	-899497514
-	.ident	"GCC: (GNU) 8.3.0"
