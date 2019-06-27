@@ -1,4 +1,5 @@
 .data
+
 addTemp: .word 0
 
 .LC0:

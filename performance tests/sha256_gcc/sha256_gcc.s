@@ -1,3 +1,106 @@
+.data
+
+addTemp: .word 0
+
+.LC0:
+	.string	"abc"
+	
+	
+masks.1628:
+	.byte	0
+	.byte	-128
+	.byte	-64
+	.byte	-32
+	.byte	-16
+	.byte	-8
+	.byte	-4
+	.byte	-2
+	.align	2
+#	.type	markbit.1629, @object
+	.size	markbit.1629, 8
+markbit.1629:
+	.byte	-128
+	.byte	64
+	.byte	32
+	.byte	16
+	.byte	8
+	.byte	4
+	.byte	2
+	.byte	1
+	.section	.rodata
+	.align	2
+#	.type	K.1641, @object
+	.size	K.1641, 256
+K.1641:
+	.word	1116352408
+	.word	1899447441
+	.word	-1245643825
+	.word	-373957723
+	.word	961987163
+	.word	1508970993
+	.word	-1841331548
+	.word	-1424204075
+	.word	-670586216
+	.word	310598401
+	.word	607225278
+	.word	1426881987
+	.word	1925078388
+	.word	-2132889090
+	.word	-1680079193
+	.word	-1046744716
+	.word	-459576895
+	.word	-272742522
+	.word	264347078
+	.word	604807628
+	.word	770255983
+	.word	1249150122
+	.word	1555081692
+	.word	1996064986
+	.word	-1740746414
+	.word	-1473132947
+	.word	-1341970488
+	.word	-1084653625
+	.word	-958395405
+	.word	-710438585
+	.word	113926993
+	.word	338241895
+	.word	666307205
+	.word	773529912
+	.word	1294757372
+	.word	1396182291
+	.word	1695183700
+	.word	1986661051
+	.word	-2117940946
+	.word	-1838011259
+	.word	-1564481375
+	.word	-1474664885
+	.word	-1035236496
+	.word	-949202525
+	.word	-778901479
+	.word	-694614492
+	.word	-200395387
+	.word	275423344
+	.word	430227734
+	.word	506948616
+	.word	659060556
+	.word	883997877
+	.word	958139571
+	.word	1322822218
+	.word	1537002063
+	.word	1747873779
+	.word	1955562222
+	.word	2024104815
+	.word	-2067236844
+	.word	-1933114872
+	.word	-1866530822
+	.word	-1538233109
+	.word	-1090935817
+	.word	-965641998
+	.ident	"GCC: (GNU) 8.3.0"
+	
+	
+
+	
 	.file	"sha256_gcc.c"
 	.option nopic
 	.text
@@ -5,8 +108,9 @@
 	.comm	addTemp,4,4
 	.data
 	.align	2
-	.type	SHA224_H0, @object
+#	.type	SHA224_H0, @object
 	.size	SHA224_H0, 32
+	
 SHA224_H0:
 	.word	-1056596264
 	.word	914150663
@@ -16,8 +120,8 @@ SHA224_H0:
 	.word	1750603025
 	.word	1694076839
 	.word	-1090891868
-	.align	2
-	.type	SHA256_H0, @object
+#	.align	2
+#	.type	SHA256_H0, @object
 	.size	SHA256_H0, 32
 SHA256_H0:
 	.word	1779033703
@@ -29,17 +133,26 @@ SHA256_H0:
 	.word	528734635
 	.word	1541459225
 	.text
-	.align	2
+#	.align	2
 	.globl	SHA256Reset
-	.type	SHA256Reset, @function
+#	.type	SHA256Reset, @function
+
+
+
+	j main
+
+
 SHA256Reset:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
 	sw	s0,24(sp)
 	addi	s0,sp,32
 	sw	a0,-20(s0)
-	lui	a5,%hi(SHA256_H0)
-	addi	a1,a5,%lo(SHA256_H0)
+#	lui	a5,%hi(SHA256_H0)
+#	addi	a1,a5,%lo(SHA256_H0)
+	
+	la a1, SHA256_H0
+	
 	lw	a0,-20(s0)
 	call	SHA224_256Reset
 	mv	a5,a0
@@ -47,11 +160,11 @@ SHA256Reset:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA256Reset, .-SHA256Reset
-	.align	2
+#	.align	2
 	.globl	SHA256Input
-	.type	SHA256Input, @function
+#	.type	SHA256Input, @function
 SHA256Input:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
@@ -110,8 +223,12 @@ SHA256Input:
 	sb	a4,42(a5)
 	lw	a5,-20(s0)
 	lw	a4,36(a5)
-	lui	a5,%hi(addTemp)
-	sw	a4,%lo(addTemp)(a5)
+#	lui	a5,%hi(addTemp)
+#	sw	a4,%lo(addTemp)(a5)
+
+	la a5, addTemp
+	sw a4, 0(a5)
+	
 	lw	a5,-20(s0)
 	lw	a5,36(a5)
 	addi	a4,a5,8
@@ -119,8 +236,12 @@ SHA256Input:
 	sw	a4,36(a5)
 	lw	a5,-20(s0)
 	lw	a4,36(a5)
-	lui	a5,%hi(addTemp)
-	lw	a5,%lo(addTemp)(a5)
+#	lui	a5,%hi(addTemp)
+#	lw	a5,%lo(addTemp)(a5)
+	
+	la a5, addTemp
+	lw a5, 0(a5)
+	
 	bgeu	a4,a5,.L11
 	lw	a5,-20(s0)
 	lw	a5,32(a5)
@@ -164,11 +285,11 @@ SHA256Input:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA256Input, .-SHA256Input
-	.align	2
+#	.align	2
 	.globl	SHA256FinalBits
-	.type	SHA256FinalBits, @function
+#	.type	SHA256FinalBits, @function
 SHA256FinalBits:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
@@ -217,8 +338,12 @@ SHA256FinalBits:
 .L22:
 	lw	a5,-20(s0)
 	lw	a4,36(a5)
-	lui	a5,%hi(addTemp)
-	sw	a4,%lo(addTemp)(a5)
+#	lui	a5,%hi(addTemp)
+#	sw	a4,%lo(addTemp)(a5)
+	
+	la a5, addTemp
+	sw a4, 0(a5)
+	
 	lw	a5,-20(s0)
 	lw	a4,36(a5)
 	lw	a5,-28(s0)
@@ -227,8 +352,12 @@ SHA256FinalBits:
 	sw	a4,36(a5)
 	lw	a5,-20(s0)
 	lw	a4,36(a5)
-	lui	a5,%hi(addTemp)
-	lw	a5,%lo(addTemp)(a5)
+#	lui	a5,%hi(addTemp)
+#	lw	a5,%lo(addTemp)(a5)
+	
+	la a5, addTemp
+	lw a5, 0(a5)
+	
 	bgeu	a4,a5,.L23
 	lw	a5,-20(s0)
 	lw	a5,32(a5)
@@ -247,16 +376,22 @@ SHA256FinalBits:
 .L25:
 	lw	a4,-20(s0)
 	sw	a5,112(a4)
-	lui	a5,%hi(masks.1628)
-	addi	a4,a5,%lo(masks.1628)
+#	lui	a5,%hi(masks.1628)
+#	addi	a4,a5,%lo(masks.1628)
+	
+	la a4, masks.1628
+	
 	lw	a5,-28(s0)
 	add	a5,a4,a5
 	lbu	a4,0(a5)
 	lbu	a5,-21(s0)
 	and	a5,a4,a5
 	andi	a4,a5,0xff
-	lui	a5,%hi(markbit.1629)
-	addi	a3,a5,%lo(markbit.1629)
+#	lui	a5,%hi(markbit.1629)
+#	addi	a3,a5,%lo(markbit.1629)
+	
+	la a3, markbit.1629
+	
 	lw	a5,-28(s0)
 	add	a5,a3,a5
 	lbu	a5,0(a5)
@@ -272,11 +407,11 @@ SHA256FinalBits:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA256FinalBits, .-SHA256FinalBits
-	.align	2
+#	.align	2
 	.globl	SHA256Result
-	.type	SHA256Result, @function
+#	.type	SHA256Result, @function
 SHA256Result:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
@@ -293,10 +428,10 @@ SHA256Result:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA256Result, .-SHA256Result
-	.align	2
-	.type	SHA224_256Reset, @function
+#	.align	2
+#	.type	SHA224_256Reset, @function
 SHA224_256Reset:
 	addi	sp,sp,-32
 	sw	s0,28(sp)
@@ -357,10 +492,10 @@ SHA224_256Reset:
 	mv	a0,a5
 	lw	s0,28(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA224_256Reset, .-SHA224_256Reset
-	.align	2
-	.type	SHA224_256ProcessMessageBlock, @function
+#	.align	2
+#	.type	SHA224_256ProcessMessageBlock, @function
 SHA224_256ProcessMessageBlock:
 	addi	sp,sp,-336
 	sw	s0,332(sp)
@@ -548,10 +683,13 @@ SHA224_256ProcessMessageBlock:
 	and	a5,a2,a5
 	xor	a5,a3,a5
 	add	a4,a4,a5
-	lui	a5,%hi(K.1641)
+#	lui	a5,%hi(K.1641)
 	lw	a3,-20(s0)
 	slli	a3,a3,2
-	addi	a5,a5,%lo(K.1641)
+#	addi	a5,a5,%lo(K.1641)
+	
+	la a5, K.1641
+	
 	add	a5,a3,a5
 	lw	a5,0(a5)
 	add	a4,a4,a5
@@ -667,10 +805,10 @@ SHA224_256ProcessMessageBlock:
 	nop
 	lw	s0,332(sp)
 	addi	sp,sp,336
-	jr	ra
+	jr	ra, 0
 	.size	SHA224_256ProcessMessageBlock, .-SHA224_256ProcessMessageBlock
-	.align	2
-	.type	SHA224_256Finalize, @function
+#	.align	2
+#	.type	SHA224_256Finalize, @function
 SHA224_256Finalize:
 	addi	sp,sp,-48
 	sw	ra,44(sp)
@@ -708,10 +846,10 @@ SHA224_256Finalize:
 	lw	ra,44(sp)
 	lw	s0,40(sp)
 	addi	sp,sp,48
-	jr	ra
+	jr	ra, 0
 	.size	SHA224_256Finalize, .-SHA224_256Finalize
-	.align	2
-	.type	SHA224_256PadMessage, @function
+#	.align	2
+#	.type	SHA224_256PadMessage, @function
 SHA224_256PadMessage:
 	addi	sp,sp,-32
 	sw	ra,28(sp)
@@ -856,10 +994,10 @@ SHA224_256PadMessage:
 	lw	ra,28(sp)
 	lw	s0,24(sp)
 	addi	sp,sp,32
-	jr	ra
+	jr	ra, 0
 	.size	SHA224_256PadMessage, .-SHA224_256PadMessage
-	.align	2
-	.type	SHA224_256ResultN, @function
+#	.align	2
+#	.type	SHA224_256ResultN, @function
 SHA224_256ResultN:
 	addi	sp,sp,-48
 	sw	ra,44(sp)
@@ -924,16 +1062,16 @@ SHA224_256ResultN:
 	lw	ra,44(sp)
 	lw	s0,40(sp)
 	addi	sp,sp,48
-	jr	ra
+	jr	ra, 0
 	.size	SHA224_256ResultN, .-SHA224_256ResultN
 	.section	.rodata
-	.align	2
-.LC0:
-	.string	"abc"
-	.text
-	.align	2
+#	.align	2
+#.LC0:
+#	.string	"abc"
+#	.text
+#	.align	2
 	.globl	main
-	.type	main, @function
+#	.type	main, @function
 main:
 	addi	sp,sp,-192
 	sw	ra,188(sp)
@@ -941,8 +1079,11 @@ main:
 	addi	s0,sp,192
 	sw	a0,-180(s0)
 	sw	a1,-184(s0)
-	lui	a5,%hi(.LC0)
-	addi	a5,a5,%lo(.LC0)
+#	lui	a5,%hi(.LC0)
+#	addi	a5,a5,%lo(.LC0)
+	
+	la a5, .LC0
+	
 	sw	a5,-24(s0)
 	sw	zero,-20(s0)
 	j	.L57
@@ -974,100 +1115,10 @@ main:
 	lw	ra,188(sp)
 	lw	s0,184(sp)
 	addi	sp,sp,192
-	jr	ra
+	#jr	ra, 0
 	.size	main, .-main
 	.section	.sdata,"aw"
-	.align	2
-	.type	masks.1628, @object
-	.size	masks.1628, 8
-masks.1628:
-	.byte	0
-	.byte	-128
-	.byte	-64
-	.byte	-32
-	.byte	-16
-	.byte	-8
-	.byte	-4
-	.byte	-2
-	.align	2
-	.type	markbit.1629, @object
-	.size	markbit.1629, 8
-markbit.1629:
-	.byte	-128
-	.byte	64
-	.byte	32
-	.byte	16
-	.byte	8
-	.byte	4
-	.byte	2
-	.byte	1
-	.section	.rodata
-	.align	2
-	.type	K.1641, @object
-	.size	K.1641, 256
-K.1641:
-	.word	1116352408
-	.word	1899447441
-	.word	-1245643825
-	.word	-373957723
-	.word	961987163
-	.word	1508970993
-	.word	-1841331548
-	.word	-1424204075
-	.word	-670586216
-	.word	310598401
-	.word	607225278
-	.word	1426881987
-	.word	1925078388
-	.word	-2132889090
-	.word	-1680079193
-	.word	-1046744716
-	.word	-459576895
-	.word	-272742522
-	.word	264347078
-	.word	604807628
-	.word	770255983
-	.word	1249150122
-	.word	1555081692
-	.word	1996064986
-	.word	-1740746414
-	.word	-1473132947
-	.word	-1341970488
-	.word	-1084653625
-	.word	-958395405
-	.word	-710438585
-	.word	113926993
-	.word	338241895
-	.word	666307205
-	.word	773529912
-	.word	1294757372
-	.word	1396182291
-	.word	1695183700
-	.word	1986661051
-	.word	-2117940946
-	.word	-1838011259
-	.word	-1564481375
-	.word	-1474664885
-	.word	-1035236496
-	.word	-949202525
-	.word	-778901479
-	.word	-694614492
-	.word	-200395387
-	.word	275423344
-	.word	430227734
-	.word	506948616
-	.word	659060556
-	.word	883997877
-	.word	958139571
-	.word	1322822218
-	.word	1537002063
-	.word	1747873779
-	.word	1955562222
-	.word	2024104815
-	.word	-2067236844
-	.word	-1933114872
-	.word	-1866530822
-	.word	-1538233109
-	.word	-1090935817
-	.word	-965641998
-	.ident	"GCC: (GNU) 8.3.0"
+#	.align	2
+#	.type	masks.1628, @object
+#	.size	masks.1628, 8
+
